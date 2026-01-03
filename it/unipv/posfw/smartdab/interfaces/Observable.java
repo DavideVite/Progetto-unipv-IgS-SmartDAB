@@ -4,9 +4,7 @@ import java.util.EventObject;
 
 public interface Observable {
 
-	void addObserver(Observer observer);
-	
-	void removeObserver(Observer observer);
-	
-	void notifyObservers(Object args);
+	public void addObserver(Observer observer);
+	public void removeObserver(Observer observer);
+	public void notifyObservers(Object args);
 }
