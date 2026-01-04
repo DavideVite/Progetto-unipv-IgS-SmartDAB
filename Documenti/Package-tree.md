@@ -12,13 +12,13 @@ src/
 │   │   │   │
 │   │   │   ├── dispositivo/
 │   │   │   │   ├── Dispositivo.java
-│   │   │   │   ├── sensori/
+│   │   │   │   ├── sensori
 │   │   │   │   │   ├── Sensore.java        
 │   │   │   │   │   ├── SensorI.java
 │   │   │   │   │   └── SensorII.java
 │   │   │   │   └── attuatori/
 │   │   │   │       ├── Attuatore.java       
-│   │   │   │       ├── AttuatoreLocale.java
+│   │   │   │       ├── AttuatoreI.java
 │   │   │   │       └── AttuatoreII.java
 │   │   │   │
 │   │   │   ├── scenario/
@@ -34,56 +34,42 @@ src/
 │   │   ├── valueobject/                     
 │   │   │   ├── ParametroValue.java
 │   │   │   ├── Conflict.java
-│   │   │   ├── ObserverParameter.java
-│   │   │
+│   │   │   
 │   │   ├── enums/
-│   │   │   ├── CommunicationStatus.java     
+│   │   │   ├── Messaggio.java     
 │   │   │   ├── DeviceState.java             
 │   │   │   ├── ConflictType.java
 │   │   │   └── ScenarioState.java
 │   │   │
 │   │   └── exception/                       # Eccezioni di dominio
-│   │       ├── DomainException.java
-│   │       ├── ScenarioNotFoundException.java
-│   │       ├── ConflictException.java
-│   │       └── InvalidParameterException.java
-│   │
 │   |                          
-│   │── dto/                            
-│   │   ├── ScenarioDTO.java
-│   │   ├── ParametroDTO.java
-│   │   └── ConflictDTO.java
+│   │── beans/                            
+│   │   ├── ScenarioPOJO.java
+│   │   ├── ParametroPOJO.java
+│   │   ├── LogAzionePOJO.java
+│   │   └── ConflictPOJO.java
 │   │
-│   ├── service/                             # --- DOMAIN SERVICES ---
-│   │   │                                   
+│   ├── service/
+│   │   ├── GestoreStanze.java                            # --- DOMAIN SERVICES ---                                
 │   │   ├── ScenarioManager.java
 │   │   ├── ParametroManager.java
 │   │   ├── ConflictValidator.java
-│   │   │
 │   │   └── strategy/                        
-│   │       ├── TransitionStrategy.java      
-│   │       ├── ManualVideoStrategy.java
-│   │       ├── BruceSimulaStrategy.java
-│   │       └── EventBusStrategy.java
 │   │
 │   └── port/                                
 │       │
 │       ├── outbound/                       
-│       │   ├── repository/
-│       │   │   ├── IScenarioRepository.java
-│       │   │   ├── IParametroRepository.java
-│       │   │   └── ILogRepository.java
-│       │   │
-│       │   ├── registry/                    
-│       │   │   ├── IDeviceRegistry.java
-│       │   │   └── IStanzaRegistry.java
-│       │   │
-│       │   └── communication/
-│       │       └── ICommunicator.java
-│       │
-│       └── inbound/                         # Porte in entrata (driving) - opzionale
-│           ├── IScenarioService.java
-│           └── IParametroService.java
+│             ├── repository/
+│         │   ├── IScenarioRepository.java
+│         │   ├── IParametroRepository.java
+│         │   └── ILogRepository.java
+│         │
+│         ├── registry/                    
+│         │   ├── IDeviceRegistry.java
+│         │   └── IStanzaRegistry.java
+│         │
+│         └── communication/
+│             └── ICommunicator.java
 │
 ├── infrastructure/                          # === OUTER LAYER - Frameworks & Drivers ===
 │   │
@@ -91,17 +77,9 @@ src/
 │   │   │
 │   │   ├── mysql/
 │   │   │   ├── repository/
-│   │   │   │   ├── ScenarioRepositoryImpl.java
-│   │   │   │   ├── ParametroRepositoryImpl.java
-│   │   │   │   └── LogRepositoryImpl.java
-│   │   │   │
-│   │   │   ├── entity/                      # Entità JPA/database (se diverso da domain)
-│   │   │   │   ├── ScenarioEntity.java
-│   │   │   │   └── ParametroEntity.java
-│   │   │   │
-│   │   │   └── mapper/                      # Mapping Entity <-> Domain
-│   │   │       ├── ScenarioMapper.java
-│   │   │       └── ParametroMapper.java
+│   │   │          ├── ScenarioRepositoryImpl.java
+│   │   │          ├── ParametroRepositoryImpl.java
+│   │   │          └── LogRepositoryImpl.jav
 │   │   │
 │   │   ├── DatabaseConnection.java
 │   │   └── StoricoDatiImpl.java
@@ -121,41 +99,19 @@ src/
 │   │   │   ├── ParametroController.java
 │   │   │   └── StanzaController.java
 │   │   │
-│   │   ├── facade/                          # Facade Pattern
-│   │   │   ├── GestoreStanze.java
+│   │   ├── facade/                         
 │   │   │   └── SensoreFacade.java
 │   │   │   └── AttuatoreFacade.java
 │   │   │
-│   │   └── presenter/                       # Formattazione output
-│   │       ├── ScenarioPresenter.java
-│   │       └── ConflictPresenter.java
 │
-├── ui/                                      # === PRESENTATION LAYER ===
+├── Factory/                                  # === CONFIGURATION ===
 │   │
-│   └── view/
-│       ├── console/                         # CLI (se presente)
-│       │   └── ConsoleView.java
-│       │
-│       └── gui/                             # GUI (se presente)
-│           └── MainView.java
-│
-├── config/                                  # === CONFIGURATION ===
-│   │
-│   ├── ApplicationContext.java              # DI Container / Bootstrap
-│   ├── DatabaseConfig.java
-│   ├── EventBusConfig.java
-│   │
-│   └── di/                                 
-│       ├── RepositoryModule.java
-│       ├── ServiceModule.java
-│       └── ControllerModule.java
+│   ├── EventBusFactory.java
 │
 └── shared/                                 
     │
     ├── util/
     │   ├── DateTimeUtils.java
-    │   
-    │
     └── constant/
         └── ApplicationConstants.java
 
