@@ -49,26 +49,11 @@ src/
 │   │       ├── ConflictException.java
 │   │       └── InvalidParameterException.java
 │   │
-│   ├── usecase/                             
-│   │   │
-│   │   ├── scenario/                        # UC3 - Creazione Scenario Personalizzato
-│   │   │   ├── CreateScenarioUseCase.java
-│   │   │   ├── ActivateScenarioUseCase.java # UC4 - Attivazione Scenario
-│   │   │   ├── ModifyScenarioUseCase.java
-│   │   │   └── DeleteScenarioUseCase.java
-│   │   │
-│   │   ├── parametro/                       # UC2 - Settaggio Manuale Parametri
-│   │   │   ├── SetParameterUseCase.java
-│   │   │   ├── GetParameterUseCase.java
-│   │   │   └── ValidateParameterUseCase.java
-│   │   │
-│   │   ├── conflict/
-│   │   │   └── DetectConflictUseCase.java
-│   │   │
-│   │   └── dto/                            
-│   │       ├── ScenarioDTO.java
-│   │       ├── ParametroDTO.java
-│   │       └── ConflictDTO.java
+│   |                          
+│   │── dto/                            
+│   │   ├── ScenarioDTO.java
+│   │   ├── ParametroDTO.java
+│   │   └── ConflictDTO.java
 │   │
 │   ├── service/                             # --- DOMAIN SERVICES ---
 │   │   │                                   
