@@ -60,12 +60,7 @@ src/
 │   │   ├── ScenarioManager.java
 │   │   ├── ParametroManager.java
 │   │   ├── ConflictValidator.java
-│   │   │
-│   │   └── strategy/                        
-│   │       ├── TransitionStrategy.java      
-│   │       ├── ManualVideoStrategy.java
-│   │       ├── BruceSimulaStrategy.java
-│   │       └── EventBueStrategy.java
+│   │   
 │   │
 │   └── port/                                
 │       │
