@@ -50,6 +50,10 @@ public class Dispositivo implements Observable {
 		return c;
 	}
 	
+	public void setCommunicator(ICommunicator c) {
+		this.c = c;
+	}
+	
 	public void switchDispositivo() {
 		active = !active;
 	}
