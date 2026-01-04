@@ -1,0 +1,199 @@
+```
+src/
+├── core/                                   
+│   │
+│   ├── domain/                              # --- ENTITIES LAYER ---
+│   │   │
+│   │   ├── model/                           # Entità di dominio
+│   │   │   ├── casa/
+│   │   │   │   ├── Casa.java
+│   │   │   │   └── Stanza.java
+│   │   │   │
+│   │   │   ├── dispositivo/
+│   │   │   │   ├── Dispositivo.java
+│   │   │   │   ├── Hub.java
+│   │   │   │   ├── sensore/
+│   │   │   │   │   ├── Sensore.java        
+│   │   │   │   │   ├── SensorI.java
+│   │   │   │   │   └── SensorII.java
+│   │   │   │   └── attuatore/
+│   │   │   │       ├── Attuatore.java       
+│   │   │   │       ├── AttuatoreLocale.java
+│   │   │   │       └── AttuatoreII.java
+│   │   │   │
+│   │   │   ├── scenario/
+│   │   │   │   ├── Scenario.java
+│   │   │   │   └── ScenarioRoomConfig.java
+│   │   │   │
+│   │   │   ├── parametro/
+│   │   │   │   └── Parametro.java
+│   │   │   │
+│   │   │   └── utente/
+│   │   │       └── Autenticazione.java
+│   │   │
+│   │   ├── valueobject/                     
+│   │   │   ├── ParametroValue.java
+│   │   │   ├── Conflict.java
+│   │   │   ├── ObserverParameter.java
+│   │   │   └── DeviceStatus.java
+│   │   │
+│   │   ├── enums/
+│   │   │   ├── CommunicationStatus.java     
+│   │   │   ├── DeviceState.java             
+│   │   │   ├── ConflictType.java
+│   │   │   └── ScenarioState.java
+│   │   │
+│   │   └── exception/                       # Eccezioni di dominio
+│   │       ├── DomainException.java
+│   │       ├── ScenarioNotFoundException.java
+│   │       ├── ConflictException.java
+│   │       └── InvalidParameterException.java
+│   │
+│   ├── usecase/                             
+│   │   │
+│   │   ├── scenario/                        # UC3 - Creazione Scenario Personalizzato
+│   │   │   ├── CreateScenarioUseCase.java
+│   │   │   ├── ActivateScenarioUseCase.java # UC4 - Attivazione Scenario
+│   │   │   ├── ModifyScenarioUseCase.java
+│   │   │   └── DeleteScenarioUseCase.java
+│   │   │
+│   │   ├── parametro/                       # UC2 - Settaggio Manuale Parametri
+│   │   │   ├── SetParameterUseCase.java
+│   │   │   ├── GetParameterUseCase.java
+│   │   │   └── ValidateParameterUseCase.java
+│   │   │
+│   │   ├── conflict/
+│   │   │   └── DetectConflictUseCase.java
+│   │   │
+│   │   └── dto/                            
+│   │       ├── ScenarioDTO.java
+│   │       ├── ParametroDTO.java
+│   │       └── ConflictDTO.java
+│   │
+│   ├── service/                             # --- DOMAIN SERVICES ---
+│   │   │                                   
+│   │   ├── ScenarioManager.java
+│   │   ├── ParametroManager.java
+│   │   ├── ConflictValidator.java
+│   │   │
+│   │   └── strategy/                        
+│   │       ├── TransitionStrategy.java      
+│   │       ├── ManualVideoStrategy.java
+│   │       ├── BruceSimulaStrategy.java
+│   │       └── EventBueStrategy.java
+│   │
+│   └── port/                                
+│       │
+│       ├── outbound/                       
+│       │   ├── repository/
+│       │   │   ├── IScenarioRepository.java
+│       │   │   ├── IParametroRepository.java
+│       │   │   └── ILogRepository.java
+│       │   │
+│       │   ├── registry/                    
+│       │   │   ├── IDeviceRegistry.java
+│       │   │   └── IStanzaRegistry.java
+│       │   │
+│       │   ├── messaging/
+│       │   │   └── IEventBus.java
+│       │   │
+│       │   └── communication/
+│       │       └── ICommunicationModule.java
+│       │
+│       └── inbound/                         # Porte in entrata (driving) - opzionale
+│           ├── IScenarioService.java
+│           └── IParametroService.java
+│
+├── infrastructure/                          # === OUTER LAYER - Frameworks & Drivers ===
+│   │
+│   ├── persistence/                         # --- DATABASE ---
+│   │   │
+│   │   ├── mysql/
+│   │   │   ├── repository/
+│   │   │   │   ├── ScenarioRepositoryImpl.java
+│   │   │   │   ├── ParametroRepositoryImpl.java
+│   │   │   │   └── LogRepositoryImpl.java
+│   │   │   │
+│   │   │   ├── entity/                      # Entità JPA/database (se diverso da domain)
+│   │   │   │   ├── ScenarioEntity.java
+│   │   │   │   └── ParametroEntity.java
+│   │   │   │
+│   │   │   └── mapper/                      # Mapping Entity <-> Domain
+│   │   │       ├── ScenarioMapper.java
+│   │   │       └── ParametroMapper.java
+│   │   │
+│   │   ├── DatabaseConnection.java
+│   │   └── StoricoDatiImpl.java
+│   │
+│   ├── messaging/                           # --- EVENT BUS ---
+│   │   ├── EventBusImpl.java
+│   │   │
+│   │   └── event/                           # Eventi concreti
+│   │       ├── DomainEvent.java             # Base class
+│   │       ├── ScenarioActivatedEvent.java
+│   │       ├── ParameterChangedEvent.java
+│   │       └── ConflictDetectedEvent.java
+│   │
+│   ├── communication/                       # --- MODULO COMUNICAZIONE ---
+│   │   ├── CommunicationModuleImpl.java
+│   │   └── adapter/
+│   │       └── CommunicationAdapter.java
+│   │
+│   |
+│   │
+│   └── logging/
+│       └── LogAdmin.java
+│
+├── adapter/                                 # === INTERFACE ADAPTERS ===
+│   │
+│   ├── inbound/                             # --- Driving Adapters ---
+│   │   │
+│   │   ├── controller/                      # REST/API Controllers
+│   │   │   ├── ScenarioController.java
+│   │   │   ├── ParametroController.java
+│   │   │   └── StanzaController.java
+│   │   │
+│   │   ├── facade/                          # Facade Pattern
+│   │   │   ├── GestoreStanze.java
+│   │   │   └── SensorFacade.java
+│   │   │
+│   │   └── presenter/                       # Formattazione output
+│   │       ├── ScenarioPresenter.java
+│   │       └── ConflictPresenter.java
+│   │
+│   └── outbound/                            # --- Driven Adapters ---
+│       │
+│       └── gateway/                         # Gateway verso sistemi esterni
+│           ├── DeviceGateway.java
+│           └── NotificationGateway.java
+│
+├── ui/                                      # === PRESENTATION LAYER ===
+│   │
+│   └── view/
+│       ├── console/                         # CLI (se presente)
+│       │   └── ConsoleView.java
+│       │
+│       └── gui/                             # GUI (se presente)
+│           └── MainView.java
+│
+├── config/                                  # === CONFIGURATION ===
+│   │
+│   ├── ApplicationContext.java              # DI Container / Bootstrap
+│   ├── DatabaseConfig.java
+│   ├── EventBusConfig.java
+│   │
+│   └── di/                                 
+│       ├── RepositoryModule.java
+│       ├── ServiceModule.java
+│       └── ControllerModule.java
+│
+└── shared/                                 
+    │
+    ├── util/
+    │   ├── DateTimeUtils.java
+    │   
+    │
+    └── constant/
+        └── ApplicationConstants.java
+
+```
