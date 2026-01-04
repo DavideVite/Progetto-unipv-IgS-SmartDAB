@@ -8,19 +8,25 @@ src/
 │   │   │   ├── casa/
 │   │   │   │   ├── Casa.java
 │   │   │   │   └── Stanza.java
+│   │   │   │   └── Hub.java
 │   │   │   │
 │   │   │   ├── dispositivo/
 │   │   │   │   ├── Dispositivo.java
-│   │   │   │       ├── Sensore.java
-│   │   │   │       ├── Attuatore.java   
-│   │   │   │   ├── Hub.java
-│   │   │   │           
+│   │   │   │   ├── sensori/
+│   │   │   │   │   ├── Sensore.java        
+│   │   │   │   │   ├── SensorI.java
+│   │   │   │   │   └── SensorII.java
+│   │   │   │   └── attuatori/
+│   │   │   │       ├── Attuatore.java       
+│   │   │   │       ├── AttuatoreLocale.java
+│   │   │   │       └── AttuatoreII.java
+│   │   │   │
 │   │   │   ├── scenario/
 │   │   │   │   ├── Scenario.java
 │   │   │   │   └── ScenarioRoomConfig.java
 │   │   │   │
 │   │   │   ├── parametro/
-│   │   │   │   └── Parametro.java
+│   │   │   │   └── ObservableParameter.java
 │   │   │   │
 │   │   │   └── utente/
 │   │   │       └── Autenticazione.java
@@ -29,7 +35,6 @@ src/
 │   │   │   ├── ParametroValue.java
 │   │   │   ├── Conflict.java
 │   │   │   ├── ObserverParameter.java
-│   │   │   └── DeviceStatus.java
 │   │   │
 │   │   ├── enums/
 │   │   │   ├── CommunicationStatus.java     
@@ -54,7 +59,12 @@ src/
 │   │   ├── ScenarioManager.java
 │   │   ├── ParametroManager.java
 │   │   ├── ConflictValidator.java
-│   │   
+│   │   │
+│   │   └── strategy/                        
+│   │       ├── TransitionStrategy.java      
+│   │       ├── ManualVideoStrategy.java
+│   │       ├── BruceSimulaStrategy.java
+│   │       └── EventBusStrategy.java
 │   │
 │   └── port/                                
 │       │
@@ -68,11 +78,8 @@ src/
 │       │   │   ├── IDeviceRegistry.java
 │       │   │   └── IStanzaRegistry.java
 │       │   │
-│       │   ├── messaging/
-│       │   │   └── IEventBus.java
-│       │   │
 │       │   └── communication/
-│       │       └── ICommunicationModule.java
+│       │       └── ICommunicator.java
 │       │
 │       └── inbound/                         # Porte in entrata (driving) - opzionale
 │           ├── IScenarioService.java
@@ -100,20 +107,7 @@ src/
 │   │   └── StoricoDatiImpl.java
 │   │
 │   ├── messaging/                           # --- EVENT BUS ---
-│   │   ├── EventBusImpl.java
-│   │   │
-│   │   └── event/                           # Eventi concreti
-│   │       ├── DomainEvent.java             # Base class
-│   │       ├── ScenarioActivatedEvent.java
-│   │       ├── ParameterChangedEvent.java
-│   │       └── ConflictDetectedEvent.java
-│   │
-│   ├── communication/                       # --- MODULO COMUNICAZIONE ---
-│   │   ├── CommunicationModuleImpl.java
-│   │   └── adapter/
-│   │       └── CommunicationAdapter.java
-│   │
-│   |
+│   │   ├── EventBus.java
 │   │
 │   └── logging/
 │       └── LogAdmin.java
@@ -129,8 +123,21 @@ src/
 │   │   │
 │   │   ├── facade/                          # Facade Pattern
 │   │   │   ├── GestoreStanze.java
-│   │   │   └── SensorFacade.java
+│   │   │   └── SensoreFacade.java
+│   │   │   └── AttuatoreFacade.java
 │   │   │
+│   │   └── presenter/                       # Formattazione output
+│   │       ├── ScenarioPresenter.java
+│   │       └── ConflictPresenter.java
+│
+├── ui/                                      # === PRESENTATION LAYER ===
+│   │
+│   └── view/
+│       ├── console/                         # CLI (se presente)
+│       │   └── ConsoleView.java
+│       │
+│       └── gui/                             # GUI (se presente)
+│           └── MainView.java
 │
 ├── config/                                  # === CONFIGURATION ===
 │   │
@@ -148,6 +155,7 @@ src/
     ├── util/
     │   ├── DateTimeUtils.java
     │   
+    │
     └── constant/
         └── ApplicationConstants.java
 
