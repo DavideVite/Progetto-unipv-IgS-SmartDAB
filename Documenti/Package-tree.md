@@ -11,16 +11,10 @@ src/
 │   │   │   │
 │   │   │   ├── dispositivo/
 │   │   │   │   ├── Dispositivo.java
+│   │   │   │       ├── Sensore.java
+│   │   │   │       ├── Attuatore.java   
 │   │   │   │   ├── Hub.java
-│   │   │   │   ├── sensore/
-│   │   │   │   │   ├── Sensore.java        
-│   │   │   │   │   ├── SensorI.java
-│   │   │   │   │   └── SensorII.java
-│   │   │   │   └── attuatore/
-│   │   │   │       ├── Attuatore.java       
-│   │   │   │       ├── AttuatoreLocale.java
-│   │   │   │       └── AttuatoreII.java
-│   │   │   │
+│   │   │   │           
 │   │   │   ├── scenario/
 │   │   │   │   ├── Scenario.java
 │   │   │   │   └── ScenarioRoomConfig.java
@@ -137,24 +131,6 @@ src/
 │   │   │   ├── GestoreStanze.java
 │   │   │   └── SensorFacade.java
 │   │   │
-│   │   └── presenter/                       # Formattazione output
-│   │       ├── ScenarioPresenter.java
-│   │       └── ConflictPresenter.java
-│   │
-│   └── outbound/                            # --- Driven Adapters ---
-│       │
-│       └── gateway/                         # Gateway verso sistemi esterni
-│           ├── DeviceGateway.java
-│           └── NotificationGateway.java
-│
-├── ui/                                      # === PRESENTATION LAYER ===
-│   │
-│   └── view/
-│       ├── console/                         # CLI (se presente)
-│       │   └── ConsoleView.java
-│       │
-│       └── gui/                             # GUI (se presente)
-│           └── MainView.java
 │
 ├── config/                                  # === CONFIGURATION ===
 │   │
@@ -172,7 +148,6 @@ src/
     ├── util/
     │   ├── DateTimeUtils.java
     │   
-    │
     └── constant/
         └── ApplicationConstants.java
 
