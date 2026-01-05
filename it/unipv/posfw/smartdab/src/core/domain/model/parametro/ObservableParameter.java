@@ -1,12 +1,12 @@
-package it.unipv.posfw.smartdab.dispositivi.attuatori;
+package it.unipv.posfw.smartdab.src.core.domain.model.parametro;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import it.unipv.posfw.smartdab.dispositivi.facade.AttuatoreFacade;
-import it.unipv.posfw.smartdab.interfaces.Observable;
-import it.unipv.posfw.smartdab.interfaces.Observer;
+import it.unipv.posfw.smartdab.src.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
 
 public class ObservableParameter implements Observable {
 	

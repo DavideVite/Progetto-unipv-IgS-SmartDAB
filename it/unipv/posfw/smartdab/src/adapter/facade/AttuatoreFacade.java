@@ -1,9 +1,9 @@
-package it.unipv.posfw.smartdab.dispositivi.facade;
+package it.unipv.posfw.smartdab.src.adapter.facade;
 
-import it.unipv.posfw.smartdab.dispositivi.Dispositivo;
-import it.unipv.posfw.smartdab.dispositivi.ICommunicator;
-import it.unipv.posfw.smartdab.dispositivi.attuatori.DispatcherAdapter;
-import it.unipv.posfw.smartdab.dispositivi.attuatori.ObservableParameter;
+import it.unipv.posfw.smartdab.src.adapter.interfaces.DispatcherAdapter;
+import it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.src.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
 
 public class AttuatoreFacade extends Dispositivo {
 	private double setpoint;

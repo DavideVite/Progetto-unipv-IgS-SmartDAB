@@ -1,4 +1,7 @@
-package it.unipv.posfw.smartdab.dispositivi;
+package it.unipv.posfw.smartdab.src.core.port.communication;
+
+import it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates;
+import it.unipv.posfw.smartdab.src.core.domain.enums.Message;
 
 public interface ICommunicator {
 	
