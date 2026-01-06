@@ -1,3 +1,5 @@
+package main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro;
+
 
 import java.util.List;
 import java.util.Objects;

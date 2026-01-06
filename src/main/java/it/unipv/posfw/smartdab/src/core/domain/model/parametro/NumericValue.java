@@ -1,3 +1,5 @@
+package main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro;
+
 /**
  * Value Object per parametri numerici (temperatura, umidità, luminosità, etc.).
  * Supporta validazione di range min-max opzionale.
