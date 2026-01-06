@@ -1,5 +1,7 @@
 package main.java.it.unipv.posfw.smartdab.src.core.domain.model.scenario;
 
+import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.EnumTipoParametro;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro.IParametroValue;
 
 public class ScenarioStanzaConfig {
 
