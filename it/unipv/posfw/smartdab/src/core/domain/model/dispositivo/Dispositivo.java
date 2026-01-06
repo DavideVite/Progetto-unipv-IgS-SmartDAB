@@ -10,7 +10,7 @@ import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
 
 public class Dispositivo implements Observable {
 	private String id;
-	private String topic;
+	private String topic;	// home/room/dispositivo/parameter
 	private boolean active;
 	private DispositivoStates state;
 	private ICommunicator c;
@@ -30,6 +30,7 @@ public class Dispositivo implements Observable {
 
 	public void setId(String id) {
 		this.id = id;
+		
 	}
 
 	public String getTopic() {
@@ -37,7 +38,13 @@ public class Dispositivo implements Observable {
 	}
 
 	public void setTopic(String topic) {
-		this.topic = topic;
+		
+		// conto i livelli del topic
+		String[] result = topic.split("/");
+		
+		// topic_livelloDispositivo = home/room/id/parameter
+		if(result.length == 4 && result[0].equals("home") && result[2].equals(id)) this.topic = topic;
+		else System.out.println("Topic non valido");
 	}
 
 	public DispositivoStates getState() {
@@ -58,6 +65,14 @@ public class Dispositivo implements Observable {
 	
 	public void switchDispositivo() {
 		active = !active;
+	}
+	
+	public String getParameterByTopic() {
+		return topic.split("/")[3];
+	}
+	
+	public String getRoomByTopic() {
+		return topic.split("/")[1];
 	}
 	
 	// Osservazione dell'event bus o altri eventuali osservatori
