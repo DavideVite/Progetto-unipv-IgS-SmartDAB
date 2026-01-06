@@ -39,18 +39,19 @@ public final  class EnumValue implements IParametroValue {
     	   return selectedValue; 
        }
        
-       @Override
-       public String toString() {
-           return "EnumValue{" +
-                   "selected='" + selectedValue + '\'' +
-                   ", allowed=" + allowedValues +
-                   ", valid=" + isValid() +
-                   '}';
+       
+	   @Override
+	   public String toString() {
+		return "EnumValue [selectedValue=" + selectedValue + ", allowedValues=" + allowedValues + "]";
+	   }
+       
+
+      
        }
        
        
        
-   }
+ 
     
     
     

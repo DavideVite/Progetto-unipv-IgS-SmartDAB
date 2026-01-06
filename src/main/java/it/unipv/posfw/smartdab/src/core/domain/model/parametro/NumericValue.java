@@ -71,16 +71,18 @@ public final class NumericValue implements IParametroValue{
 	return formatted; 
 	
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "NumericValue [value=" + value + ", minValue=" + minValue + ", maxValue=" + maxValue + ", unit=" + unit
+				+ "]";
+	}
 	
-    @Override
-    public String toString() {
-        return "NumericValue{" +
-                "value=" + value +
-                ", min=" + minValue +
-                ", max=" + maxValue +
-                ", unit='" + unit + '\'' +
-                ", valid=" + isValid() +
-                '}';
+
+	
+	
     }
 	
 }

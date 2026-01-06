@@ -39,12 +39,12 @@ public class BooleanValue implements IParametroValue{
     	return value ? trueLabel : falseLabel; 
     	
     }
+
+	@Override
+	public String toString() {
+		return "BooleanValue [value=" + value + ", trueLabel=" + trueLabel + ", falseLabel=" + falseLabel + "]";
+	}
 	
-    @Override
-    public String toString() {
-        return "BooleanValue{" +
-                "value=" + value +
-                ", display='" + getDisplayString() + '\'' +
-                '}';
-    }
+
+    
 }
