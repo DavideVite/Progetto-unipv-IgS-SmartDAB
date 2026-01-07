@@ -34,9 +34,8 @@ public class SensoreFacade extends Dispositivo implements Observer{
 	}
 	
 	public void publishMeasure() {
-	//	String payload = Double.toString(measure);
-	//	super.getCommunicator().sendPayload(payload);
-		System.out.println(Double.toString(measure));
+		String payload = Double.toString(measure);
+		super.getCommunicator().sendPayload(payload);
 	}
 	
 	@Override
