@@ -63,3 +63,22 @@ Quando il lavoro è pronto:
 **Strategia di Merge:**
 Utilizziamo **Squash and Merge**.
 Tutti i tuoi commit intermedi ("wip", "fix typo") verranno schiacciati in un unico commit pulito sul main. Questo mantiene la storia del progetto leggibile. 
+
+
+## 5. Uso di .gitignore 
+Il file di testo .gitignore serve come da filtro per quei files che non si volgiono caricare sul repository remoto, ma si vogliono mantere solo locali. Ad esempio, il file .project prodotto da Eclipse è presente localmente ma non su GitHub. Il repository remoto rimane "puro" e contiene solo codice sorgente. 
+
+**vantaggi**
+1. Ognuno può mantenere file diversi in base ai diversi IDE che usa. 
+2. Ognuno può tenere altri files rispetto a strettamente necessari 
+
+Si consiglia di scrivere nel .gitignore : 
+```
+.project
+.classpath
+.settings/
+bin/
+```
+
+**Attenzione**
+il .gitignore ignora solo i file che non sono stati ancora tracciati. 

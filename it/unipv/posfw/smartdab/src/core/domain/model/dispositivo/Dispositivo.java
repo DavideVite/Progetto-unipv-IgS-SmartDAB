@@ -37,8 +37,7 @@ public class Dispositivo implements Observable {
 		return topic;
 	}
 
-	public void setTopic(String topic) {
-		
+	public void setTopic(String topic) {		
 		// conto i livelli del topic
 		String[] result = topic.split("/");
 		
