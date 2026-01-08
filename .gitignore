@@ -1,0 +1,9 @@
+# --- Eclipse (IDE) ---
+# È meglio ignorare questi file perché vengono generati da Eclipse
+# e possono creare conflitti se i colleghi hanno versioni diverse di Eclipse.
+
+.metadata/
+.settings
+bin/
+.classpath
+.project
