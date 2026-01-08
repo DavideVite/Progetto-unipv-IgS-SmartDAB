@@ -1,20 +1,15 @@
-package it.unipv.posfw.smartdab.src.core.domain.model.dispositivo;
+package main.java.it.unipv.posfw.smartdab.src.core.domain.model.dispositivo;
 
-import java.util.ArrayList;
-import java.util.List;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.src.core.port.device.DevicePort;
 
-import it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates;
-import it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
-
-public class Dispositivo implements Observable {
+public class Dispositivo implements DevicePort {
 	private String id;
 	private String topic;	// home/room/dispositivo/parameter
 	private boolean active;
 	private DispositivoStates state;
 	private ICommunicator c;
-	private List<Observer> observers = new ArrayList<>();
 
 	public Dispositivo(String id, ICommunicator c, boolean active) {
 		this.id = id;
@@ -63,6 +58,10 @@ public class Dispositivo implements Observable {
 		this.c = c;
 	}
 	
+	public boolean isActive() {
+		return active;
+	}
+	
 	public void switchDispositivo() {
 		active = !active;
 	}
@@ -73,18 +72,5 @@ public class Dispositivo implements Observable {
 	
 	public String getRoomByTopic() {
 		return topic.split("/")[1];
-	}
-	
-	// Osservazione dell'event bus o altri eventuali osservatori
-	public void addObserver(Observer observer) {
-		observers.add(observer);
-	}
-	
-	public void removeObserver(Observer observer) {
-		observers.remove(observer);
-	}
-	
-	public void notifyObservers(Object args) {
-		c.sendPayload((String)args);
 	}
 }

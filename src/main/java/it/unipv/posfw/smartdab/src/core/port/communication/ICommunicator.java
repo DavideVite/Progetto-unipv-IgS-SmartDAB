@@ -1,14 +1,23 @@
-package it.unipv.posfw.smartdab.src.core.port.communication;
+package main.java.it.unipv.posfw.smartdab.src.core.port.communication;
 
-import it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates;
-import it.unipv.posfw.smartdab.src.core.domain.enums.Message;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.Message;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
 
-public interface ICommunicator {
+public interface ICommunicator extends Observable{
 	
 	// es. home/stanza1/disp1/param1/val
-	final String format = "home/%s/%s/%s/%s";
+	final String FORMAT = "home/%s/%s/%s/%s";
 	
 	public boolean sendPayload(String payload);
 	public Message processRequest(String request);
 	public boolean changeState(DispositivoStates state);
+	// Osservazione dell'event bus o altri eventuali osservatori
+	
+	public void addObserver(Observer observer);
+	
+	public void removeObserver(Observer observer);
+	
+	public void notifyObservers(Object args);
 }
