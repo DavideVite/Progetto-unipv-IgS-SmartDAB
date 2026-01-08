@@ -233,6 +233,10 @@ I dispositivi hanno inviato o ricevuto con successo le informazioni dall’event
 4. L’hub aggiorna la base di dati mettendo lo stato “inattivo” sul dispositivo interessato  
 5. Hub esegue le operazioni dall’1 al 4 periodicamente
 
-   
 
+--- 
+
+
+   
+![](Diagramma_UML_casi_d'uso.drawio.png)
                           
