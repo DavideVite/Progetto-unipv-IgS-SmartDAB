@@ -4,7 +4,7 @@ import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.DispositivoStates
 import main.java.it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
 import main.java.it.unipv.posfw.smartdab.src.core.port.device.DevicePort;
 
-public class Dispositivo implements DevicePort {
+public class Dispositivo {
 	private String id;
 	private String topic;	// home/room/dispositivo/parameter
 	private boolean active;
