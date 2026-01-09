@@ -1,5 +1,4 @@
 package it.unipv.posfw.smartdab.src.core.service;
-
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class GestoreStanze {
     	return true;
     }
     
-    public boolean modificaStanza(String nome, String nuovoNome) {
+    public boolean modificaNomeStanza(String nome, String nuovoNome) {
     	Stanza s = casa.cercaStanza(nome); 
     	if (s!=null) {
     		if(casa.esisteStanza(nuovoNome)) {

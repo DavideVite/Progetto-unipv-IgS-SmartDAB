@@ -1,10 +1,11 @@
-package src.main.java.it.unipv.posfw.smartdab.src.core.domain.model.casa;
+package it.unipv.posfw.smartdab.src.core.domain.model.casa;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import src.main.java.it.unipv.posfw.smartdab.src.adapter.facade.SensoreFacade;
 import src.main.java.it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
 import src.main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro.ObservableParameter;
 import src.main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
@@ -42,8 +43,8 @@ public class Stanza implements Observable, Observer{
 		 return parametri;
 	 }
 
-	 public Double getMisura(String p) {
-		 return parametri.get(p);
+	 public Double getMisura(String parametro) {
+		 return parametri.get(parametro);
 	 }
 	 
 	 public boolean isEmpty() {
@@ -56,16 +57,12 @@ public class Stanza implements Observable, Observer{
 	 public void addDispositivo(Dispositivo d) {
 		 if (d != null) {
 			 this.dispositivi.add(d);
-			 
-			 notifyObservers("dispositivo_aggiunto");
 		 }
 	 }
 	 
 	 public void removeDispositivo(Dispositivo d) {
 		 if (d != null) {
 			 this.dispositivi.remove(d);
-			 
-			 notifyObservers("dispositivo_rimosso");
 		 }
 	 }
 	 
@@ -87,8 +84,11 @@ public class Stanza implements Observable, Observer{
 	 
      @Override
 	 public void notifyObservers(Object args) {
-         for(Observer observer : observers) {
-        	 observer.update(this, args);
+         for (Observer o : observers) {
+        	 if (o instanceof SensoreFacade) {
+        		 SensoreFacade s = (SensoreFacade) o;
+        		 s.update(this, args);
+        	 }
          }
          }
      
