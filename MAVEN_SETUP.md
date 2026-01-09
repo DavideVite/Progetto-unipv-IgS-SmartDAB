@@ -154,11 +154,3 @@ Per aggiungere nuove dipendenze, modifica il `pom.xml` nella sezione `<dependenc
 - Eclipse dovrebbe rilevare automaticamente i cambi
 - Se no: `Maven` → `Update Project...`
 
-## Prossimi Passi
-
-1. ✅ Setup progetto Maven completato
-2. ⬜ Importare in Eclipse
-3. ⬜ Verificare che non ci siano errori di compilazione
-4. ⬜ Eseguire `mvn clean test` per verificare il setup
-5. ⬜ Iniziare a scrivere i test per le classi esistenti
-6. ⬜ (Opzionale) Aggiungere una classe Main se necessario
