@@ -43,15 +43,24 @@ public class Lampada_CommandDispatcher implements DispatcherAdapter {
 		}
 	}
 	
-	/* Formato delle richieste: 
+	/* Formato delle richieste:
 	 * - CONFIG.SETPOINT.val
 	 * - CONFIG.STATE.val
 	 */
 	@Override
-	public Message processRequest(String request) {
-		
+	public Message processRequest(String request, Object val) {
+		// TEMPORANEAMENTE STUB PER COMPILAZIONE
+		// Implementazione corretta da fare con due parametri
 		return Message.ACK;
 	}
+
+	/* IMPLEMENTAZIONE ORIGINALE COMMENTATA - Firma errata (mancava parametro Object val)
+	@Override
+	public Message processRequest(String request) {
+
+		return Message.ACK;
+	}
+	*/
 
 	@Override
 	public boolean dispatchCommand(String command) {

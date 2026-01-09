@@ -57,6 +57,14 @@ public class ObservableParameter implements Observable {
 		this.value = value;
 	}
 
+	public String getParameterName() {
+		return parameterName;
+	}
+
+	public void setParameterName(String parameterName) {
+		this.parameterName = parameterName;
+	}
+
 	public List<Observer> getRooms() {
 		return rooms;
 	}

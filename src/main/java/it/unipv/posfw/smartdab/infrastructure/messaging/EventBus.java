@@ -87,7 +87,8 @@ public class EventBus implements DispositiviObserver {
 	}
 	
 	private EventBus() {
-		request.clear();
+		// TEMPORANEAMENTE COMMENTATO PER COMPILAZIONE - request è null
+		// request.clear();
 	}
 	
 	// Singleton
@@ -101,36 +102,49 @@ public class EventBus implements DispositiviObserver {
 	
 	@Override
 	public Message update(String payload) {
+		// TEMPORANEAMENTE STUB PER COMPILAZIONE
+		// Implementazione originale commentata sotto - contiene metodi e variabili mancanti
+		return Message.ACK;
+	}
+
+	/* IMPLEMENTAZIONE ORIGINALE COMMENTATA - Metodi e variabili mancanti
+	 * Problemi:
+	 * - setPayload(payload) non esiste
+	 * - topicFormat non è dichiarata
+	 * - longFormat non è dichiarata
+	 *
+	public Message update(String payload) {
 		// update verrà usato per gestire carichi a 5 livelli
-		
+
 		setPayload(payload);
-		
+
 		if(topicLayers.length == 5) {
 			if(topicLayers[3].equals("state")) {
 				// Comunica con l'hub...
 			}
 			else {
 				// Verifica se il parametro esiste nella stanza...
-				
+
 				// Prendi tutti gli iscritti al topic
 				ArrayList<Dispositivo> subs = getSubrscribers();
 				Iterator<Dispositivo> iterSubs = subs.iterator();
-				
+
 				while(iterSubs.hasNext()) {
 					// Manda richiesta
 					for(int i = 0; i < 10; i++) {
 						if(sendRequest(topicFormat.formatted(topicLayers[1], iterSubs.next().getId()),
-								       longFormat.formatted(Message.CONFIG, Message.STATE, 
+								       longFormat.formatted(Message.CONFIG, Message.STATE,
 								       topicLayers[4])).equals(Message.ACK)) break;
-						
+
 						// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo
 						else if(i == 9) System.out.println("Dispositivo " + topicLayers[2] + " non ha risposto");
 					}
 				}
 			}
 		}
-		
+
 		return Message.ACK;
-		
+
 	}
+	*/
 }
