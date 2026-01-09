@@ -123,35 +123,6 @@ Contiene:
 - **Dipendenze**: JUnit 5, Mockito
 - **Plugin**: compiler, surefire (test), jar
 
-### .gitignore
-Configurato per ignorare:
-- File Eclipse (`.project`, `.classpath`, `.settings/`, `bin/`)
-- File Maven (`target/`, `pom.xml.*`)
-- File IDE (IntelliJ, VSCode)
-- File OS (`.DS_Store`, `Thumbs.db`)
-
-## Struttura Package Java
-
-Tutti i package seguono la convenzione:
-```
-it.unipv.posfw.smartdab.<modulo>.<subpackage>
-```
-
-Esempi:
-- `it.unipv.posfw.smartdab.core.domain.model.casa`
-- `it.unipv.posfw.smartdab.infrastructure.messaging`
-- `it.unipv.posfw.smartdab.factory`
-
-## Note Importanti
-
-1. **Factory spostato**: La cartella `Factory/` nella root è stata spostata in `src/main/java/it/unipv/posfw/smartdab/factory/` con package corretto
-
-2. **Target sempre ignorato**: La cartella `target/` è generata da Maven e non va committata su Git
-
-3. **Settings Eclipse**: I file `.project`, `.classpath`, e `.settings/` sono inclusi nel progetto per facilitare il setup, ma sono normalmente ignorati. Questo è accettabile per progetti universitari piccoli.
-
-4. **Java 17**: Il progetto è configurato per Java 17. Se hai una versione diversa, modifica `maven.compiler.source` e `maven.compiler.target` nel `pom.xml`
-
 ## Aggiungere Dipendenze
 
 Per aggiungere nuove dipendenze, modifica il `pom.xml` nella sezione `<dependencies>`:
@@ -163,8 +134,6 @@ Per aggiungere nuove dipendenze, modifica il `pom.xml` nella sezione `<dependenc
     <version>version</version>
 </dependency>
 ```
-
-Poi aggiorna il progetto Maven in Eclipse.
 
 ## Troubleshooting
 
