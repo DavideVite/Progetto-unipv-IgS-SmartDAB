@@ -1,12 +1,12 @@
-package it.unipv.posfw.smartdab.src.core.domain.model.parametro;
+package main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import it.unipv.posfw.smartdab.src.adapter.facade.AttuatoreFacade;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
+import main.java.it.unipv.posfw.smartdab.src.adapter.facade.AttuatoreFacade;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
 
 public class ObservableParameter implements Observable {
 	
@@ -32,7 +32,7 @@ public class ObservableParameter implements Observable {
 		try {
 			AttuatoreFacade attuatore = (AttuatoreFacade)args;
 			
-			if(attuatore.getTopic().endsWith(parameterName)) {
+			if(attuatore.getTopic().toString().endsWith(parameterName)) {
 				Iterator<Observer> roomsIterator = rooms.iterator();
 			
 				while(roomsIterator.hasNext()) {

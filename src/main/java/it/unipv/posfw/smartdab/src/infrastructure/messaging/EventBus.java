@@ -1,30 +1,29 @@
-package it.unipv.posfw.smartdab.src.infrastructure.messaging;
+package main.java.it.unipv.posfw.smartdab.src.infrastructure.messaging;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import it.unipv.posfw.smartdab.src.core.domain.enums.Message;
-import it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
+
+import main.java.it.unipv.posfw.smartdab.src.core.domain.enums.Message;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.src.infrastructure.messaging.request.Request;
 
 public class EventBus implements DispositiviObserver {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
 	private EventBus instance = null;
-	private String payload;
-	private String[] payloadLayers;
+	private Request request;
+	private String[] topicLayers;
 	
 	/* Notazioni: 
-	 * payloadLayers[0] = "home" 
-	 * payloadLayers[1] = "room" 
-	 * payloadLayers[2] = "device" 
-	 * payloadLayers[3] = "parameter" 
-	 * payloadLayers[4] = "value" 
-	
-	 * topic = payloadLayers[0:2]
+	 * topicLayers[0] = "home" 
+	 * topicLayers[1] = "room" 
+	 * topicLayers[2] = "device" 
+	 * topicLayers[3] = "parameter" 
 	 * Es. msgFormato = MAIN.SUB.val 
 	 */
 	
 	/* Come chiamare l'event bus:
-	 * 1) setPayload()
+	 * 1) setRequest()
 	 * 2) sendRequest() <- Richiede la conoscenza della richiesta da mandare, seguendo notazione
 	 * 3) Restituisce un Messaggio che informa sulla buona riuscita dell'operazione
 	 * 
@@ -34,23 +33,15 @@ public class EventBus implements DispositiviObserver {
 	 * 2) L'event bus aggiorna tutti i subrscriber
 	 */
 	
-	public final String topicFormat = "home/%s/%s";
-	public final String longFormat = "%s.%s.%s";
-	public final String shortFormat = "%s.%s";
 	
 	// Quando event bus riceve una misura (home/r1/d1/parameter/payload = topic + value)
-	public void setPayload(String payload) {
-		this.payload = payload;
-		setPayloadLayers();
+	public void setRequest(Request request) {
+		this.request = request;
+		setTopicLayers();
 	}
 	
-	private void setPayloadLayers() {
-		payloadLayers = getTopicByPayload(payload).split("/");
-	}
-	
-	private String getTopicByPayload(String payload) {
-		String[] payloadLayers = payload.split("/");
-		return topicFormat.formatted(payloadLayers[1], payloadLayers[2]);
+	private void setTopicLayers() {
+		topicLayers = request.getTopic().toString().split("/");
 	}
 	
 	public Dispositivo searchDispositivoByName(String name) {
@@ -75,9 +66,9 @@ public class EventBus implements DispositiviObserver {
 		
 		while(iter.hasNext()) {
 			d = iter.next();
-			if(payloadLayers[3].equals(d.getParameterByTopic()) &&
-				payloadLayers[1].equals(d.getRoomByTopic()) && 
-			   !payloadLayers[2].equals(d.getId())) {
+			if(topicLayers[3].equals(d.getTopic().getParameterByTopic()) &&
+				topicLayers[1].equals(d.getTopic().getRoomByTopic()) && 
+			   !topicLayers[2].equals(d.getId())) {
 				
 				subs.add(d);
 			}
@@ -85,17 +76,18 @@ public class EventBus implements DispositiviObserver {
 		return subs;
 	}
 	
-	public void removePayload() {
-		payload = "";
+	public void removeRequest() {
+		request.clear();
 	}
 	
 	// Es. request = CONFIG.SETPOINT.value
-	public Message sendRequest(String topic, String request) {
-		return searchDispositivoByName(topic).getCommunicator().processRequest(request);
+	public Message sendRequest(Request request) {
+		return searchDispositivoByName(request.getTopic().toString())
+				.getCommunicator().processRequest(request.getType(), request.getVal());
 	}
 	
 	private EventBus() {
-		payload = "";
+		request.clear();
 	}
 	
 	// Singleton
@@ -113,8 +105,8 @@ public class EventBus implements DispositiviObserver {
 		
 		setPayload(payload);
 		
-		if(payloadLayers.length == 5) {
-			if(payloadLayers[3].equals("state")) {
+		if(topicLayers.length == 5) {
+			if(topicLayers[3].equals("state")) {
 				// Comunica con l'hub...
 			}
 			else {
@@ -127,12 +119,12 @@ public class EventBus implements DispositiviObserver {
 				while(iterSubs.hasNext()) {
 					// Manda richiesta
 					for(int i = 0; i < 10; i++) {
-						if(sendRequest(topicFormat.formatted(payloadLayers[1], iterSubs.next().getId()),
+						if(sendRequest(topicFormat.formatted(topicLayers[1], iterSubs.next().getId()),
 								       longFormat.formatted(Message.CONFIG, Message.STATE, 
-								       payloadLayers[4])).equals(Message.ACK)) break;
+								       topicLayers[4])).equals(Message.ACK)) break;
 						
 						// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo
-						else if(i == 9) System.out.println("Dispositivo " + payloadLayers[2] + " non ha risposto");
+						else if(i == 9) System.out.println("Dispositivo " + topicLayers[2] + " non ha risposto");
 					}
 				}
 			}

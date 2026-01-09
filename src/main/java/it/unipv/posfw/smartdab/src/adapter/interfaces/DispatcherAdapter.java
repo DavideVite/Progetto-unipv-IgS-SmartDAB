@@ -1,6 +1,6 @@
-package it.unipv.posfw.smartdab.src.adapter.interfaces;
+package main.java.it.unipv.posfw.smartdab.src.adapter.interfaces;
 
-import it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
 
 public interface DispatcherAdapter extends ICommunicator{
 	public boolean dispatchCommand(String command);
