@@ -1,9 +1,9 @@
-package it.unipv.posfw.smartdab.src.adapter.facade;
+package main.java.it.unipv.posfw.smartdab.src.adapter.facade;
 
-import it.unipv.posfw.smartdab.src.adapter.interfaces.DispatcherAdapter;
-import it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.src.core.domain.model.parametro.ObservableParameter;
-import it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.src.adapter.interfaces.DispatcherAdapter;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.model.parametro.ObservableParameter;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
 
 public class AttuatoreFacade extends Dispositivo {
 	private double setpoint;
@@ -21,7 +21,7 @@ public class AttuatoreFacade extends Dispositivo {
 		
 		double error = setpoint - state;
 		double new_state = Math.round(state + error * variation * 10) / 10;
-		super.getCommunicator().sendPayload(Double.toString(new_state));
+		super.getCommunicator().notifyObservers(Double.toString(new_state));
 		return 1;
 
 	}

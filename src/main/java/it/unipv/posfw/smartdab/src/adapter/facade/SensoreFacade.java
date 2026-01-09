@@ -1,9 +1,9 @@
-package it.unipv.posfw.smartdab.src.adapter.facade;
+package main.java.it.unipv.posfw.smartdab.src.adapter.facade;
 
-import it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
-import it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
+import main.java.it.unipv.posfw.smartdab.src.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observable;
+import main.java.it.unipv.posfw.smartdab.src.core.port.communication.observer.Observer;
 
 
 public class SensoreFacade extends Dispositivo implements Observer{
@@ -35,7 +35,7 @@ public class SensoreFacade extends Dispositivo implements Observer{
 	
 	public void publishMeasure() {
 		String payload = Double.toString(measure);
-		super.getCommunicator().sendPayload(payload);
+		super.getCommunicator().notifyObservers(payload);
 	}
 	
 	@Override
