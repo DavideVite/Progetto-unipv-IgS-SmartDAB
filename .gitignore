@@ -1,9 +1,23 @@
 # --- Eclipse (IDE) ---
-# È meglio ignorare questi file perché vengono generati da Eclipse
-# e possono creare conflitti se i colleghi hanno versioni diverse di Eclipse.
 
 .metadata/
-.settings
+.settings/
 bin/
 .classpath
 .project
+
+# --- Maven ---
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# --- VS Code ---
+.vscode/
+
