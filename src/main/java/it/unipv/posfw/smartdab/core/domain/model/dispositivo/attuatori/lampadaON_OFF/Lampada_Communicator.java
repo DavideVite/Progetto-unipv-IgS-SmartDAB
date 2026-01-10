@@ -18,7 +18,7 @@ public class Lampada_Communicator implements ICommunicator {
 	private CommandDispatcher dispatcher;
 	
 	
-	public Lampada_Communicator(IDispatcherBootstrap boot) {
+	public Lampada_Communicator(Lampada_DispatcherBootstrap boot) {
 		dispatcher = boot.createDispatcher();
 	}
 	
