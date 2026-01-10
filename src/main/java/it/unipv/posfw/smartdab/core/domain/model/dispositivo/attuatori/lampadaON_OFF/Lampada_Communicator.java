@@ -49,7 +49,7 @@ public class Lampada_Communicator implements ICommunicator {
 	public void notifyObservers(Object args) {
 		try {
 			int payload = (int)args;
-			if(payload > 0 && payload <= 900) {
+			if(payload > 0 && payload <= 5000) {
 				
 			}
 			Iterator<Observer> iter = observers.iterator();
