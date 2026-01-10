@@ -7,7 +7,7 @@ import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatche
 
 public class Lampada_DispatcherBootstrap implements IDispatcherBootstrap {
 
-	private Lampada_DispatcherBootstrap() {
+	public Lampada_DispatcherBootstrap() {
 		
 	}
 	
