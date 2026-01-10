@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.core.port.communication.observer;
+package main.java.it.unipv.posfw.smartdab.core.port.communication.observer;
 
 public interface Observable {
 

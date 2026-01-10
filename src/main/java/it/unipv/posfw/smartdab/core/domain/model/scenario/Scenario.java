@@ -1,5 +1,5 @@
-package it.unipv.posfw.smartdab.core.domain.model.scenario;
-import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType; 
+package main.java.it.unipv.posfw.smartdab.core.domain.model.scenario;
+import main.java.it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType; 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

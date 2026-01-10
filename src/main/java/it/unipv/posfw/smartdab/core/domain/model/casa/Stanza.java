@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.core.domain.model.casa;
+package main.java.it.unipv.posfw.smartdab.core.domain.model.casa;
 
 
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
-import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import main.java.it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 
 public class Stanza implements Observable, Observer{
 	 private String id;

@@ -1,7 +1,7 @@
-package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
-import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import main.java.it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 
 public class Lampada_ON_OFF extends AttuatoreFacade {
 	
@@ -9,10 +9,11 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	private int intensita; // u.m. lumen
 	public final int MAX_INTENSITA = 5000; 
 	
-	public Lampada_ON_OFF(String id, Lampada_CommandDispatcher c, ObservableParameter parameter, int intensita) {
+	public Lampada_ON_OFF(String id, Lampada_Communicator c, ObservableParameter parameter, int intensita) {
 		super(id, c, parameter);
 		this.intensita = intensita;
 		illuminazione = 0;
+		c.setDevicePort(this);
 	}
 
 	public int getIntensita() {

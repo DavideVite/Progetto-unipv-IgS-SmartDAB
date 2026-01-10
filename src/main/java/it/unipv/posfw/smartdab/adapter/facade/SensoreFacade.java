@@ -1,9 +1,9 @@
-package it.unipv.posfw.smartdab.adapter.facade;
+package main.java.it.unipv.posfw.smartdab.adapter.facade;
 
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
-import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
-import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 
 
 public class SensoreFacade extends Dispositivo implements Observer{

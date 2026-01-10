@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.core.domain.model.parametro;
+package main.java.it.unipv.posfw.smartdab.core.domain.model.parametro;
 
 /**
  * Value Object per parametri numerici (temperatura, umidità, luminosità, etc.).

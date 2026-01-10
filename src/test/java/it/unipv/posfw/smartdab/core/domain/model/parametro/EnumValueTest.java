@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.core.domain.model.parametro;
+package test.java.it.unipv.posfw.smartdab.core.domain.model.parametro;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
