@@ -1,11 +1,11 @@
-package it.unipv.posfw.smartdab.core.service;
+package main.java.it.unipv.posfw.smartdab.core.service;
 
 import java.util.List;
 import java.util.Set;
 
-import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
-import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 
 public class GestoreStanze {
      private Casa casa;

@@ -1,16 +1,15 @@
-package it.unipv.posfw.smartdab.adapter.facade;
+package main.java.it.unipv.posfw.smartdab.adapter.facade;
 
-import it.unipv.posfw.smartdab.adapter.interfaces.DispatcherAdapter;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 
 public class AttuatoreFacade extends Dispositivo {
 	private double setpoint;
 	private double variation;
 	private ObservableParameter parameter;
 	
-	public AttuatoreFacade(String id, DispatcherAdapter c, ObservableParameter parameter) {
+	public AttuatoreFacade(String id, ICommunicator c, ObservableParameter parameter) {
 		super(id, c, false);
 		this.setParameter(parameter);
 	}
@@ -28,20 +27,6 @@ public class AttuatoreFacade extends Dispositivo {
 
 	public void applySetpoint(double setpoint) {
 		this.setpoint = setpoint;
-	}
-	
-	@Override
-	public void setCommunicator(ICommunicator c) {
-		
-		// Il communicator degli attuatori è il command dispatcher
-		
-		try {
-			DispatcherAdapter commandDispatcher = (DispatcherAdapter)c;
-			super.setCommunicator(commandDispatcher);
-			
-		} catch(ClassCastException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public double getSetpoint() {
