@@ -12,6 +12,25 @@ public class Dispositivo implements DevicePort {
 	private DispositivoStates state;
 	private ICommunicator c;
 
+	// ======================================================================
+	// Aggiunte da Davide per gestire la scelta runtime del dispositivo
+	// da parte del ParametroManager
+	// ======================================================================
+	// private Set<EnumTipoParametro> parametriSupportati = new HashSet<>();
+	//
+	// public boolean supportaParametro(EnumTipoParametro tipo) {
+	//     return parametriSupportati.contains(tipo);
+	// }
+	//
+	// public void addParametroSupportato(EnumTipoParametro tipo) {
+	//     parametriSupportati.add(tipo);
+	// }
+	//
+	// public Set<EnumTipoParametro> getParametriSupportati() {
+	//     return Collections.unmodifiableSet(parametriSupportati);
+	// }
+	// ======================================================================
+
 	public Dispositivo(String id, ICommunicator c, boolean active) {
 		this.id = id;
 		this.c = c;

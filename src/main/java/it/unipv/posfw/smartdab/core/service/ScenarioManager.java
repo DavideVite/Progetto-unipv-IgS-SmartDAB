@@ -2,6 +2,8 @@ package it.unipv.posfw.smartdab.core.service;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,5 +90,20 @@ public class ScenarioManager {
 
 	public int getNumeroScenari() {
 		return scenari.size();
+	}
+
+	// Esecuzione scenario - ParametroManager passato come parametro
+	public boolean eseguiScenario(String nomeScenario, ParametroManager parametroManager) {
+		Scenario scenario = getScenario(nomeScenario);
+		if (scenario == null) return false;
+
+		boolean tuttiSuccesso = true;
+		for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+			if (!parametroManager.applicaScenarioConfig(config)) {
+				tuttiSuccesso = false;
+				// Continua comunque con le altre configurazioni
+			}
+		}
+		return tuttiSuccesso;
 	}
 }
