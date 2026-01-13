@@ -1,18 +1,25 @@
 package main.java.it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 
+import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
 import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import main.java.it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 public class Topic {
-	private String topic;
+	private String home;
+	private String room;
+	private String id;
+	private DispositivoParameters parameter;
 	public final int length = 4; // Numero di Layers
-	public final String TOPIC_FORMAT = "home/%s/%s/%s";
+	public final String TOPIC_FORMAT = "%s/%s/%s/%s";
 	
-	private Topic(RoomPort room, DevicePort dispositivo, String parameter) {
-		topic = TOPIC_FORMAT.formatted(room.getID(), dispositivo.getId(), parameter);
+	private Topic(RoomPort room, DevicePort dispositivo, DispositivoParameters parameter) {
+		home = "home";
+		this.room = room.getID();
+		id = dispositivo.getId();
+		this.parameter = parameter;
 	}
 	
-	public static Topic createTopic(RoomPort room, DevicePort dispositivo, String parameter) throws IllegalArgumentException {
+	public static Topic createTopic(RoomPort room, DevicePort dispositivo, DispositivoParameters parameter) throws IllegalArgumentException {
 		if(verifyArguments(room, dispositivo, parameter)) {
 			return new Topic(room, dispositivo, parameter);
 		}
@@ -24,35 +31,55 @@ public class Topic {
 	
 	@Override
 	public String toString() {
-		return topic;
+		return TOPIC_FORMAT.formatted(home, room, id, parameter);
 	}
 	
-	private static boolean verifyArguments(RoomPort room, DevicePort dispositivo, String parameter) {
-		if(!room.equals(null) && !dispositivo.equals(null) && !parameter.equals(""))
+	private static boolean verifyArguments(RoomPort room, DevicePort dispositivo, DispositivoParameters parameter) {
+		if(room != null && dispositivo != null && parameter != null)
 			return true;
 		
 		return false;
 	}
 
-	public boolean setTopic(RoomPort room, DevicePort dispositivo, String parameter) {
+	public boolean setTopic(RoomPort room, DevicePort dispositivo, DispositivoParameters parameter) {
 		if(verifyArguments(room, dispositivo, parameter)) {
-			topic = TOPIC_FORMAT.formatted(room.getID(), dispositivo.getId(), parameter);
+			this.room = room.getID();
+			id = dispositivo.getId();
+			this.parameter = parameter;
 			return true;
 		}
 		
 		System.out.println("I parametri inseriti non sono corretti");
 		return false;
 	}
-	
-	public String getRoomByTopic() {
-		return topic.split("/")[1];
+
+	public String getHome() {
+		return home;
+	}
+
+	public String getRoom() {
+		return room;
+	}
+
+	public void setRoom(RoomPort room) {
+		if(room != null) this.room = room.getID();
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(DevicePort dispositivo) {
+		this.id = dispositivo.getId();
+	}
+
+	public DispositivoParameters getParameter() {
+		return parameter;
+	}
+
+	public void setParameter(DispositivoParameters parameter) {
+		if(parameter != null) this.parameter = parameter;
 	}
 	
-	public String getIdByTopic() {
-		return topic.split("/")[2];
-	}
 	
-	public String getParameterByTopic() {
-		return topic.split("/")[3];
-	}
 }

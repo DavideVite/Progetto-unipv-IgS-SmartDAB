@@ -52,9 +52,9 @@ public class EventBus implements DispositiviObserver {
 		
 		while(iter.hasNext()) {
 			d = iter.next();
-			if(request.getTopic().getParameterByTopic().equals(d.getTopic().getParameterByTopic()) &&
-				request.getTopic().getRoomByTopic().equals(d.getTopic().getRoomByTopic()) && 
-			   request.getTopic().getIdByTopic().equals(d.getId())) {
+			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
+				request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
+			   request.getTopic().getId().equals(d.getId())) {
 				
 				subs.add(d);
 			}
@@ -99,7 +99,7 @@ public class EventBus implements DispositiviObserver {
 
 					// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo
 					else if(i == 9) 
-						System.out.println("Dispositivo " + request.getTopic().getIdByTopic() + " non ha risposto");
+						System.out.println("Dispositivo " + request.getTopic().getId() + " non ha risposto");
 				}
 			}
 		}
