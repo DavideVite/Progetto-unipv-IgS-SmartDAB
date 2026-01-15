@@ -1,6 +1,6 @@
-package main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request;
+package it.unipv.posfw.smartdab.infrastructure.messaging.request;
 
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
+import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public class Request {
 	private Topic topic;

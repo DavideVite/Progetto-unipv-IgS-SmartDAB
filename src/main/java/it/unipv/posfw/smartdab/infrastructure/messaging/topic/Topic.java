@@ -1,8 +1,8 @@
-package main.java.it.unipv.posfw.smartdab.infrastructure.messaging.topic;
+package it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.core.port.room.RoomPort;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 public class Topic {
 	private String home;

@@ -1,12 +1,12 @@
-package main.java.it.unipv.posfw.smartdab.infrastructure.messaging;
+package it.unipv.posfw.smartdab.infrastructure.messaging;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.Message;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class EventBus implements DispositiviObserver {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();

@@ -1,4 +1,4 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.casa;
+package it.unipv.posfw.smartdab.core.domain.model.casa;
 
 
 import java.util.HashSet;

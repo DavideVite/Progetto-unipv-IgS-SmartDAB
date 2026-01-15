@@ -1,7 +1,7 @@
-package main.java.it.unipv.posfw.smartdab.core.port.device;
+package it.unipv.posfw.smartdab.core.port.device;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
+import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public interface DevicePort {
 	Topic getTopic();
