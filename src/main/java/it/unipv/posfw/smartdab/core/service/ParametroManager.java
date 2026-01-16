@@ -19,15 +19,24 @@ public class ParametroManager {
         this.eventBusClient = eventBusClient;
     }
 
-    // Trova primo dispositivo idoneo nella stanza
-    // TODO: Decommentare quando supportaParametro() viene abilitato in Dispositivo
+    // Trova primo attuatore idoneo nella stanza che supporta il parametro richiesto
     public Dispositivo getDispositivoIdoneo(String stanzaId, DispositivoParameters tipoParametro) {
         List<Dispositivo> dispositivi = gestoreStanze.getDispositiviPerStanza(stanzaId);
         if (dispositivi == null) return null;
 
         for (Dispositivo d : dispositivi) {
-            // if (d.isActive() && d.supportaParametro(tipoParametro)) {
-            if (d.isActive()) {  // Temporaneo: ritorna il primo dispositivo attivo
+            // 1. Deve essere un attuatore
+            if (!d.isAttuatore()) {
+                continue;
+            }
+
+            // 2. Deve essere attivo
+            if (!d.isActive()) {
+                continue;
+            }
+
+            // 3. Deve supportare il parametro richiesto
+            if (d.getTopic() != null && d.getTopic().getParameter() == tipoParametro) {
                 return d;
             }
         }

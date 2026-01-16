@@ -54,4 +54,9 @@ public class Dispositivo implements DevicePort {
 	public void switchDispositivo() {
 		active = !active;
 	}
+
+	// metodo inserito da Davide per identificare attuatori e sensori
+	public boolean isAttuatore() {
+		return false;
+	}
 }

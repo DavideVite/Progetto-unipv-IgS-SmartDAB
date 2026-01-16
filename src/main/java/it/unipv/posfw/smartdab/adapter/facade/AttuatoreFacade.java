@@ -40,6 +40,10 @@ public class AttuatoreFacade extends Dispositivo {
 	public void setParameter(ObservableParameter parameter) {
 		this.parameter = parameter;
 	}
-	
-	
+
+	//metodo inserito da Davide per identificare attuatori e sensori
+	@Override
+	public boolean isAttuatore() {
+		return true;
+	}
 }

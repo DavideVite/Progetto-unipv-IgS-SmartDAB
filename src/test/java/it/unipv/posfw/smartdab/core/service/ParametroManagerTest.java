@@ -50,8 +50,10 @@ class ParametroManagerTest {
 
         when(gestoreStanze.getDispositiviPerStanza(stanzaId))
             .thenReturn(List.of(dispositivo));
+        when(dispositivo.isAttuatore()).thenReturn(true);
         when(dispositivo.isActive()).thenReturn(true);
         when(dispositivo.getTopic()).thenReturn(topic);
+        when(topic.getParameter()).thenReturn(tipoParametro);
         when(eventBusClient.sendRequest(any(Request.class)))
             .thenReturn(Message.ACK);
 
@@ -73,8 +75,10 @@ class ParametroManagerTest {
 
         when(gestoreStanze.getDispositiviPerStanza(stanzaId))
             .thenReturn(List.of(dispositivo));
+        when(dispositivo.isAttuatore()).thenReturn(true);
         when(dispositivo.isActive()).thenReturn(true);
         when(dispositivo.getTopic()).thenReturn(topic);
+        when(topic.getParameter()).thenReturn(tipoParametro);
         when(eventBusClient.sendRequest(any(Request.class)))
             .thenReturn(Message.ERROR);
 
@@ -94,6 +98,7 @@ class ParametroManagerTest {
 
         when(gestoreStanze.getDispositiviPerStanza(stanzaId))
             .thenReturn(List.of(dispositivo));
+        when(dispositivo.isAttuatore()).thenReturn(true);
         when(dispositivo.isActive()).thenReturn(false);
 
         // Act
@@ -122,5 +127,151 @@ class ParametroManagerTest {
         assertFalse(result);
         verify(eventBusClient, never()).setRequest(any());
         verify(eventBusClient, never()).sendRequest(any());
+    }
+
+    @Test
+    void impostaParametro_ignoraSensori_usaSoloAttuatori() {
+        // Arrange
+        String stanzaId = "stanza1";
+        DispositivoParameters tipoParametro = DispositivoParameters.TEMPERATURA;
+        BooleanValue valore = new BooleanValue(true, "On", "Off");
+
+        Dispositivo sensore = mock(Dispositivo.class);
+        Dispositivo attuatore = mock(Dispositivo.class);
+        Topic attuatoreTopic = mock(Topic.class);
+
+        when(gestoreStanze.getDispositiviPerStanza(stanzaId))
+            .thenReturn(List.of(sensore, attuatore));
+
+        // Sensore: non è un attuatore
+        when(sensore.isAttuatore()).thenReturn(false);
+
+        // Attuatore: è un attuatore attivo con parametro corretto
+        when(attuatore.isAttuatore()).thenReturn(true);
+        when(attuatore.isActive()).thenReturn(true);
+        when(attuatore.getTopic()).thenReturn(attuatoreTopic);
+        when(attuatoreTopic.getParameter()).thenReturn(tipoParametro);
+        when(eventBusClient.sendRequest(any(Request.class))).thenReturn(Message.ACK);
+
+        // Act
+        boolean result = parametroManager.impostaParametro(stanzaId, tipoParametro, valore);
+
+        // Assert
+        assertTrue(result);
+        verify(eventBusClient).setRequest(any(Request.class));
+        verify(eventBusClient).sendRequest(any(Request.class));
+    }
+
+    @Test
+    void impostaParametro_ritornaFalse_quandoNessunAttuatoreSupportaParametro() {
+        // Arrange
+        String stanzaId = "stanza1";
+        DispositivoParameters tipoRichiesto = DispositivoParameters.TEMPERATURA;
+        DispositivoParameters tipoDisponibile = DispositivoParameters.LUMINOSITA;
+        BooleanValue valore = new BooleanValue(true, "On", "Off");
+
+        when(gestoreStanze.getDispositiviPerStanza(stanzaId))
+            .thenReturn(List.of(dispositivo));
+        when(dispositivo.isAttuatore()).thenReturn(true);
+        when(dispositivo.isActive()).thenReturn(true);
+        when(dispositivo.getTopic()).thenReturn(topic);
+        when(topic.getParameter()).thenReturn(tipoDisponibile);
+
+        // Act
+        boolean result = parametroManager.impostaParametro(stanzaId, tipoRichiesto, valore);
+
+        // Assert
+        assertFalse(result);
+        verify(eventBusClient, never()).setRequest(any());
+        verify(eventBusClient, never()).sendRequest(any());
+    }
+
+    @Test
+    void impostaParametro_usaPrimoAttuatoreCorrispondente() {
+        // Arrange
+        String stanzaId = "stanza1";
+        DispositivoParameters tipoParametro = DispositivoParameters.TEMPERATURA;
+        BooleanValue valore = new BooleanValue(true, "On", "Off");
+
+        Dispositivo attuatore1 = mock(Dispositivo.class);
+        Dispositivo attuatore2 = mock(Dispositivo.class);
+        Topic topic1 = mock(Topic.class);
+        Topic topic2 = mock(Topic.class);
+
+        when(gestoreStanze.getDispositiviPerStanza(stanzaId))
+            .thenReturn(List.of(attuatore1, attuatore2));
+
+        when(attuatore1.isAttuatore()).thenReturn(true);
+        when(attuatore1.isActive()).thenReturn(true);
+        when(attuatore1.getTopic()).thenReturn(topic1);
+        when(topic1.getParameter()).thenReturn(tipoParametro);
+
+        when(attuatore2.isAttuatore()).thenReturn(true);
+        when(attuatore2.isActive()).thenReturn(true);
+        when(attuatore2.getTopic()).thenReturn(topic2);
+        when(topic2.getParameter()).thenReturn(tipoParametro);
+
+        when(eventBusClient.sendRequest(any(Request.class))).thenReturn(Message.ACK);
+
+        // Act
+        boolean result = parametroManager.impostaParametro(stanzaId, tipoParametro, valore);
+
+        // Assert
+        assertTrue(result);
+        verify(eventBusClient, times(1)).setRequest(any(Request.class));
+        verify(eventBusClient, times(1)).sendRequest(any(Request.class));
+    }
+
+    @Test
+    void impostaParametro_gestisceTopicNull() {
+        // Arrange
+        String stanzaId = "stanza1";
+        DispositivoParameters tipoParametro = DispositivoParameters.TEMPERATURA;
+        BooleanValue valore = new BooleanValue(true, "On", "Off");
+
+        when(gestoreStanze.getDispositiviPerStanza(stanzaId))
+            .thenReturn(List.of(dispositivo));
+        when(dispositivo.isAttuatore()).thenReturn(true);
+        when(dispositivo.isActive()).thenReturn(true);
+        when(dispositivo.getTopic()).thenReturn(null);
+
+        // Act
+        boolean result = parametroManager.impostaParametro(stanzaId, tipoParametro, valore);
+
+        // Assert
+        assertFalse(result);
+        verify(eventBusClient, never()).setRequest(any());
+        verify(eventBusClient, never()).sendRequest(any());
+    }
+
+    @Test
+    void impostaParametro_saltaAttuatoriInattivi() {
+        // Arrange
+        String stanzaId = "stanza1";
+        DispositivoParameters tipoParametro = DispositivoParameters.TEMPERATURA;
+        BooleanValue valore = new BooleanValue(true, "On", "Off");
+
+        Dispositivo attuatoreInattivo = mock(Dispositivo.class);
+        Dispositivo attuatoreAttivo = mock(Dispositivo.class);
+        Topic topicAttivo = mock(Topic.class);
+
+        when(gestoreStanze.getDispositiviPerStanza(stanzaId))
+            .thenReturn(List.of(attuatoreInattivo, attuatoreAttivo));
+
+        when(attuatoreInattivo.isAttuatore()).thenReturn(true);
+        when(attuatoreInattivo.isActive()).thenReturn(false);
+
+        when(attuatoreAttivo.isAttuatore()).thenReturn(true);
+        when(attuatoreAttivo.isActive()).thenReturn(true);
+        when(attuatoreAttivo.getTopic()).thenReturn(topicAttivo);
+        when(topicAttivo.getParameter()).thenReturn(tipoParametro);
+
+        when(eventBusClient.sendRequest(any(Request.class))).thenReturn(Message.ACK);
+
+        // Act
+        boolean result = parametroManager.impostaParametro(stanzaId, tipoParametro, valore);
+
+        // Assert
+        assertTrue(result);
     }
 }
