@@ -57,13 +57,34 @@ public class ScenarioManager {
 
 	// Attivazione e Disattivazione
 
-	public boolean attivaScenario(String nomeScenario) {
+	/**
+	 * Attiva uno scenario ed esegue automaticamente le sue configurazioni.
+	 * Cicla tutte le ScenarioStanzaConfig dello scenario e le passa al ParametroManager
+	 * che le tratta come impostazioni di parametri manuali.
+	 *
+	 * @param nomeScenario Nome dello scenario da attivare
+	 * @param parametroManager Il ParametroManager per applicare le configurazioni
+	 * @return true se tutte le configurazioni sono state applicate con successo,
+	 *         false se lo scenario non esiste o se almeno una configurazione è fallita
+	 */
+	public boolean attivaScenario(String nomeScenario, ParametroManager parametroManager) {
 		Scenario scenario = scenari.get(nomeScenario);
-		if (scenario != null) {
-			scenario.attivaScenario();
-			return true;
+		if (scenario == null) {
+			return false;
 		}
-		return false;
+
+		// Attiva lo scenario (setta il flag)
+		scenario.attivaScenario();
+
+		// Esegui le configurazioni
+		boolean tuttiSuccesso = true;
+		for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+			if (!parametroManager.applicaScenarioConfig(config)) {
+				tuttiSuccesso = false;
+				// Continua comunque con le altre configurazioni
+			}
+		}
+		return tuttiSuccesso;
 	}
 
 
@@ -97,20 +118,21 @@ public class ScenarioManager {
 		return scenari.size();
 	}
 
-	// Esecuzione scenario - ParametroManager passato come parametro
-	public boolean eseguiScenario(String nomeScenario, ParametroManager parametroManager) {
-		Scenario scenario = getScenario(nomeScenario);
-		if (scenario == null) return false;
+	
+    // Esecuzione Scenario (senza attivazione). Adesso si trova in attivaScenario.
+	// public boolean eseguiScenario(String nomeScenario, ParametroManager parametroManager) {
+	// 	Scenario scenario = getScenario(nomeScenario);
+	// 	if (scenario == null) return false;
 
-		boolean tuttiSuccesso = true;
-		for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
-			if (!parametroManager.applicaScenarioConfig(config)) {
-				tuttiSuccesso = false;
-				// Continua comunque con le altre configurazioni
-			}
-		}
-		return tuttiSuccesso;
-	}
+	// 	boolean tuttiSuccesso = true;
+	// 	for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+	// 		if (!parametroManager.applicaScenarioConfig(config)) {
+	// 			tuttiSuccesso = false;
+	// 			// Continua comunque con le altre configurazioni
+	// 		}
+	// 	}
+	// 	return tuttiSuccesso;
+	// }
 
 
 	/**
