@@ -1,7 +1,7 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.command;
+package it.unipv.posfw.smartdab.core.domain.model.command;
 
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 // Ogni comando valido deve implementare questa interfaccia
 

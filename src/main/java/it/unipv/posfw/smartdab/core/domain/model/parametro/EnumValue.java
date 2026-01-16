@@ -1,4 +1,4 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.parametro;
+package it.unipv.posfw.smartdab.core.domain.model.parametro;
 
 
 import java.util.List;

@@ -1,11 +1,11 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class CommandDispatcher {
 	private Map<String, ICommand> commands = new HashMap<>();

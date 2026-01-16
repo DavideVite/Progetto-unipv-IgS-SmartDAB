@@ -1,9 +1,9 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.Message;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.commands.SwitchCommand;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.commands.SwitchCommand;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
 
 public class Lampada_DispatcherBootstrap implements IDispatcherBootstrap {
 

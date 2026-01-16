@@ -1,15 +1,15 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.Message;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
+import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class Lampada_Communicator implements ICommunicator {
 

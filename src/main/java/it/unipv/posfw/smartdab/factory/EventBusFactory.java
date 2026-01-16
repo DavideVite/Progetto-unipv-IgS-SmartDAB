@@ -1,10 +1,10 @@
-package main.java.it.unipv.posfw.smartdab.factory;
+package it.unipv.posfw.smartdab.factory;
 
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.lang.reflect.Constructor;
 
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
+import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
 
 public class EventBusFactory {
 	private static EventBus event;

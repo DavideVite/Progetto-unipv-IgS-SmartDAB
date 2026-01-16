@@ -1,8 +1,8 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
-import main.java.it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 
 public class Lampada_ON_OFF extends AttuatoreFacade {
 	
