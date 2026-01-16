@@ -41,18 +41,19 @@ public class Scenario {
 
 	}
 
+	// I senguenti 2 metodi sono public per permettere a ScenarioManager di usarli.
 	/*  Questa funzione aggiunge allo Scenario la nuova configurazione. 
 	/*Lo Scenario è sostanzialmente formato da un insime di configurazioni,
 	/* cioè di oggetti ScenarioStanzaConfig
 	*/
-	void aggiungiConfigurazione(ScenarioStanzaConfig config) {
+	public void aggiungiConfigurazione(ScenarioStanzaConfig config) {
 	       configurazioni.add(config);
 	       this.data_ultima_modifica = LocalDateTime.now();
 	 }
 
 
 
-	 boolean rimuoviConfigurazione(ScenarioStanzaConfig config) {
+	 public boolean rimuoviConfigurazione(ScenarioStanzaConfig config) {
 		   boolean removed = configurazioni.remove(config);
 		   if (removed) {
 		       this.data_ultima_modifica = LocalDateTime.now();
