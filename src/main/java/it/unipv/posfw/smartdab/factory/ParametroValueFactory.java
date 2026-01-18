@@ -1,9 +1,9 @@
-package main.java.it.unipv.posfw.smartdab.factory;
+package it.unipv.posfw.smartdab.factory;
 
 import java.util.List;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.BooleanValue;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.NumericValue;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.EnumValue;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.BooleanValue;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.NumericValue;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.EnumValue;
 
 public class ParametroValueFactory {
 

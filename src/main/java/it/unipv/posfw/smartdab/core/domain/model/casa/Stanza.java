@@ -1,4 +1,4 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.casa;
+package it.unipv.posfw.smartdab.core.domain.model.casa;
 
 
 import java.util.ArrayList;
@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import main.java.it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer{
+public class Stanza implements Observable, Observer, RoomPort{
 	 private String id;
 	 private String nome;
 	 private List<Dispositivo> dispositivi = new ArrayList<>();
@@ -23,7 +24,9 @@ public class Stanza implements Observable, Observer{
 		 this.id = id;
 		 this.nome = nome;	 
 	 }
-
+	 
+	 // Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
+	 @Override
 	 public String getId() {
 		 return id;
 	 }
@@ -97,7 +100,7 @@ public class Stanza implements Observable, Observer{
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
 
-         String nome = obsParam.getParameterName();
+         // String nome = obsParam.getParameterName();
          double valore = obsParam.getValue();
 
          this.updateParameter(nome, valore);

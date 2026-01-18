@@ -1,19 +1,26 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
-import main.java.it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 
 public class Lampada_ON_OFF extends AttuatoreFacade {
 	
 	private int illuminazione;
 	private int intensita; // u.m. lumen
+	public static final DispositivoParameter parameter = DispositivoParameter.LUMINOSITA;
 	public final int MAX_INTENSITA = 5000; 
 	
-	public Lampada_ON_OFF(String id, Lampada_Communicator c, ObservableParameter parameter, int intensita) {
-		super(id, c, parameter);
-		super.getTopic().setParameter(DispositivoParameters.LUMINOSITA);
-		this.intensita = intensita;
+	public Lampada_ON_OFF(String id, Lampada_Communicator c, int intensita) {
+		// Manca la logica per capire se un observable parameter esiste già
+		super(id, c, new ObservableParameter(parameter));
+		
+		if(intensita <= MAX_INTENSITA) this.intensita = intensita;
+		else {
+			System.out.println("L'intensità inserita non è corretta");
+			intensita = 0;
+		}
+		
 		illuminazione = 0;
 		c.setDevicePort(this);
 	}
@@ -35,6 +42,24 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	public void switchDispositivo() {
 		super.switchDispositivo();
 		illuminazione = intensita * (this.isActive() ? 1 : 0);
+		applyVariation(illuminazione);
+	}
+	
+	// Devo implementare controllo ON/OFF
+	
+	@Override
+	public int applyVariation(Object state) {
+		try {
+			
+			super.getParameter().setValue((int)state);
+			super.getParameter().notifyObservers(this);
+			
+		} catch(ClassCastException e) {
+			e.printStackTrace();
+			return 0;
+		}
+		
+		return 1;
 	}
 	
 	

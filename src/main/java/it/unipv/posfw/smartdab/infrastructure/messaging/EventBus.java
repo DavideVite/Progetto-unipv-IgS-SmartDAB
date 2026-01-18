@@ -1,12 +1,12 @@
-package main.java.it.unipv.posfw.smartdab.infrastructure.messaging;
+package it.unipv.posfw.smartdab.infrastructure.messaging;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.Message;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class EventBus implements DispositiviObserver {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
@@ -25,7 +25,8 @@ public class EventBus implements DispositiviObserver {
 	 */
 	
 	
-	// Quando event bus riceve una misura (home/r1/d1/parameter/payload = topic + value)
+	// Quando event bus riceve una request = topic (home/room/dispositivo/parameter) + type + val
+	
 	public void setRequest(Request request) {
 		this.request = request;
 	}
@@ -53,10 +54,18 @@ public class EventBus implements DispositiviObserver {
 		while(iter.hasNext()) {
 			d = iter.next();
 			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
-				request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
+			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
 			   request.getTopic().getId().equals(d.getId())) {
 				
-				subs.add(d);
+				// Se il dispositivo è un attuatore lo inserisco, altrimenti passo avanti
+				
+				try {
+					d = (AttuatoreFacade)d;
+					subs.add(d);
+				} catch(ClassCastException e) {
+					continue;
+				}
+
 			}
 		}
 		return subs;
@@ -79,13 +88,21 @@ public class EventBus implements DispositiviObserver {
 		
 		return instance;
 	}
+
+	
+	// Metodo esclusivo dei sensori che misurano dei parametri
+	
+	// topic = "home/room/sensore/parameter"
+	// type = "UPDATE.PARAMETER"
+	// val = payload
 	
 	@Override
 	public Message update(Request request) {
 		
-		setRequest(request);
-		
-		if(request.getTopic().length== 4 && request.getVal() != null) {
+		// Verifico se il messaggio arrivato è pertinente alla funzionalità
+		if(request.getType().equals(Message.UPDATE + "." + Message.PARAMETER)) {
+			setRequest(request);
+
 			// Verifica se il parametro esiste nella stanza...
 
 			// Prendi tutti gli iscritti al topic

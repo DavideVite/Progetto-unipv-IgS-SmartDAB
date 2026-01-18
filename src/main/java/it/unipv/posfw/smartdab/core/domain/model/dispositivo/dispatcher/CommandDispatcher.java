@@ -1,11 +1,11 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class CommandDispatcher {
 	private Map<String, ICommand> commands = new HashMap<>();
@@ -15,7 +15,7 @@ public class CommandDispatcher {
 	}
 	
 	public void register(String type, ICommand command) {
-		if(!type.equals("") && command  != null) commands.put(type, command);
+		if(!type.equals("") && type != null && command  != null) commands.put(type, command);
 		else System.out.println("I parametri inseriti non sono validi");
 	}
 	

@@ -1,36 +1,19 @@
-package main.java.it.unipv.posfw.smartdab.adapter.facade;
+package it.unipv.posfw.smartdab.adapter.facade;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 
-public class AttuatoreFacade extends Dispositivo {
-	private double setpoint;
-	private double variation;
+
+// Questa classe serve solo per dividere semanticamente sensori da attuatori
+// non ha particolari logiche e implementazioni
+
+public abstract class AttuatoreFacade extends Dispositivo {
 	private ObservableParameter parameter;
 	
 	public AttuatoreFacade(String id, ICommunicator c, ObservableParameter parameter) {
 		super(id, c, false);
 		this.setParameter(parameter);
-	}
-	
-	public int applyVariation(double state) {
-		
-		// Inserisco un controllo proporzionale per semplicità
-		
-		double error = setpoint - state;
-		double new_state = Math.round(state + error * variation * 10) / 10;
-		super.getCommunicator().notifyObservers(Double.toString(new_state));
-		return 1;
-
-	}
-
-	public void applySetpoint(double setpoint) {
-		this.setpoint = setpoint;
-	}
-
-	public double getSetpoint() {
-		return setpoint;
 	}
 
 	public ObservableParameter getParameter() {
@@ -41,5 +24,6 @@ public class AttuatoreFacade extends Dispositivo {
 		this.parameter = parameter;
 	}
 	
-	
+	// Il modo in cui un attuatore applica la variazione dipende dalla particolare specializzazione
+	public abstract int applyVariation(Object state);
 }
