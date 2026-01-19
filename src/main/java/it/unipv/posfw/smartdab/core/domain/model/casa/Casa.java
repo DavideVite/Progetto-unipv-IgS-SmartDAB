@@ -4,17 +4,13 @@ package it.unipv.posfw.smartdab.core.domain.model.casa;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class Casa {
       private Set<Stanza> stanze = new HashSet<>();
-      double mqTotali;
 
-      public Casa(double mqTotali) {
-    	  this.mqTotali = mqTotali;
+
+      public Casa() {
       }
-
-	  public double getMqTotali() {
-		  return mqTotali;
-	  }
 
 	  public Set<Stanza> getStanze() {
 		  return stanze;
@@ -44,6 +40,14 @@ public class Casa {
 
 	  public void rimuoviStanza(Stanza s) {
 		  this.stanze.remove(s);
+	  }
+	  
+	  public double calcolaMqTotali() {
+		  double mqTotali = 0;
+		  for(Stanza s: stanze) {
+			  mqTotali += s.getMq();
+		  }
+		  return mqTotali;
 	  }
 
 

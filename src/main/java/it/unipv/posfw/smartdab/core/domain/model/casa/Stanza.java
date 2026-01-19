@@ -15,17 +15,22 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 public class Stanza implements Observable, Observer{
 	 private String id;
 	 private String nome;
+	 private double mq;
 	 private List<Dispositivo> dispositivi = new ArrayList<>();
 	 private Map<String, Double> parametri = new HashMap<>();
 	 private List<Observer> observers = new ArrayList<>(); 
 
-	 public Stanza(String id, String nome) {
+	 public Stanza(String id, String nome, double mq) {
 		 this.id = id;
-		 this.nome = nome;	 
-	 }
+		 this.nome = nome;	
+		 this.mq = mq;	 }
 
 	 public String getId() {
 		 return id;
+	 }
+	 
+	 public double getMq() {
+		 return mq;
 	 }
 
 	 public String getNome() {
