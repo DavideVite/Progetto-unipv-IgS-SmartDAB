@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.BooleanValue;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.EnumValue;
@@ -140,7 +140,7 @@ public class ScenarioManager {
 	 */
 	public ScenarioStanzaConfig creaConfigNumerico(
 			String stanzaId,
-			DispositivoParameters tipoParametro,
+			DispositivoParameter tipoParametro,
 			double valore,
 			Double min,
 			Double max,
@@ -159,7 +159,7 @@ public class ScenarioManager {
 	 */
 	public ScenarioStanzaConfig creaConfigBooleano(
 			String stanzaId,
-			DispositivoParameters tipoParametro,
+			DispositivoParameter tipoParametro,
 			boolean valore,
 			String labelTrue,
 			String labelFalse) {
@@ -173,7 +173,7 @@ public class ScenarioManager {
 	 */
 	public ScenarioStanzaConfig creaConfigEnum(
 			String stanzaId,
-			DispositivoParameters tipoParametro,
+			DispositivoParameter tipoParametro,
 			String valoreSelezionato,
 			List<String> valoriAmmessi) {
 
