@@ -1,9 +1,9 @@
-package main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
-import main.java.it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
+import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public class Dispositivo implements DevicePort {
 	private String id;
@@ -53,5 +53,10 @@ public class Dispositivo implements DevicePort {
 	
 	public void switchDispositivo() {
 		active = !active;
+	}
+
+	// metodo inserito da Davide per identificare attuatori e sensori
+	public boolean isAttuatore() {
+		return false;
 	}
 }

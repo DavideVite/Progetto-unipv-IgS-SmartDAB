@@ -1,8 +1,8 @@
-package main.java.it.unipv.posfw.smartdab.adapter.facade;
+package it.unipv.posfw.smartdab.adapter.facade;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import main.java.it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 
 public class AttuatoreFacade extends Dispositivo {
 	private double setpoint;
@@ -40,6 +40,10 @@ public class AttuatoreFacade extends Dispositivo {
 	public void setParameter(ObservableParameter parameter) {
 		this.parameter = parameter;
 	}
-	
-	
+
+	//metodo inserito da Davide per identificare attuatori e sensori
+	@Override
+	public boolean isAttuatore() {
+		return true;
+	}
 }

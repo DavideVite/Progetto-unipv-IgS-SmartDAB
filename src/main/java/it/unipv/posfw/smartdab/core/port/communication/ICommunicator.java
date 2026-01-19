@@ -1,9 +1,9 @@
-package main.java.it.unipv.posfw.smartdab.core.port.communication;
+package it.unipv.posfw.smartdab.core.port.communication;
 
-import main.java.it.unipv.posfw.smartdab.core.domain.enums.Message;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
-import main.java.it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
-import main.java.it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public interface ICommunicator extends Observable{
 	
