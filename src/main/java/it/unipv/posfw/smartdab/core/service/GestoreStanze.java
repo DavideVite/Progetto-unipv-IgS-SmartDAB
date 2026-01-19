@@ -4,10 +4,15 @@ import java.util.List;
 import java.util.Set;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+<<<<<<< HEAD
 import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 
+=======
+import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+>>>>>>> main
 
 public class GestoreStanze {
      private Casa casa;

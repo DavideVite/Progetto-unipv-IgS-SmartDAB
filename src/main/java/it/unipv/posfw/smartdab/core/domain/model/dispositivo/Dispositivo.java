@@ -23,10 +23,20 @@ public class Dispositivo implements DevicePort {
 		return id;
 	}
 
-	public void setId(String id) {
-		if(!id.equals("")) this.id = id;
+	public boolean setId(String id) {
+		if(checkId(id)) {
+			this.id = id.toLowerCase();
+			return true;
+		}
+		
+		return false;
 	}
-
+	
+	private boolean checkId(String id) {
+		String idx = "[A-Za-z]{1,17}[0-9]{0,3}";
+		return id.matches(idx);
+	}
+	
 	public Topic getTopic() {
 		return topic;
 	}
@@ -44,7 +54,7 @@ public class Dispositivo implements DevicePort {
 	}
 	
 	public void setCommunicator(ICommunicator c) {
-		this.c = c;
+		if(c != null) this.c = c;
 	}
 	
 	public boolean isActive() {

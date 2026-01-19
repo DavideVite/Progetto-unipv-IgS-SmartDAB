@@ -5,7 +5,10 @@ import java.util.Iterator;
 
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
+<<<<<<< HEAD
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
+=======
+>>>>>>> main
 import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
@@ -18,7 +21,8 @@ public class Lampada_Communicator implements ICommunicator {
 	private CommandDispatcher dispatcher;
 	
 	
-	public Lampada_Communicator(Lampada_DispatcherBootstrap boot) {
+	public Lampada_Communicator() {
+		Lampada_DispatcherBootstrap boot = new Lampada_DispatcherBootstrap();
 		dispatcher = boot.createDispatcher();
 	}
 	
@@ -37,12 +41,14 @@ public class Lampada_Communicator implements ICommunicator {
 	
 	@Override
 	public void addObserver(Observer observer) {
-		observers.add(observer);
+		if(observer != null) observers.add(observer);
+		else System.out.println("Osservatore non valido");
 	}
 	
 	@Override
 	public void removeObserver(Observer observer) {
-		observers.remove(observer);
+		if(observers.remove(observer)) System.out.println("Osservatore " + observer.toString() + " è stato rimosso");
+		else System.out.println("Osservatore " + observer.toString() + " non presente nella lista");
 	}
 	
 	@Override

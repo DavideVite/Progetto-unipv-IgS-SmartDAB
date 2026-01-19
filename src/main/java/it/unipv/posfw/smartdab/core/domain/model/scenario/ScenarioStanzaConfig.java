@@ -1,15 +1,19 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
 
+<<<<<<< HEAD
 import it.unipv.posfw.smartdab.core.domain.enums.EnumTipoParametro;
+=======
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
+>>>>>>> main
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
 public class ScenarioStanzaConfig {
 
 	private String stanzaId;
 	private IParametroValue valore; 
-	private EnumTipoParametro tipo_parametro; 
+	private DispositivoParameter tipo_parametro; 
 	
-	public ScenarioStanzaConfig (String stanzaId, IParametroValue valore, EnumTipoParametro tipo_parametro)  {
+	public ScenarioStanzaConfig (String stanzaId, IParametroValue valore, DispositivoParameter tipo_parametro)  {
 		this.stanzaId = stanzaId;
 		this.valore = valore;
 		this.tipo_parametro = tipo_parametro;
@@ -24,7 +28,7 @@ public class ScenarioStanzaConfig {
 	}
 		
 	
-	public EnumTipoParametro getTipo_parametro() {
+	public DispositivoParameter getTipo_parametro() {
 		return tipo_parametro; 
 	}
 
