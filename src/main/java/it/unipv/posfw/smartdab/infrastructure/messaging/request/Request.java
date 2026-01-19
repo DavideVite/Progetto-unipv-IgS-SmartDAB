@@ -30,16 +30,19 @@ public class Request {
 	private static boolean verifyArguments(Topic topic, String type, Object val) {
 		
 		// Prima verifica su parametri non nulli
-		if(topic != null && !type.equals("") && val != null) {
+		
+		// Se type è null cortocircuito il .equals su "" che darebbe un'eccezione
+		if(topic != null && type != null && !type.equals("") && val != null) {
 			List<Message> msg = Arrays.asList(Message.values());
 			
 			// Seconda verifica sul type dato da composizione di Message
-			for(String layer: type.split(".")) {
+			for(String layer: type.split("\\.")) {
 				if(!msg.contains(Message.valueOf(layer))) return false;
 			}
 			
 			return true;
 		}
+		
 		return false;
 	}
 	

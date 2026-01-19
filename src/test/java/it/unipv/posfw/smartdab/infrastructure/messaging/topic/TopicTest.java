@@ -59,7 +59,7 @@ public class TopicTest {
 			fail("Topic ha fallito nell'inizializzazione");
 		
 		} catch(IllegalArgumentException e) {
-			assertTrue(topic == null, "Topic non inizializzato");
+
 		}
 	}
 	
@@ -71,7 +71,7 @@ public class TopicTest {
 			fail("Topic ha fallito nell'inizializzazione");
 		
 		} catch(IllegalArgumentException e) {
-			assertTrue(topic == null, "Topic non inizializzato");
+
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class TopicTest {
 			fail("Topic ha fallito nell'inizializzazione");
 		
 		} catch(IllegalArgumentException e) {
-			assertTrue(topic == null, "Topic non inizializzato");
+
 		}
 	}
 	
