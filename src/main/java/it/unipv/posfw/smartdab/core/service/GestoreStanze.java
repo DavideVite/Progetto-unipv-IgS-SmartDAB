@@ -4,8 +4,15 @@ import java.util.List;
 import java.util.Set;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+<<<<<<< HEAD
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+
+=======
+import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+>>>>>>> main
 
 public class GestoreStanze {
      private Casa casa;
@@ -32,15 +39,19 @@ public class GestoreStanze {
     	return null;  	
     }
 
-    public boolean creaStanza(String id, String nomeStanza) {
+    public boolean creaStanza(String id, String nomeStanza, double mqStanza, String pin, String passwordProduttore) {
+        if(!Hub.getInstance().getAutenticazione().verificaPin(pin)) {
+        	return false;
+        }
+      
     	  if(casa.esisteStanza(nomeStanza)) {
     		  return false;
     		}
 
-    	Stanza nuovaStanza = new Stanza(id, nomeStanza);
+    	Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
     	casa.nuovaStanza(nuovaStanza);
     	return true;
-    }
+        }
 
     public boolean modificaNomeStanza(String nome, String nuovoNome) {
     	Stanza s = casa.cercaStanza(nome); 

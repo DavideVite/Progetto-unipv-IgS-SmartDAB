@@ -1,6 +1,10 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
 
+<<<<<<< HEAD
+import it.unipv.posfw.smartdab.core.domain.enums.EnumTipoParametro;
+=======
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
+>>>>>>> main
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
 public class ScenarioStanzaConfig {

@@ -1,9 +1,12 @@
 package it.unipv.posfw.smartdab.infrastructure.messaging.request;
 
+<<<<<<< HEAD
+=======
 import java.util.Arrays;
 import java.util.List;
 
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
+>>>>>>> main
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public class Request {
