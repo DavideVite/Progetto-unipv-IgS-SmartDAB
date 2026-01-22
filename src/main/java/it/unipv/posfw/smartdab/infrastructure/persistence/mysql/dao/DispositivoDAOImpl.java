@@ -3,19 +3,20 @@ package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
 public class DispositivoDAOImpl implements DispositivoDAO{
-	private String schema;
 	private Connection connection;
 	public final int MAX_N = 100;
 	
 	public DispositivoDAOImpl() {
-		this.schema = "";
+
 	}
 	
 	public ArrayList<DispositivoPOJO> selectN(int n) {
@@ -25,12 +26,14 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			System.out.println("Il numero di dispositivi da selezionare è troppo elevato");
 			return result;
 		}
-		
-		// connection = DBConnection.startConnection(connection, schema);
-		PreparedStatement s;
-		ResultSet r;
+
 		
 		try {
+			connection = DatabaseConnection.getConnection();
+			
+			PreparedStatement s;
+			ResultSet r;
+			
 			String query = "SELECT * from Dispositivi LIMIT " + n;
 			s = connection.prepareStatement(query);
 			r = s.executeQuery(query);
@@ -46,13 +49,20 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 														r.getString(8)
 														);
 				result.add(d);
-			}
+			} 
 			
-		} catch(Exception e) {
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		// DBConnection.closeConnection(conn);
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return result;
 	}
 }
