@@ -41,7 +41,7 @@ public class EventBus implements DispositiviObserver {
 		
 		while(iter.hasNext()) {
 			d = iter.next();
-			if(name.equals(d.getId())) {
+			if(name.equals(d.getTopic().getId())) {
 				return d;
 			}
 		}
@@ -59,7 +59,7 @@ public class EventBus implements DispositiviObserver {
 			d = iter.next();
 			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
 			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
-			   request.getTopic().getId().equals(d.getId())) {
+			   request.getTopic().getId().equals(d.getTopic().getId())) {
 				
 				// Se il dispositivo è un attuatore lo inserisco, altrimenti passo avanti
 				

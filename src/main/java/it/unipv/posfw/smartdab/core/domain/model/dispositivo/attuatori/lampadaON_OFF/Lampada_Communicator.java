@@ -54,14 +54,14 @@ public class Lampada_Communicator implements ICommunicator {
 	@Override
 	public void notifyObservers(Object args) {
 		try {
-			int payload = (int)args;
-			if(payload > 0 && payload <= 5000) {
-				
-			}
+			
+			// L'unico motivo per cui lampada notifica è un cambio di stato
+			Request request = Request.createRequest(dispositivo.getTopic(), Message.STATE + "", String.valueOf(args));
+			
 			Iterator<Observer> iter = observers.iterator();
 			
 			while(iter.hasNext()) {
-				iter.next().update(this, payload);
+				iter.next().update(this, request);
 			}
 			
 		} catch(ClassCastException e) {
