@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
 import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
@@ -51,14 +50,14 @@ public class Lampada_Communicator implements ICommunicator {
 	@Override
 	public void notifyObservers(Object args) {
 		try {
-			int payload = (int)args;
-			if(payload > 0 && payload <= 5000) {
-				
-			}
+			
+			// L'unico motivo per cui lampada notifica è un cambio di stato
+			Request request = Request.createRequest(dispositivo.getTopic(), Message.STATE + "", String.valueOf(args));
+			
 			Iterator<Observer> iter = observers.iterator();
 			
 			while(iter.hasNext()) {
-				iter.next().update(this, payload);
+				iter.next().update(this, request);
 			}
 			
 		} catch(ClassCastException e) {
