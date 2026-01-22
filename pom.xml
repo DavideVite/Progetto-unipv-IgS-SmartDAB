@@ -38,6 +38,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+           <groupId>com.mysql</groupId>
+           <artifactId>mysql-connector-j</artifactId>
+           <version>9.1.0</version>
+       </dependency>
+
+
+
         <!-- Mockito per i mock nei test -->
         <dependency>
             <groupId>org.mockito</groupId>
