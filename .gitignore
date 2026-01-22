@@ -21,3 +21,5 @@ buildNumber.properties
 # --- VS Code ---
 .vscode/
 
+# --- SQL ---
+properties/application.properties
