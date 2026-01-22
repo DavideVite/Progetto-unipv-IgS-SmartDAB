@@ -5,10 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
-<<<<<<< HEAD
-=======
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
->>>>>>> main
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 

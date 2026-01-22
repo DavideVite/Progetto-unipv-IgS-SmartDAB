@@ -7,16 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
-<<<<<<< HEAD
-=======
-import it.unipv.posfw.smartdab.core.port.room.RoomPort;
->>>>>>> main
 
-public class Stanza implements Observable, Observer, RoomPort{
+public class Stanza implements Observable, Observer{
 	 private String id;
 	 private String nome;
 	 private double mq;
@@ -26,17 +23,10 @@ public class Stanza implements Observable, Observer, RoomPort{
 
 	 public Stanza(String id, String nome, double mq) {
 		 this.id = id;
-<<<<<<< HEAD
 		 this.nome = nome;	
-		 this.mq = mq;	 }
-
-=======
-		 this.nome = nome;	 
+		 this.mq = mq;	  
 	 }
 	 
-	 // Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
-	 @Override
->>>>>>> main
 	 public String getId() {
 		 return id;
 	 }
@@ -114,7 +104,7 @@ public class Stanza implements Observable, Observer, RoomPort{
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
 
-         // String nome = obsParam.getParameterName();
+         //DispositivoParameter nome = obsParam.getParameterName();
          double valore = obsParam.getValue();
 
          this.updateParameter(nome, valore);
