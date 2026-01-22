@@ -8,7 +8,6 @@ import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 
-
 public class GestoreStanze {
      private Casa casa;
 

@@ -5,6 +5,10 @@ import java.util.Iterator;
 
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.CommandDispatcher;
+<<<<<<< HEAD
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.dispatcher.IDispatcherBootstrap;
+=======
+>>>>>>> main
 import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
