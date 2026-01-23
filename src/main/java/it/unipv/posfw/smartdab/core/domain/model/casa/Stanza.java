@@ -12,8 +12,9 @@ import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer{
+public class Stanza implements Observable, Observer, RoomPort {
 	 private String id;
 	 private String nome;
 	 private double mq;
@@ -23,12 +24,9 @@ public class Stanza implements Observable, Observer{
 
 	 public Stanza(String id, String nome, double mq) {
 		 this.id = id;
-		 this.nome = nome;	
-		 this.mq = mq;	  
+		 this.nome = nome;
+		 this.mq = mq;
 	 }
-	 
-		 this.nome = nome;	
-		 this.mq = mq;	 }
 
 	 public String getId() {
 		 return id;

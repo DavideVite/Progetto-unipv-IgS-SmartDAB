@@ -1,1 +1,1 @@
-eventbus.dispositiviobserver.class.name = it.unipv.posfw.smartdab.src.infrastructure.messaging.EventBus
+eventbus.dispositiviobserver.class.name = it.unipv.posfw.smartdab.infrastructure.messaging.EventBus
