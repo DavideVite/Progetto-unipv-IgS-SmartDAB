@@ -23,12 +23,9 @@ public class Stanza implements Observable, Observer{
 
 	 public Stanza(String id, String nome, double mq) {
 		 this.id = id;
-		 this.nome = nome;	
-		 this.mq = mq;	  
+		 this.nome = nome;
+		 this.mq = mq;
 	 }
-	 
-		 this.nome = nome;	
-		 this.mq = mq;	 }
 
 	 public String getId() {
 		 return id;
