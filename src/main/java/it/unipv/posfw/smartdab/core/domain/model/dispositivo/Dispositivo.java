@@ -41,6 +41,10 @@ public class Dispositivo implements DevicePort {
 		return topic;
 	}
 
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
+
 	public DispositivoStates getState() {
 		return state;
 	}
