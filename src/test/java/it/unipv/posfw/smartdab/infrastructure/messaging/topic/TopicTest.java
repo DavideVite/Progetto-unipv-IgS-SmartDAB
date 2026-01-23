@@ -24,12 +24,13 @@ public class TopicTest {
 	
 	@BeforeAll
 	public static void initTest() {
-		
+
 		// Effettuo test su implementazioni concrete
-		
+
 		Lampada_Communicator lc = new Lampada_Communicator();
 		d = new Lampada_ON_OFF("lamp1", lc, 2000);
-		r = new Stanza("1", "room1");
+		// TODO: Aggiornare quando si conosce il valore corretto per il terzo parametro (double)
+		r = new Stanza("1", "room1", 0.0);
 		p = Lampada_ON_OFF.parameter;
 	}
 	
