@@ -3,11 +3,7 @@ package it.unipv.posfw.smartdab.infrastructure.messaging;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-<<<<<<< HEAD
-
-=======
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
->>>>>>> main
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
