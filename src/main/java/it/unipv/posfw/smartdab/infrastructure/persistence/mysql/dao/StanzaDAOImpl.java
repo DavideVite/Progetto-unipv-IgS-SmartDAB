@@ -20,7 +20,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		
-		String sql = "INSERT INTO stanze (id, nome, mq) VALUES (?, ?, ?)";
+		String sql = "INSERT INTO stanza (id, nome, mq) VALUES (?, ?, ?)";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -58,7 +58,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		ResultSet rs = null;
 		Stanza s = null;	
 		
-		String sql = "SELECT * FROM STANZE WHERE id = ?";
+		String sql = "SELECT * FROM STANZA WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -134,7 +134,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
-		String sql = "DELETE FROM STANZE WHERE id = ?";
+		String sql = "DELETE FROM STANZA WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -173,7 +173,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		ResultSet rs = null;
 		Set<Stanza> stanze = new HashSet<>();	 
 		
-		String sql = "SELECT * FROM stanze";
+		String sql = "SELECT * FROM stanza";
 		
 		try {
 			conn = DatabaseConnection.getConnection();		

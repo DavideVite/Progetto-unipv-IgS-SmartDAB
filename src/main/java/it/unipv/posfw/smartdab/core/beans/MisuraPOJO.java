@@ -2,7 +2,7 @@ package it.unipv.posfw.smartdab.core.beans;
 
 import java.sql.Timestamp;
 
-public class Misura {
+public class MisuraPOJO {
 	private String id;
 	private String tipo;
 	private String unita;
@@ -10,7 +10,7 @@ public class Misura {
 	private String idStanza;
 	private Timestamp timestamp;
 	
-	public Misura (String id, String tipo, String unita, double valore, String idStanza, Timestamp timestamp) {
+	public MisuraPOJO (String id, String tipo, String unita, double valore, String idStanza, Timestamp timestamp) {
 		this.id = id;
 		this.tipo = tipo;
 		this.unita = unita;

@@ -1,10 +1,8 @@
 package it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 
-<<<<<<< HEAD
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameters;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
-=======
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
@@ -15,7 +13,6 @@ import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 // Questa classe definisce un nuovo abstract type topic semi-strutturato
 
 // Ogni controllo necessario per l'istanza è gestito qui
->>>>>>> main
 
 public class Topic {
 	private String home;
