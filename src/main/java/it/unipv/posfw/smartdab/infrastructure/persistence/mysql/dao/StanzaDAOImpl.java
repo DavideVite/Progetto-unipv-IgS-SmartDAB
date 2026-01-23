@@ -104,7 +104,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
-		String sql = "UPDATE stanza SET nome=?, mq = ? WHERE id = ?";
+		String sql = "UPDATE stanze SET nome=?, mq = ? WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();		
