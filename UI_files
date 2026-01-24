@@ -1,0 +1,15 @@
+ui/
+├── SmartDABApp.java              # Entry point
+├── view/
+│   ├── MainFrame.java            # JFrame principale
+│   ├── MainPanel.java            # Contenitore navigazione
+│   ├── stanze/
+│   │   └── StanzePanel.java      # Lista stanze
+│   └── scenari/
+│       ├── ScenariPanel.java         # Lista scenari
+│       ├── ScenarioDetailPanel.java  # Dettaglio configurazioni
+│       └── ScenarioFormPanel.java    # Form CRUD
+└── controller/
+    ├── MainAction.java           # Navigazione
+    ├── StanzeAction.java         # Logica stanze
+    └── ScenariAction.java        # CRUD scenari
