@@ -44,6 +44,24 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 		super.switchDispositivo();
 		super.getCommunicator().notifyObservers(this.isActive());
 		illuminazione = intensita * (this.isActive() ? 1 : 0);
+		applyVariation(illuminazione);
+	}
+	
+	// Devo implementare controllo ON/OFF
+	
+	@Override
+	public int applyVariation(Object state) {
+		try {
+			
+			super.getParameter().setValue((int)state);
+			super.getParameter().notifyObservers(this);
+			
+		} catch(ClassCastException e) {
+			e.printStackTrace();
+			return 0;
+		}
+		
+		return 1;
 	}
 	
 	// Devo implementare controllo ON/OFF

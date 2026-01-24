@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
