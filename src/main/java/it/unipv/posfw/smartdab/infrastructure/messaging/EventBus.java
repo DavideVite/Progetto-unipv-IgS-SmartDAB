@@ -3,15 +3,14 @@ package it.unipv.posfw.smartdab.infrastructure.messaging;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
-import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
-public class EventBus implements DispositiviObserver, IEventBusClient {
+public class EventBus implements DispositiviObserver {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
-	private EventBus instance = null;
+	private static EventBus instance = null;
 	private Request request;
 	
 	/* Come chiamare l'event bus:
@@ -26,8 +25,8 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	 */
 	
 	
-	// Quando event bus riceve una misura (home/r1/d1/parameter/payload = topic + value)
-	@Override
+	// Quando event bus riceve una request = topic (home/room/dispositivo/parameter) + type + val
+	
 	public void setRequest(Request request) {
 		this.request = request;
 	}
@@ -38,7 +37,7 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		
 		while(iter.hasNext()) {
 			d = iter.next();
-			if(name.equals(d.getId())) {
+			if(name.equals(d.getTopic().getId())) {
 				return d;
 			}
 		}
@@ -47,7 +46,7 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		return null;
 	}
 	
-	public ArrayList<Dispositivo> getSubrscribers() {
+	public ArrayList<Dispositivo> getSubscribers() {
 		Iterator<Dispositivo> iter = dispositivi.iterator();
 		ArrayList<Dispositivo> subs = new ArrayList<>();
 		Dispositivo d;
@@ -55,16 +54,23 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		while(iter.hasNext()) {
 			d = iter.next();
 			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
-				request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
-			   request.getTopic().getId().equals(d.getId())) {
+			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
+			   request.getTopic().getId().equals(d.getTopic().getId())) {
 				
-				subs.add(d);
+				// Se il dispositivo è un attuatore lo inserisco, altrimenti passo avanti
+				
+				try {
+					d = (AttuatoreFacade)d;
+					subs.add(d);
+				} catch(ClassCastException e) {
+					continue;
+				}
+
 			}
 		}
 		return subs;
 	}
 	
-	@Override
 	public Message sendRequest(Request request) {
 		return searchDispositivoByName(request.getTopic().toString()
 				).getCommunicator().processRequest(request);
@@ -75,24 +81,32 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	}
 	
 	// Singleton
-	public EventBus getInstance() {
+	public static EventBus getInstance() {
 		if(instance == null) {
 			instance = new EventBus();
 		}
 		
 		return instance;
 	}
+
+	
+	// Metodo esclusivo dei sensori che misurano dei parametri
+	
+	// topic = "home/room/sensore/parameter"
+	// type = "UPDATE.PARAMETER"
+	// val = payload
 	
 	@Override
 	public Message update(Request request) {
 		
-		setRequest(request);
-		
-		if(request.getTopic().length== 4 && request.getVal() != null) {
+		// Verifico se il messaggio arrivato è pertinente alla funzionalità
+		if(request.getType().equals(Message.UPDATE + "." + Message.PARAMETER)) {
+			setRequest(request);
+
 			// Verifica se il parametro esiste nella stanza...
 
 			// Prendi tutti gli iscritti al topic
-			ArrayList<Dispositivo> subs = getSubrscribers();
+			ArrayList<Dispositivo> subs = getSubscribers();
 			Iterator<Dispositivo> iterSubs = subs.iterator();
 
 			while(iterSubs.hasNext()) {

@@ -1,5 +1,9 @@
 package it.unipv.posfw.smartdab.infrastructure.messaging.request;
 
+import java.util.Arrays;
+import java.util.List;
+
+import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public class Request {
@@ -24,7 +28,20 @@ public class Request {
 	}
 	
 	private static boolean verifyArguments(Topic topic, String type, Object val) {
-		if(topic != null && !type.equals("") && val != null) return true;
+		
+		// Prima verifica su parametri non nulli
+		
+		// Se type è null cortocircuito il .equals su "" che darebbe un'eccezione
+		if(topic != null && type != null && !type.equals("") && val != null) {
+			List<Message> msg = Arrays.asList(Message.values());
+			
+			// Seconda verifica sul type dato da composizione di Message
+			for(String layer: type.split("\\.")) {
+				if(!msg.contains(Message.valueOf(layer))) return false;
+			}
+			
+			return true;
+		}
 		
 		return false;
 	}
