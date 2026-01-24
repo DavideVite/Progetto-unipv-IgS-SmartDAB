@@ -8,6 +8,5 @@ public interface DevicePort {
 	DispositivoStates getState();
 	void setState(DispositivoStates state);
 	boolean isActive();
-	String getId();
 	void switchDispositivo();
 }

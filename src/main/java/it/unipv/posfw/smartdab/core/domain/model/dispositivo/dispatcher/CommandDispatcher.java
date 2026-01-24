@@ -15,7 +15,7 @@ public class CommandDispatcher {
 	}
 	
 	public void register(String type, ICommand command) {
-		if(!type.equals("") && command  != null) commands.put(type, command);
+		if(!type.equals("") && type != null && command  != null) commands.put(type, command);
 		else System.out.println("I parametri inseriti non sono validi");
 	}
 	

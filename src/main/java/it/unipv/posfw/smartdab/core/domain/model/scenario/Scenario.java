@@ -1,9 +1,10 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
+
+import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 
 
 public class Scenario {
@@ -15,7 +16,7 @@ public class Scenario {
 
 
 	private String nome;
-	private List<ScenarioStanzaConfig> configurazioni;
+	private List<StanzaConfig> configurazioni;
 	private EnumScenarioType tipo_scenario;
 	private boolean isActive;
 	private LocalDateTime data_creazione;
@@ -42,18 +43,18 @@ public class Scenario {
 	}
 
 	// I senguenti 2 metodi sono public per permettere a ScenarioManager di usarli.
-	/*  Questa funzione aggiunge allo Scenario la nuova configurazione. 
+	/*  Questa funzione aggiunge allo Scenario la nuova configurazione.
 	/*Lo Scenario è sostanzialmente formato da un insime di configurazioni,
-	/* cioè di oggetti ScenarioStanzaConfig
+	/* cioè di oggetti StanzaConfig
 	*/
-	public void aggiungiConfigurazione(ScenarioStanzaConfig config) {
+	public void aggiungiConfigurazione(StanzaConfig config) {
 	       configurazioni.add(config);
 	       this.data_ultima_modifica = LocalDateTime.now();
 	 }
 
 
 
-	 public boolean rimuoviConfigurazione(ScenarioStanzaConfig config) {
+	 public boolean rimuoviConfigurazione(StanzaConfig config) {
 		   boolean removed = configurazioni.remove(config);
 		   if (removed) {
 		       this.data_ultima_modifica = LocalDateTime.now();
@@ -79,7 +80,7 @@ public class Scenario {
 		 return nome;
 	 }
 
-	 public List<ScenarioStanzaConfig> getConfigurazioni() {
+	 public List<StanzaConfig> getConfigurazioni() {
 	        return configurazioni;
 	    }
 
