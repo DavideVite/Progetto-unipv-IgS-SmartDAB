@@ -3,7 +3,7 @@ package it.unipv.posfw.smartdab.core.beans;
 import java.time.LocalDateTime;
 
 public class CommunicationPOJO {
-	private String id;
+	private int id;
 	private String esito;
 	private String tipo;
 	private Object value;
@@ -11,8 +11,7 @@ public class CommunicationPOJO {
 	private LocalDateTime last_update;
 
 	// Formato corto
-	public CommunicationPOJO(String id, String tipo, Object value, String dispositivo) {
-		this.id = id;
+	public CommunicationPOJO(String tipo, Object value, String dispositivo) {
 		this.tipo = tipo;
 		this.value = value;
 		this.dispositivo = dispositivo;
@@ -21,8 +20,7 @@ public class CommunicationPOJO {
 	}
 
 	// Formato con esito
-	public CommunicationPOJO(String id, String esito, String tipo, Object value, String dispositivo) {
-		this.id = id;
+	public CommunicationPOJO(String esito, String tipo, Object value, String dispositivo) {
 		this.esito = esito;
 		this.tipo = tipo;
 		this.value = value;
@@ -30,8 +28,8 @@ public class CommunicationPOJO {
 		last_update = LocalDateTime.now();
 	}
 
-	// Formato esteso
-	public CommunicationPOJO(String id, String esito, String tipo, Object value, String dispositivo, LocalDateTime t) {
+	// Formato esteso: prelevato dalla base di dati
+	public CommunicationPOJO(int id, String esito, String tipo, Object value, String dispositivo, LocalDateTime t) {
 		this.id = id;
 		this.esito = esito;
 		this.tipo = tipo;
@@ -40,10 +38,10 @@ public class CommunicationPOJO {
 		last_update = t;
 	}
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	

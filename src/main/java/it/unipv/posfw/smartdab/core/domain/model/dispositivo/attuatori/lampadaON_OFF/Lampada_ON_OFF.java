@@ -2,8 +2,8 @@ package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaO
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
+import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 public class Lampada_ON_OFF extends AttuatoreFacade {
 	
@@ -12,9 +12,8 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	public static final DispositivoParameter parameter = DispositivoParameter.LUMINOSITA;
 	public final int MAX_INTENSITA = 5000; 
 	
-	public Lampada_ON_OFF(String id, Lampada_Communicator c, int intensita) {
-		// Manca la logica per capire se un observable parameter esiste già
-		super(id, c, new ObservableParameter(parameter));
+	public Lampada_ON_OFF(Topic topic, Lampada_Communicator c, ObservableParameter o, int intensita) {
+		super(topic, c, o);
 		
 		if(intensita <= MAX_INTENSITA) this.intensita = intensita;
 		else {
@@ -38,10 +37,12 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	public int getIlluminazione() {
 		return illuminazione;
 	}
-
+	
+	// Parte di attuazione
 	@Override
 	public void switchDispositivo() {
 		super.switchDispositivo();
+		super.getCommunicator().notifyObservers(this.isActive());
 		illuminazione = intensita * (this.isActive() ? 1 : 0);
 		applyVariation(illuminazione);
 	}
@@ -61,6 +62,29 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 		}
 		
 		return 1;
+	}
+	
+	// Devo implementare controllo ON/OFF
+	
+	@Override
+	public int applyVariation(Object state) {
+		try {
+			
+			super.getParameter().setValue((int)state);
+			super.getParameter().notifyObservers(this);
+			
+		} catch(ClassCastException e) {
+			e.printStackTrace();
+			return 0;
+		}
+		
+		return 1;
+	}
+
+	@Override
+	public int action() {
+		switchDispositivo();
+		return applyVariation(illuminazione);
 	}
 	
 	

@@ -1,8 +1,5 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
 
-
-import it.unipv.posfw.smartdab.core.domain.enums.EnumTipoParametro;
-import it.unipv.posfw.smartdab.core.domain.enums.EnumTipoParametro;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
