@@ -1,15 +1,26 @@
 ui/
 ├── SmartDABApp.java              # Entry point
 ├── view/
-│   ├── MainFrame.java            # JFrame principale
-│   ├── MainPanel.java            # Contenitore navigazione
+│   ├── MainFrame.java            # JFrame principale  (qui c'è l'autenticazione) 
+│   ├── MainPanel.java            # Contenitore navigazione 
 │   ├── stanze/
+|   |   ├── StanzeFormPanel.java   # CRUD stanze
 │   │   └── StanzePanel.java      # Lista stanze
-│   └── scenari/
-│       ├── ScenariPanel.java         # Lista scenari
-│       ├── ScenarioDetailPanel.java  # Dettaglio configurazioni
-│       └── ScenarioFormPanel.java    # Form CRUD
+│   ├── scenari/
+│   |   ├── ScenariPanel.java         # Lista scenari e attivazione e disattivazione 
+│   |   ├── ScenarioDetailPanel.java  # Dettaglio configurazioni
+│   |   └── ScenarioFormPanel.java    # Form CRUD
+|   └── dispositivi
+|       ├── DispositiviPanel.java     # Lista dei dispositivi 
+|       └── DispositiviForm.java      # Dispositivi CRUD
+|
 └── controller/
     ├── MainAction.java           # Navigazione
     ├── StanzeAction.java         # Logica stanze
     └── ScenariAction.java        # CRUD scenari
+
+
+TODO: 
+- password del produttore per configurare il sistema ( l'utente deve inserire la password da UI)
+- suito dopo si richiede di impostare il PIN 
+    - il PIN sarà da salvare per l'autenticazione 
