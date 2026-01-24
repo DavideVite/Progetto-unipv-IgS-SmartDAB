@@ -2,14 +2,14 @@ package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
 import java.util.List;
 
-import it.unipv.posfw.smartdab.core.beans.Misura;
+import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
 
 public interface MisuraDAO {
 	
-	public void insertMisura(Misura m);
+	public void insertMisura(MisuraPOJO m);
 	
-	public List<Misura> readMisuraStanza (String idStanza);
+	public List<MisuraPOJO> readMisuraStanza (String idStanza);
 	
-	public Misura readUltimaMisura (String idStanza, String tipo);
+	public MisuraPOJO readUltimaMisura (String idStanza, String tipo);
 
 }

@@ -7,18 +7,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unipv.posfw.smartdab.core.beans.Misura;
+import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
 public class MisuraDAOImpl implements MisuraDAO {
 
 	@Override
-	public void insertMisura(Misura m) {
+	public void insertMisura(MisuraPOJO m) {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		
 		//non metto id perché è auto-increment
-		String sql = "INSERT INTO misure_sensori (tipo, unita, valore, idStanza) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO misura (tipo, unita, valore, stanza) VALUES (?, ?, ?, ?)";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -50,13 +50,13 @@ public class MisuraDAOImpl implements MisuraDAO {
 	}
 
 	@Override
-	public List<Misura> readMisuraStanza(String idStanza) {
+	public List<MisuraPOJO> readMisuraStanza(String stanza) {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		List<Misura> misure = new ArrayList<>();	 
+		List<MisuraPOJO> misure = new ArrayList<>();	 
 		
-		String sql = "SELECT * FROM misure_sensori WHERE idStanza = ?";
+		String sql = "SELECT * FROM misura WHERE stanza = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();		
@@ -65,12 +65,12 @@ public class MisuraDAOImpl implements MisuraDAO {
 			pstmt = conn.prepareStatement(sql);
 			
 			//passiamo l'id
-			pstmt.setString(1, idStanza);
+			pstmt.setString(1, stanza);
 			
 		    rs = pstmt.executeQuery();
 		    
 		    while(rs.next()) {
-			  String idStanzaTrovata = rs.getString("idStanza");
+			  String idStanzaTrovata = rs.getString("stanza");
 			  String id = rs.getString("id");
 			  String tipo = rs.getString("tipo");
 			  double valore = rs.getDouble("valore");
@@ -80,7 +80,7 @@ public class MisuraDAOImpl implements MisuraDAO {
 			  java.sql.Timestamp data = rs.getTimestamp("timestamp");
 			
 			  //creiamo oggetto con dati del DB
-			  Misura m = new Misura (id, tipo, unita, valore, idStanzaTrovata, data);
+			  MisuraPOJO m = new MisuraPOJO (id, tipo, unita, valore, idStanzaTrovata, data);
 			  
 			  misure.add(m);
 		  }
@@ -101,13 +101,13 @@ public class MisuraDAOImpl implements MisuraDAO {
 
 	
 	@Override
-	public Misura readUltimaMisura(String idStanza, String tipo) {
+	public MisuraPOJO readUltimaMisura(String stanza, String tipo) {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		Misura m = null;	
+		MisuraPOJO m = null;	
 		
-		String sql = "SELECT * FROM misure_sensori WHERE idStanza = ? AND tipo=? ORDER BY timestamp DESC LIMIT 1";
+		String sql = "SELECT * FROM misura WHERE stanza = ? AND tipo=? ORDER BY timestamp DESC LIMIT 1";
 		
 		try {
 			conn = DatabaseConnection.getConnection();		
@@ -116,13 +116,13 @@ public class MisuraDAOImpl implements MisuraDAO {
 			pstmt = conn.prepareStatement(sql);
 			
 			//passiamo idStanza e tipo
-			pstmt.setString(1,  idStanza);
+			pstmt.setString(1,  stanza);
 			pstmt.setString(2,  tipo);
 			
 		    rs = pstmt.executeQuery();
 		    
 		    if(rs.next()) {
-			  String idStanzaTrovata = rs.getString("idStanza");
+			  String idStanzaTrovata = rs.getString("stanza");
 			  String tipoTrovato = rs.getString("tipo");
 			  String id = rs.getString("id");
 			  double valore = rs.getDouble("valore");
@@ -131,7 +131,7 @@ public class MisuraDAOImpl implements MisuraDAO {
 			  java.sql.Timestamp data = rs.getTimestamp("timestamp");
 			
 			  //creiamo oggetto stanza con dati del DB
-			  m = new Misura(id, tipoTrovato, unita, valore, idStanzaTrovata, data);
+			  m = new MisuraPOJO(id, tipoTrovato, unita, valore, idStanzaTrovata, data);
 		  }
 		}
 	} catch (SQLException e) {
