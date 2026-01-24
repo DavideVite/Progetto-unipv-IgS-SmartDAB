@@ -5,36 +5,17 @@ import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
-public class Dispositivo implements DevicePort {
-	private String id;
+public abstract class Dispositivo implements DevicePort {
 	private Topic topic;	// home/room/dispositivo/parameter
 	private boolean active;
 	private DispositivoStates state;
 	private ICommunicator c;
 
-	public Dispositivo(String id, ICommunicator c, boolean active) {
-		this.id = id;
+	public Dispositivo(Topic topic, ICommunicator c, boolean active) {
+		this.topic = topic;
 		this.c = c;
 		this.active = active;
 		state = DispositivoStates.ALIVE;
-	}
-	
-	public String getId() {
-		return id;
-	}
-
-	public boolean setId(String id) {
-		if(checkId(id)) {
-			this.id = id.toLowerCase();
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean checkId(String id) {
-		String idx = "[A-Za-z]{1,17}[0-9]{0,3}";
-		return id.matches(idx);
 	}
 	
 	public Topic getTopic() {
@@ -68,4 +49,7 @@ public class Dispositivo implements DevicePort {
 	public void switchDispositivo() {
 		active = !active;
 	}
+	
+	// Il dispositivo fa qualcosa, ma dipende dalla specializzazione
+	public abstract int action();
 }

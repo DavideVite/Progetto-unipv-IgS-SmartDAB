@@ -8,6 +8,7 @@ import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 public class ObservableParameter implements Observable {
 	
@@ -37,18 +38,18 @@ public class ObservableParameter implements Observable {
 		try {
 			AttuatoreFacade attuatore = (AttuatoreFacade)args;
 			
-			if(attuatore.getTopic().toString().endsWith(parameterName.toString())) {
+			if(attuatore.getTopic().getParameter().equals(parameterName)) {
 				Iterator<Observer> roomsIterator = rooms.iterator();
+				RoomPort room;
 			
 				while(roomsIterator.hasNext()) {
-				
-					// se l'attuatore è nella stanza...
-					roomsIterator.next().update(this, value);
+					room = (RoomPort) roomsIterator.next();
+					if(room.getDispositivi().contains(attuatore)) room.update(this, value);
 				}
 			}
 			
 		} catch(ClassCastException e) {
-			e.printStackTrace();
+			System.out.println("Errore: il dispositivo chiamante non è un attuatore");
 		}
 		
 
@@ -67,7 +68,8 @@ public class ObservableParameter implements Observable {
 	}
 
 	public void setParameterName(DispositivoParameter parameterName) {
-		this.parameterName = parameterName;
+		if(parameterName != null) this.parameterName = parameterName;
+		else System.out.println("Nome del parametro non valido");
 	}
 
 	public List<Observer> getRooms() {

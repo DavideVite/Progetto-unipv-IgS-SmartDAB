@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
@@ -28,88 +27,86 @@ public class Stanza implements Observable, Observer, RoomPort {
 		 this.mq = mq;
 	 }
 
-	 public String getId() {
-		 return id;
-	 }
-	 
-	 public double getMq() {
-		 return mq;
-	 }
+	// Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
+	@Override
+	public String getId() {
+		return id;
+	}
 
-	 public String getNome() {
-		 return nome;
-	 }
+	public String getNome() {
+		return nome;
+	}
 
-	 public void setNome(String nome) {
-		 this.nome = nome;
-	 }
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+	public List<Dispositivo> getDispositivi() {
+		return dispositivi;
+	}
 
-	 public List<Dispositivo> getDispositivi() {
-		 return dispositivi;
-	 }
+	public Map<String, Double> getParametri() {
+		return parametri;
+	}
 
-	 public Map<String, Double> getParametri() {
-		 return parametri;
-	 }
+	public Double getMisura(String parametro) {
+		return parametri.get(parametro);
+	}
 
-	 public Double getMisura(String parametro) {
-		 return parametri.get(parametro);
-	 }
-
-	 public boolean isEmpty() {
-		 if (dispositivi == null || dispositivi.isEmpty()) {
-				 return true;  
-	     }
-	     return false;
-	 }
-
-	 public void addDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.add(d);
-		 }
-	 }
-
-	 public void removeDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.remove(d);
-		 }
-	 }
-
-	 public void updateParameter(String nomeParametro, double nuovoValore) {
-		 this.parametri.put(nomeParametro, nuovoValore);
-
-		 notifyObservers(nomeParametro);
-	 }
-
-     @Override
-	 public void addObserver(Observer observer) {
-		 observers.add(observer);
+	public boolean isEmpty() {
+		if (dispositivi == null || dispositivi.isEmpty()) {
+			return true;  
 		}
+		return false;
+	}
 
-     @Override
-	 public void removeObserver(Observer observer) {
-    	 observers.remove(observer);	     
-     }
+	public void addDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.add(d);
+		}
+	}
 
-     @Override
-	 public void notifyObservers(Object args) {
-         for (Observer o : observers) {
-        	 if (o instanceof SensoreFacade) {
-        		 SensoreFacade s = (SensoreFacade) o;
-        		 s.update(this, args);
-        	 }
-         }
-         }
+	public void removeDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.remove(d);
+		}
+	}
 
-     @Override
-     public void update(Observable o, Object arg) {
-         ObservableParameter obsParam = (ObservableParameter) o;
+	public void updateParameter(String nomeParametro, double nuovoValore) {
+		this.parametri.put(nomeParametro, nuovoValore);
 
-         //DispositivoParameter nome = obsParam.getParameterName();
-         double valore = obsParam.getValue();
+		notifyObservers(nomeParametro);
+	}
 
-         this.updateParameter(nome, valore);
-         }
-     }
+	@Override
+	public void addObserver(Observer observer) {
+		observers.add(observer);
+	}
+
+	@Override
+	public void removeObserver(Observer observer) {
+		observers.remove(observer);	     
+	}
+
+	@Override
+	public void notifyObservers(Object args) {
+		for (Observer o : observers) {
+			if (o instanceof SensoreFacade) {
+				SensoreFacade s = (SensoreFacade) o;
+				s.update(this, args);
+			}
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		ObservableParameter obsParam = (ObservableParameter) o;
+
+		// String nome = obsParam.getParameterName();
+		double valore = obsParam.getValue();
+
+		this.updateParameter(nome, valore);
+	}
+}
 
 
