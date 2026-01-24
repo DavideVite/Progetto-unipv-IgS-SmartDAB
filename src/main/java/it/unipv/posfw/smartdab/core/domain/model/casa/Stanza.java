@@ -7,24 +7,25 @@ import java.util.List;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer, RoomPort{
-	private String id;
-	private String nome;
-	private List<Dispositivo> dispositivi = new ArrayList<>();
-	private Map<String, Double> parametri = new HashMap<>();
-	private List<Observer> observers = new ArrayList<>(); 
+public class Stanza implements Observable, Observer, RoomPort {
+	 private String id;
+	 private String nome;
+	 private double mq;
+	 private List<Dispositivo> dispositivi = new ArrayList<>();
+	 private Map<String, Double> parametri = new HashMap<>();
+	 private List<Observer> observers = new ArrayList<>(); 
 
-	public Stanza(String id, String nome) {
-		this.id = id;
-		this.nome = nome;	 
-	}
+	 public Stanza(String id, String nome, double mq) {
+		 this.id = id;
+		 this.nome = nome;
+		 this.mq = mq;
+	 }
 
 	// Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
 	@Override

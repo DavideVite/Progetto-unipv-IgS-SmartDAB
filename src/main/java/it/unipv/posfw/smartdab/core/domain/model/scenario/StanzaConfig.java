@@ -3,13 +3,13 @@ package it.unipv.posfw.smartdab.core.domain.model.scenario;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
-public class ScenarioStanzaConfig {
+public class StanzaConfig {
 
 	private String stanzaId;
-	private IParametroValue valore; 
-	private DispositivoParameter tipo_parametro; 
-	
-	public ScenarioStanzaConfig (String stanzaId, IParametroValue valore, DispositivoParameter tipo_parametro)  {
+	private IParametroValue valore;
+	private DispositivoParameter tipo_parametro;
+
+	public StanzaConfig(String stanzaId, IParametroValue valore, DispositivoParameter tipo_parametro) {
 		this.stanzaId = stanzaId;
 		this.valore = valore;
 		this.tipo_parametro = tipo_parametro;
@@ -22,17 +22,14 @@ public class ScenarioStanzaConfig {
 	public IParametroValue getParametro() {
 		return valore;
 	}
-		
-	
+
 	public DispositivoParameter getTipo_parametro() {
-		return tipo_parametro; 
+		return tipo_parametro;
 	}
 
 	@Override
 	public String toString() {
-		return "ScenarioStanzaConfig [stanzaId=" + stanzaId + ", valore=" + valore + ", tipo_parametro="
+		return "StanzaConfig [stanzaId=" + stanzaId + ", valore=" + valore + ", tipo_parametro="
 				+ tipo_parametro + "]";
 	}
-	
-	
 }

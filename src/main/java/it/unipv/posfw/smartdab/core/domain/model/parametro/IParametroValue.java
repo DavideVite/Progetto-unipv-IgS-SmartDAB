@@ -1,11 +1,10 @@
 package it.unipv.posfw.smartdab.core.domain.model.parametro;
 
-import java.util.List;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 
 public interface IParametroValue {
 
 	String getDisplayString();
-	boolean isValid(); 
-
-        
- }
+	boolean isValid();
+	DispositivoParameter getTipoParametro();
+}
