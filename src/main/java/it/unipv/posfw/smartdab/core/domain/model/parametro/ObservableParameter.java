@@ -5,14 +5,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 public class ObservableParameter implements Observable {
 	
 	private List<Observer> rooms = new ArrayList<>();
-	private String parameterName;
+	private DispositivoParameter parameterName;
 	private double value;
+	
+	public ObservableParameter(DispositivoParameter name) {
+		parameterName = name;
+	}
 	
 	@Override
 	public void addObserver(Observer observer) {
@@ -32,18 +38,18 @@ public class ObservableParameter implements Observable {
 		try {
 			AttuatoreFacade attuatore = (AttuatoreFacade)args;
 			
-			if(attuatore.getTopic().toString().endsWith(parameterName)) {
+			if(attuatore.getTopic().getParameter().equals(parameterName)) {
 				Iterator<Observer> roomsIterator = rooms.iterator();
+				RoomPort room;
 			
 				while(roomsIterator.hasNext()) {
-				
-					// se l'attuatore è nella stanza...
-					roomsIterator.next().update(this, value);
+					room = (RoomPort) roomsIterator.next();
+					if(room.getDispositivi().contains(attuatore)) room.update(this, value);
 				}
 			}
 			
 		} catch(ClassCastException e) {
-			e.printStackTrace();
+			System.out.println("Errore: il dispositivo chiamante non è un attuatore");
 		}
 		
 
@@ -57,12 +63,13 @@ public class ObservableParameter implements Observable {
 		this.value = value;
 	}
 
-	public String getParameterName() {
+	public DispositivoParameter getParameterName() {
 		return parameterName;
 	}
 
-	public void setParameterName(String parameterName) {
-		this.parameterName = parameterName;
+	public void setParameterName(DispositivoParameter parameterName) {
+		if(parameterName != null) this.parameterName = parameterName;
+		else System.out.println("Nome del parametro non valido");
 	}
 
 	public List<Observer> getRooms() {

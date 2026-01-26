@@ -11,97 +11,110 @@ import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer{
+public class Stanza implements Observable, Observer, RoomPort {
 	 private String id;
 	 private String nome;
+	 private double mq;
 	 private List<Dispositivo> dispositivi = new ArrayList<>();
 	 private Map<String, Double> parametri = new HashMap<>();
 	 private List<Observer> observers = new ArrayList<>(); 
 
-	 public Stanza(String id, String nome) {
+	 public Stanza(String id, String nome, double mq) {
 		 this.id = id;
-		 this.nome = nome;	 
-	 }
-
-	 public String getId() {
-		 return id;
-	 }
-
-	 public String getNome() {
-		 return nome;
-	 }
-
-	 public void setNome(String nome) {
 		 this.nome = nome;
+		 this.mq = mq;
 	 }
 
-	 public List<Dispositivo> getDispositivi() {
-		 return dispositivi;
-	 }
+	// Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
+	@Override
+	public String getId() {
+		return id;
+	}
 
-	 public Map<String, Double> getParametri() {
-		 return parametri;
-	 }
+	public String getNome() {
+		return nome;
+	}
 
-	 public Double getMisura(String parametro) {
-		 return parametri.get(parametro);
-	 }
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	
+	public List<Dispositivo> getDispositivi() {
+		return dispositivi;
+	}
 
-	 public boolean isEmpty() {
-		 if (dispositivi == null || dispositivi.isEmpty()) {
-				 return true;  
-	     }
-	     return false;
-	 }
+	public Map<String, Double> getParametri() {
+		return parametri;
+	}
 
-	 public void addDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.add(d);
-		 }
-	 }
+	public Double getMisura(String parametro) {
+		return parametri.get(parametro);
+	}
 
-	 public void removeDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.remove(d);
-		 }
-	 }
-
-	 public void updateParameter(String nomeParametro, double nuovoValore) {
-		 this.parametri.put(nomeParametro, nuovoValore);
-
-		 notifyObservers(nomeParametro);
-	 }
-
-     @Override
-	 public void addObserver(Observer observer) {
-		 observers.add(observer);
+	public boolean isEmpty() {
+		if (dispositivi == null || dispositivi.isEmpty()) {
+			return true;  
 		}
+		return false;
+	}
 
-     @Override
-	 public void removeObserver(Observer observer) {
-    	 observers.remove(observer);	     
-     }
+	public void addDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.add(d);
+		}
+	}
 
-     @Override
-	 public void notifyObservers(Object args) {
-         for (Observer o : observers) {
-        	 if (o instanceof SensoreFacade) {
-        		 SensoreFacade s = (SensoreFacade) o;
-        		 s.update(this, args);
-        	 }
-         }
-         }
+	public void removeDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.remove(d);
+		}
+	}
 
-     @Override
-     public void update(Observable o, Object arg) {
-         ObservableParameter obsParam = (ObservableParameter) o;
+	public void updateParameter(String nomeParametro, double nuovoValore) {
+		this.parametri.put(nomeParametro, nuovoValore);
 
-         String nome = obsParam.getParameterName();
-         double valore = obsParam.getValue();
+		notifyObservers(nomeParametro);
+	}
 
-         this.updateParameter(nome, valore);
-         }
-     }
+	@Override
+	public void addObserver(Observer observer) {
+		observers.add(observer);
+	}
+
+	@Override
+	public void removeObserver(Observer observer) {
+		observers.remove(observer);	     
+	}
+
+	@Override
+	public void notifyObservers(Object args) {
+		for (Observer o : observers) {
+			if (o instanceof SensoreFacade) {
+				SensoreFacade s = (SensoreFacade) o;
+				s.update(this, args);
+			}
+		}
+	}
+
+	public double getMq() {
+		return mq;
+	}
+
+	public void setMq(double mq) {
+		this.mq = mq;
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		ObservableParameter obsParam = (ObservableParameter) o;
+
+		// String nome = obsParam.getParameterName();
+		double valore = obsParam.getValue();
+
+		this.updateParameter(nome, valore);
+	}
+}
 
 
