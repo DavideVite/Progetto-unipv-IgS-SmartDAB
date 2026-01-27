@@ -1,5 +1,4 @@
 package it.unipv.posfw.smartdab.core.service;
-
 import java.util.List;
 import java.util.Set;
 
@@ -7,6 +6,7 @@ import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 
 public class GestoreStanze {
      private Casa casa;
@@ -44,6 +44,9 @@ public class GestoreStanze {
 
     	Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
     	casa.nuovaStanza(nuovaStanza);
+    	
+    	StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();	
+    	stanzaDAO.insertStanza(nuovaStanza);
     	return true;
         }
 
@@ -54,6 +57,9 @@ public class GestoreStanze {
     			return false;
     		}		 
     		 s.setNome(nuovoNome);
+    		 
+    		 StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();
+    		 stanzaDAO.updateStanza(s);
     		 return true;
     	 }
     	 return false;
@@ -64,6 +70,9 @@ public class GestoreStanze {
     		Stanza s = casa.cercaStanza(nomeStanza);
     		if(s.isEmpty()) {
     			casa.rimuoviStanza(s);
+    			
+    			StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();
+       		    stanzaDAO.deleteStanza(s);
     			return true;
     		} else {
     			System.out.println("Errore: la stanza contiene ancora dispositivi");

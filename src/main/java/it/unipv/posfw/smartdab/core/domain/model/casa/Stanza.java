@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
@@ -14,6 +13,7 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 
 public class Stanza implements Observable, Observer{
+     private static int counter = 0;  //TODO verificare se torna a zero
 	 private String id;
 	 private String nome;
 	 private double mq;
@@ -22,7 +22,8 @@ public class Stanza implements Observable, Observer{
 	 private List<Observer> observers = new ArrayList<>(); 
 
 	 public Stanza(String id, String nome, double mq) {
-		 this.id = id;
+		 counter++;
+		 this.id = "S" + counter;
 		 this.nome = nome;	
 		 this.mq = mq;	  
 	 }
@@ -33,6 +34,10 @@ public class Stanza implements Observable, Observer{
 	 
 	 public double getMq() {
 		 return mq;
+	 }
+	 
+	 public void setMq(double mq) {
+		 this.mq=mq;
 	 }
 
 	 public String getNome() {
@@ -93,21 +98,19 @@ public class Stanza implements Observable, Observer{
      @Override
 	 public void notifyObservers(Object args) {
          for (Observer o : observers) {
-        	 if (o instanceof SensoreFacade) {
-        		 SensoreFacade s = (SensoreFacade) o;
-        		 s.update(this, args);
+        		 o.update(this, args);
         	 }
-         }
          }
 
      @Override
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
 
-         //DispositivoParameter nome = obsParam.getParameterName();
+         DispositivoParameter paramEnum = obsParam.getParameterName();
+         String nomeStr = paramEnum.name();
          double valore = obsParam.getValue();
 
-         this.updateParameter(nome, valore);
+         this.updateParameter(nomeStr, valore);
          }
      }
 

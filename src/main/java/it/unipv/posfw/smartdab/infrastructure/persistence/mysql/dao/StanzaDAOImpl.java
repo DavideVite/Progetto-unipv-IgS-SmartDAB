@@ -130,7 +130,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 	}
 
 	@Override
-	public void deleteStanza(String id) {
+	public void deleteStanza(Stanza s) {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
@@ -144,14 +144,14 @@ public class StanzaDAOImpl implements StanzaDAO{
 			pstmt = conn.prepareStatement(sql);
 			
 			//passiamo l'id
-			pstmt.setString(1,  id);
+			pstmt.setString(1,  s.getId());
 			
             int stanzaDaEliminare = pstmt.executeUpdate();
             
             if(stanzaDaEliminare > 0) {
-            	System.out.println("Stanza con ID " + id + "eliminata con successo dal database.");
+            	System.out.println("Stanza con nome " + s.getId() + "eliminata con successo dal database.");
             } else {
-            	System.out.println("Nessuna stanza trovata con ID: " + id);
+            	System.out.println("Nessuna stanza trovata con nome: " + s.getId());
             }
 		}
 	} catch (SQLException e) {

@@ -12,7 +12,7 @@ public interface StanzaDAO {
 	
 	public void updateStanza(Stanza s);
 	
-	public void deleteStanza(String id);
+	public void deleteStanza(Stanza s);
 	
 	public Set<Stanza> readAllStanze();
 
