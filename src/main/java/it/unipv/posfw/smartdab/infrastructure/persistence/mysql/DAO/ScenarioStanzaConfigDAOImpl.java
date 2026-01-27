@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.BooleanValue;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.NumericValue;
-import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 
 public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 
@@ -21,7 +20,7 @@ public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 	private static final String DELETE_BY_SCENARIO = "DELETE FROM ScenarioStanzaConfig WHERE scenario = ?";
 
 	@Override
-	public void insertConfig(Connection conn, String scenarioId, ScenarioStanzaConfig config) {
+	public void insertConfig(Connection conn, String scenarioId, StanzaConfig config) {
 		PreparedStatement pstmt = null;
 
 		try {
@@ -48,8 +47,8 @@ public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 	}
 
 	@Override
-	public List<ScenarioStanzaConfig> readConfigsByScenario(Connection conn, String scenarioId) {
-		List<ScenarioStanzaConfig> configs = new ArrayList<>();
+	public List<StanzaConfig> readConfigsByScenario(Connection conn, String scenarioId) {
+		List<StanzaConfig> configs = new ArrayList<>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 
@@ -64,9 +63,9 @@ public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 				String tipoValoreStr = rs.getString("tipo_valore");
 
 				DispositivoParameter tipoParametro = DispositivoParameter.valueOf(tipoParametroStr);
-				IParametroValue valore = deserializeParametroValue(tipoValoreStr);
+				IParametroValue valore = deserializeParametroValue(tipoValoreStr, tipoParametro);
 
-				ScenarioStanzaConfig config = new ScenarioStanzaConfig(stanzaId, valore, tipoParametro);
+				StanzaConfig config = new StanzaConfig(stanzaId, valore, tipoParametro);
 				configs.add(config);
 			}
 
@@ -106,55 +105,26 @@ public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 
 	/**
 	 * Serializza un IParametroValue in una stringa per il database.
-	 * Formato: TIPO:valore (es. "NUMERIC:22.5" o "BOOLEAN:true")
+	 * Salva il rawValue di ParametroValue.
 	 */
 	private String serializeParametroValue(IParametroValue value) {
-		if (value instanceof NumericValue) {
-			NumericValue nv = (NumericValue) value;
-			return "NUMERIC:" + nv.getValue();
-		} else if (value instanceof BooleanValue) {
-			BooleanValue bv = (BooleanValue) value;
-			return "BOOLEAN:" + bv.getValue();
-		} else {
-			// Fallback: usa getDisplayString()
-			return "STRING:" + value.getDisplayString();
+		if (value instanceof ParametroValue) {
+			ParametroValue pv = (ParametroValue) value;
+			return pv.getRawValue();
 		}
+		// Fallback: usa getDisplayString()
+		return value.getDisplayString();
 	}
 
 	/**
 	 * Deserializza una stringa dal database in un IParametroValue.
+	 * Ricostruisce un ParametroValue usando il tipoParametro dalla riga del DB.
 	 */
-	private IParametroValue deserializeParametroValue(String serialized) {
+	private IParametroValue deserializeParametroValue(String serialized, DispositivoParameter tipoParametro) {
 		if (serialized == null || serialized.isEmpty()) {
 			return null;
 		}
-
-		String[] parts = serialized.split(":", 2);
-		if (parts.length < 2) {
-			return null;
-		}
-
-		String tipo = parts[0];
-		String valore = parts[1];
-
-		switch (tipo) {
-			case "NUMERIC":
-				Double numValue = Double.parseDouble(valore);
-				return new NumericValue(numValue, null, null, null);
-			case "BOOLEAN":
-				boolean boolValue = Boolean.parseBoolean(valore);
-				return new BooleanValue(boolValue, "ON", "OFF");
-			case "STRING":
-			default:
-				// Crea un NumericValue di fallback
-				try {
-					Double fallbackValue = Double.parseDouble(valore);
-					return new NumericValue(fallbackValue, null, null, null);
-				} catch (NumberFormatException e) {
-					// Se non è un numero, crea un BooleanValue
-					return new BooleanValue(true, valore, "OFF");
-				}
-		}
+		return new ParametroValue(serialized, tipoParametro);
 	}
 
 }

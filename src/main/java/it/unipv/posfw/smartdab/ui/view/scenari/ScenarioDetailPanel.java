@@ -1,7 +1,7 @@
 package it.unipv.posfw.smartdab.ui.view.scenari;
 
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
-import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -62,7 +62,7 @@ public class ScenarioDetailPanel extends JPanel {
         lblStato.setText(scenario.isActive() ? "Attivo" : "Disattivo");
 
         configTableModel.setRowCount(0);
-        for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+        for (StanzaConfig config : scenario.getConfigurazioni()) {
             configTableModel.addRow(new Object[]{
                 config.getStanzaId(),
                 config.getTipo_parametro().toString(),

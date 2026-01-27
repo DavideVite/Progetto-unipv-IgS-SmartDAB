@@ -105,7 +105,7 @@ public class Scenario {
 	        return configurazioni;
 	 }
 
-	 public void setConfigurazioni(List<ScenarioStanzaConfig> configurazioni) {
+	 public void setConfigurazioni(List<StanzaConfig> configurazioni) {
 		 this.configurazioni = configurazioni;
 		 this.data_ultima_modifica = LocalDateTime.now();
 	 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
-import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
 public class ScenarioDAOImpl implements ScenarioDAO {
@@ -69,7 +69,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				pstmt.executeUpdate();
 
 				// Salva le configurazioni associate
-				for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+				for (StanzaConfig config : scenario.getConfigurazioni()) {
 					configDAO.insertConfig(conn, id, config);
 				}
 
@@ -106,7 +106,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				// Aggiorna le configurazioni: cancella le vecchie e inserisce le nuove
 				configDAO.deleteByScenario(conn, scenario.getId());
-				for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
+				for (StanzaConfig config : scenario.getConfigurazioni()) {
 					configDAO.insertConfig(conn, scenario.getId(), config);
 				}
 
@@ -172,7 +172,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				if (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					// Carica le configurazioni
-					List<ScenarioStanzaConfig> configs = configDAO.readConfigsByScenario(conn, id);
+					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, id);
 					scenario.setConfigurazioni(configs);
 					return Optional.of(scenario);
 				}
@@ -207,7 +207,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				if (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
-					List<ScenarioStanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
+					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
 					scenario.setConfigurazioni(configs);
 					return Optional.of(scenario);
 				}
@@ -242,7 +242,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
-					List<ScenarioStanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
+					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
 					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
@@ -278,7 +278,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
-					List<ScenarioStanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
+					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
 					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
@@ -314,7 +314,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
-					List<ScenarioStanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
+					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
 					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
