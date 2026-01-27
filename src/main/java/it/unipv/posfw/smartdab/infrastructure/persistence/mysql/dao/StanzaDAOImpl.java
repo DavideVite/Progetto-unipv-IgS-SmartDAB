@@ -1,11 +1,12 @@
 package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
@@ -58,7 +59,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		ResultSet rs = null;
 		Stanza s = null;	
 		
-		String sql = "SELECT * FROM STANZA WHERE id = ?";
+		String sql = "SELECT * FROM stanza WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -134,7 +135,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
-		String sql = "DELETE FROM STANZA WHERE id = ?";
+		String sql = "DELETE FROM stanza WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -171,7 +172,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		Set<Stanza> stanze = new HashSet<>();	 
+		Set<Stanza> stanza = new HashSet<>();	 
 		
 		String sql = "SELECT * FROM stanza";
 		
@@ -191,7 +192,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 			  //creiamo oggetto con dati del DB
 			  Stanza s = new Stanza (id, nome, mq);
 			  
-			  stanze.add(s);
+			  stanza.add(s);
 		  }
 		}
 	} catch (SQLException e) {
@@ -206,6 +207,6 @@ public class StanzaDAOImpl implements StanzaDAO{
 		}		
 		
 	}
-	return stanze;
+	return stanza;
    }
 }

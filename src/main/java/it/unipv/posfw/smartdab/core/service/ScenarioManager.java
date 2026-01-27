@@ -7,11 +7,8 @@ import java.util.Map;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.BooleanValue;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.EnumValue;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.NumericValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
-import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 
 public class ScenarioManager {
 
@@ -59,7 +56,7 @@ public class ScenarioManager {
 
 	/**
 	 * Attiva uno scenario ed esegue automaticamente le sue configurazioni.
-	 * Cicla tutte le ScenarioStanzaConfig dello scenario e le passa al ParametroManager
+	 * Cicla tutte le StanzaConfig dello scenario e le passa al ParametroManager
 	 * che le tratta come impostazioni di parametri manuali.
 	 *
 	 * @param nomeScenario Nome dello scenario da attivare
@@ -78,8 +75,8 @@ public class ScenarioManager {
 
 		// Esegui le configurazioni
 		boolean tuttiSuccesso = true;
-		for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
-			if (!parametroManager.applicaScenarioConfig(config)) {
+		for (StanzaConfig config : scenario.getConfigurazioni()) {
+			if (!parametroManager.applicaStanzaConfig(config)) {
 				tuttiSuccesso = false;
 				// Continua comunque con le altre configurazioni
 			}
@@ -118,79 +115,12 @@ public class ScenarioManager {
 		return scenari.size();
 	}
 
-	
-    // Esecuzione Scenario (senza attivazione). Adesso si trova in attivaScenario.
-	// public boolean eseguiScenario(String nomeScenario, ParametroManager parametroManager) {
-	// 	Scenario scenario = getScenario(nomeScenario);
-	// 	if (scenario == null) return false;
-
-	// 	boolean tuttiSuccesso = true;
-	// 	for (ScenarioStanzaConfig config : scenario.getConfigurazioni()) {
-	// 		if (!parametroManager.applicaScenarioConfig(config)) {
-	// 			tuttiSuccesso = false;
-	// 			// Continua comunque con le altre configurazioni
-	// 		}
-	// 	}
-	// 	return tuttiSuccesso;
-	// }
-
-
-	/**
-	 * Crea una configurazione con valore numerico (es. temperatura, luminosità).
-	 */
-	public ScenarioStanzaConfig creaConfigNumerico(
-			String stanzaId,
-			DispositivoParameter tipoParametro,
-			double valore,
-			Double min,
-			Double max,
-			String unit) {
-
-		NumericValue numericValue = new NumericValue(valore, min, max, unit);
-		if (!numericValue.isValid()) {
-			throw new IllegalArgumentException("Valore non valido: " + valore +
-					" (min: " + min + ", max: " + max + ")");
-		}
-		return new ScenarioStanzaConfig(stanzaId, numericValue, tipoParametro);
-	}
-
-	/**
-	 * Crea una configurazione con valore booleano (es. acceso/spento).
-	 */
-	public ScenarioStanzaConfig creaConfigBooleano(
-			String stanzaId,
-			DispositivoParameter tipoParametro,
-			boolean valore,
-			String labelTrue,
-			String labelFalse) {
-
-		BooleanValue booleanValue = new BooleanValue(valore, labelTrue, labelFalse);
-		return new ScenarioStanzaConfig(stanzaId, booleanValue, tipoParametro);
-	}
-
-	/**
-	 * Crea una configurazione con valore enum (es. modalità di funzionamento).
-	 */
-	public ScenarioStanzaConfig creaConfigEnum(
-			String stanzaId,
-			DispositivoParameter tipoParametro,
-			String valoreSelezionato,
-			List<String> valoriAmmessi) {
-
-		EnumValue enumValue = new EnumValue(valoreSelezionato, valoriAmmessi);
-		if (!enumValue.isValid()) {
-			throw new IllegalArgumentException("Valore non ammesso: " + valoreSelezionato +
-					". Valori ammessi: " + valoriAmmessi);
-		}
-		return new ScenarioStanzaConfig(stanzaId, enumValue, tipoParametro);
-	}
-
 	// ===== GESTIONE CONFIGURAZIONI =====
 
 	/**
 	 * Aggiunge una configurazione a uno scenario esistente.
 	 */
-	public boolean aggiungiConfigurazione(String nomeScenario, ScenarioStanzaConfig config) {
+	public boolean aggiungiConfigurazione(String nomeScenario, StanzaConfig config) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return false;
 		scenario.aggiungiConfigurazione(config);
@@ -200,9 +130,34 @@ public class ScenarioManager {
 	/**
 	 * Rimuove una configurazione da uno scenario esistente.
 	 */
-	public boolean rimuoviConfigurazione(String nomeScenario, ScenarioStanzaConfig config) {
+	public boolean rimuoviConfigurazione(String nomeScenario, StanzaConfig config) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return false;
 		return scenario.rimuoviConfigurazione(config);
+	}
+
+	/**
+	 * Rimuove una configurazione identificata da stanzaId e tipoParametro.
+	 */
+	public boolean rimuoviConfigurazione(String nomeScenario, String stanzaId, DispositivoParameter tipoParametro) {
+		Scenario scenario = scenari.get(nomeScenario);
+		if (scenario == null) return false;
+
+		List<StanzaConfig> configurazioni = scenario.getConfigurazioni();
+		for (StanzaConfig config : configurazioni) {
+			if (config.getStanzaId().equals(stanzaId) && config.getTipo_parametro() == tipoParametro) {
+				return scenario.rimuoviConfigurazione(config);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Ritorna la lista delle configurazioni di uno scenario.
+	 */
+	public List<StanzaConfig> getConfigurazioniScenario(String nomeScenario) {
+		Scenario scenario = scenari.get(nomeScenario);
+		if (scenario == null) return null;
+		return scenario.getConfigurazioni();
 	}
 }
