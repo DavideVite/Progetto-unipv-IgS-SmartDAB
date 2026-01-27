@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
-import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer, RoomPort {
+public class Stanza implements Observable, Observer{
+     private static int counter = 0;  //TODO verificare se torna a zero
 	 private String id;
 	 private String nome;
 	 private double mq;
@@ -22,43 +22,56 @@ public class Stanza implements Observable, Observer, RoomPort {
 	 private List<Observer> observers = new ArrayList<>(); 
 
 	 public Stanza(String id, String nome, double mq) {
-		 this.id = id;
-		 this.nome = nome;
-		 this.mq = mq;
+		 counter++;
+		 this.id = "S" + counter;
+		 this.nome = nome;	
+		 this.mq = mq;	  
 	 }
 
-	// Alessandro: implemento RoomPort aggiungendo solo la clausola @Override
-	@Override
-	public String getId() {
-		return id;
-	}
+	 public String getId() {
+		 return id;
+	 }
+	 
+	 public double getMq() {
+		 return mq;
+	 }
+	 
+	 public void setMq(double mq) {
+		 this.mq=mq;
+	 }
 
-	public String getNome() {
-		return nome;
-	}
+	 public String getNome() {
+		 return nome;
+	 }
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-	
-	public List<Dispositivo> getDispositivi() {
-		return dispositivi;
-	}
+	 public void setNome(String nome) {
+		 this.nome = nome;
+	 }
 
-	public Map<String, Double> getParametri() {
-		return parametri;
-	}
+	 public List<Dispositivo> getDispositivi() {
+		 return dispositivi;
+	 }
 
-	public Double getMisura(String parametro) {
-		return parametri.get(parametro);
-	}
+	 public Map<String, Double> getParametri() {
+		 return parametri;
+	 }
 
-	public boolean isEmpty() {
-		if (dispositivi == null || dispositivi.isEmpty()) {
-			return true;  
-		}
-		return false;
-	}
+	 public Double getMisura(String parametro) {
+		 return parametri.get(parametro);
+	 }
+
+	 public boolean isEmpty() {
+		 if (dispositivi == null || dispositivi.isEmpty()) {
+				 return true;  
+	     }
+	     return false;
+	 }
+
+	 public void addDispositivo(Dispositivo d) {
+		 if (d != null) {
+			 this.dispositivi.add(d);
+		 }
+	 }
 
 	public void addDispositivo(Dispositivo d) {
 		if (d != null) {
@@ -105,8 +118,28 @@ public class Stanza implements Observable, Observer, RoomPort {
 		// String nome = obsParam.getParameterName();
 		double valore = obsParam.getValue();
 
-		this.updateParameter(nome, valore);
-	}
-}
+     @Override
+	 public void removeObserver(Observer observer) {
+    	 observers.remove(observer);	     
+     }
+
+     @Override
+	 public void notifyObservers(Object args) {
+         for (Observer o : observers) {
+        		 o.update(this, args);
+        	 }
+         }
+
+     @Override
+     public void update(Observable o, Object arg) {
+         ObservableParameter obsParam = (ObservableParameter) o;
+
+         DispositivoParameter paramEnum = obsParam.getParameterName();
+         String nomeStr = paramEnum.name();
+         double valore = obsParam.getValue();
+
+         this.updateParameter(nomeStr, valore);
+         }
+     }
 
 
