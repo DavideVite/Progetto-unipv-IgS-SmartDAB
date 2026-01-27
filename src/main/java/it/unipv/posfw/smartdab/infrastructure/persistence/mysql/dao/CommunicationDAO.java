@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
+package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DAO;
 
 import java.util.ArrayList;
 

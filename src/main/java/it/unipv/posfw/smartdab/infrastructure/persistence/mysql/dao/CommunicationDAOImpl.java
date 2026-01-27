@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
+package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,7 +39,7 @@ public class CommunicationDAOImpl implements CommunicationDAO {
 			
 			while(r.next()) {
 				CommunicationPOJO c = new CommunicationPOJO(
-														r.getString(1),
+														r.getInt(1),
 														r.getString(2),
 														r.getString(3),
 														r.getObject(4),

@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
+package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,7 +45,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 														r.getString(4), 
 														DispositivoStates.valueOf(r.getString(5)), 
 														r.getBoolean(6),
-														r.getTimestamp(7).toLocalDateTime(), 
+														r.getr, 
 														r.getString(8)
 														);
 				result.add(d);
