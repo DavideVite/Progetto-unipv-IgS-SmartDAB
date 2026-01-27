@@ -2,11 +2,12 @@ package it.unipv.posfw.smartdab.core.service;
 
 import java.util.List;
 
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
-import it.unipv.posfw.smartdab.core.domain.model.scenario.ScenarioStanzaConfig;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
@@ -25,19 +26,22 @@ public class ParametroManager {
         if (dispositivi == null) return null;
 
         for (Dispositivo d : dispositivi) {
-            // 1. Deve essere un attuatore
-            // if (!d.isAttuatore()) {
-            //   continue;
-            // }
+            // 1. Verifica se è un attuatore tramite cast
+            try {
+                AttuatoreFacade attuatore = (AttuatoreFacade) d;
 
-            // 2. Deve essere attivo
-            if (!d.isActive()) {
+                // 2. Deve essere attivo
+                if (!attuatore.isActive()) {
+                    continue;
+                }
+
+                // 3. Deve supportare il parametro richiesto
+                if (attuatore.getTopic() != null && attuatore.getTopic().getParameter() == tipoParametro) {
+                    return attuatore;
+                }
+            } catch (ClassCastException e) {
+                // Non è un attuatore, passa al prossimo dispositivo
                 continue;
-            }
-
-            // 3. Deve supportare il parametro richiesto
-            if (d.getTopic() != null && d.getTopic().getParameter() == tipoParametro) {
-                return d;
             }
         }
         return null;
@@ -51,11 +55,10 @@ public class ParametroManager {
         if (dispositivo == null) return false;
 
         return inviaComando(dispositivo, tipoParametro, valore);
+    }
 
-          }
-
-    // Caso d'uso 2: Applicazione scenario
-    public boolean applicaScenarioConfig(ScenarioStanzaConfig config) {
+    // Caso d'uso 2: Applicazione configurazione (sia manuale che da scenario)
+    public boolean applicaStanzaConfig(StanzaConfig config) {
         return impostaParametro(
             config.getStanzaId(),
             config.getTipo_parametro(),
@@ -64,7 +67,6 @@ public class ParametroManager {
     }
 
     // Invio all'EventBus tramite IEventBusClient
-
     private boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore) {
         Request request = Request.createRequest(dispositivo.getTopic(), "SETPOINT", valore);
 

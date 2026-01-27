@@ -73,22 +73,50 @@ public class Stanza implements Observable, Observer{
 		 }
 	 }
 
-	 public void removeDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.remove(d);
-		 }
-	 }
-
-	 public void updateParameter(String nomeParametro, double nuovoValore) {
-		 this.parametri.put(nomeParametro, nuovoValore);
-
-		 notifyObservers(nomeParametro);
-	 }
-
-     @Override
-	 public void addObserver(Observer observer) {
-		 observers.add(observer);
+	public void addDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.add(d);
 		}
+	}
+
+	public void removeDispositivo(Dispositivo d) {
+		if (d != null) {
+			this.dispositivi.remove(d);
+		}
+	}
+
+	public void updateParameter(String nomeParametro, double nuovoValore) {
+		this.parametri.put(nomeParametro, nuovoValore);
+
+		notifyObservers(nomeParametro);
+	}
+
+	@Override
+	public void addObserver(Observer observer) {
+		observers.add(observer);
+	}
+
+	@Override
+	public void removeObserver(Observer observer) {
+		observers.remove(observer);	     
+	}
+
+	@Override
+	public void notifyObservers(Object args) {
+		for (Observer o : observers) {
+			if (o instanceof SensoreFacade) {
+				SensoreFacade s = (SensoreFacade) o;
+				s.update(this, args);
+			}
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		ObservableParameter obsParam = (ObservableParameter) o;
+
+		// String nome = obsParam.getParameterName();
+		double valore = obsParam.getValue();
 
      @Override
 	 public void removeObserver(Observer observer) {

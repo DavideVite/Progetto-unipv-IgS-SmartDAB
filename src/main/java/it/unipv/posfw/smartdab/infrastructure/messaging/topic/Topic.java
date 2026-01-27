@@ -11,6 +11,7 @@ import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 // Questa classe definisce un nuovo abstract type topic semi-strutturato
+
 // Ogni controllo necessario per l'istanza è gestito qui
 
 public class Topic {
@@ -22,17 +23,17 @@ public class Topic {
 	public final String TOPIC_FORMAT = "%s/%s/%s/%s";
 	
 	// Costruttore chiuso per garantire la costruzione di topic regolari
-	private Topic(RoomPort room, DevicePort dispositivo, DispositivoParameter parameter) {
+	private Topic(String id, RoomPort room, DispositivoParameter parameter) {
 		home = "home";
 		this.room = room.getId();
-		id = dispositivo.getId();
+		this.id = id;
 		this.parameter = parameter;
 	}
 	
 	// Usare questo metodo per istanziare il topic
-	public static Topic createTopic(RoomPort room, DevicePort dispositivo, DispositivoParameter parameter) throws IllegalArgumentException {
-		if(verifyArguments(room, dispositivo, parameter)) {
-			return new Topic(room, dispositivo, parameter);
+	public static Topic createTopic(String id, RoomPort room, DispositivoParameter parameter) throws IllegalArgumentException {
+		if(verifyArguments(room, parameter) && checkId(id)) {
+			return new Topic(id, room, parameter);
 		}
 		
 		throw new IllegalArgumentException("Parametri inseriti non validi");
@@ -43,18 +44,18 @@ public class Topic {
 		return TOPIC_FORMAT.formatted(home, room, id, parameter);
 	}
 	
-	private static boolean verifyArguments(RoomPort room, DevicePort dispositivo, DispositivoParameter parameter) {
-		if(room != null && dispositivo != null && parameter != null)
+	private static boolean verifyArguments(RoomPort room, DispositivoParameter parameter) {
+		if(room != null && parameter != null)
 			return true;
 		
 		return false;
 	}
 	
 	// Metodo per reimpostare il topic post-istanza (non funziona senza istanza)
-	public boolean setTopic(RoomPort room, DevicePort dispositivo, DispositivoParameter parameter) {
-		if(verifyArguments(room, dispositivo, parameter)) {
+	public boolean setTopic(String id, RoomPort room, DispositivoParameter parameter) {
+		if(verifyArguments(room, parameter) && checkId(id)) {
 			this.room = room.getId();
-			id = dispositivo.getId();
+			this.id = id;
 			this.parameter = parameter;
 			return true;
 		}
@@ -80,8 +81,19 @@ public class Topic {
 		return id;
 	}
 
-	public void setId(DevicePort dispositivo) {
-		this.id = dispositivo.getId();
+	public boolean setId(String id) {
+		if(checkId(id)) {
+			this.id = id.toLowerCase();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private static boolean checkId(String id) {
+		String idx = "[A-Za-z]{1,17}[0-9]{0,3}";
+		if(id != null) return id.matches(idx);
+		return false;
 	}
 
 	public DispositivoParameter getParameter() {

@@ -3,6 +3,7 @@ package it.unipv.posfw.smartdab.adapter.facade;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
+import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
 
 // Questa classe serve solo per dividere semanticamente sensori da attuatori
@@ -11,8 +12,8 @@ import it.unipv.posfw.smartdab.core.port.communication.ICommunicator;
 public abstract class AttuatoreFacade extends Dispositivo {
 	private ObservableParameter parameter;
 	
-	public AttuatoreFacade(String id, ICommunicator c, ObservableParameter parameter) {
-		super(id, c, false);
+	public AttuatoreFacade(Topic topic, ICommunicator c, ObservableParameter parameter) {
+		super(topic, c, false);
 		this.setParameter(parameter);
 	}
 
