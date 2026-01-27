@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.ui;
+package it.unipv.posfw.smartdab.ui;  // TODO: parlare con Alessandro se questo deve essere il punto di ingresso. Questo o la casa. 
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
