@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DAO;
+package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
