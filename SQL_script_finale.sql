@@ -71,8 +71,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`Misura` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `tipo` VARCHAR(30) NULL,
-  `unita` VARCHAR(30) NULL,
+  `tipo` VARCHAR(50) NULL,
+  `unita` VARCHAR(50) NULL,
   `valore` DOUBLE NOT NULL,
   `stanza` VARCHAR(50) NULL,
   `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,

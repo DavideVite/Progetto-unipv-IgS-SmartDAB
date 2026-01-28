@@ -92,9 +92,21 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             }
         });
 
-        // Bottone Nuovo - FIX: Ora apre ScenarioFormPanel invece di semplice input dialog
-        // Questo permette di creare scenari completi con configurazioni StanzaConfig
+        // Bottone Nuovo - apre ScenarioFormPanel per creare scenari con configurazioni
         panel.getBtnNuovo().addActionListener(e -> mostraFormNuovoScenario());
+
+        // Bottone Modifica - apre ScenarioFormPanel per modificare scenario selezionato
+        panel.getBtnModifica().addActionListener(e -> {
+            int row = panel.getTabellaScenari().getSelectedRow();
+            if (row >= 0 && row < scenariList.size()) {
+                Scenario scenario = scenariList.get(row);
+                mostraFormModificaScenario(scenario);
+            } else {
+                JOptionPane.showMessageDialog(panel,
+                    "Seleziona uno scenario da modificare",
+                    "Attenzione", JOptionPane.WARNING_MESSAGE);
+            }
+        });
 
         // Bottone Elimina
         panel.getBtnElimina().addActionListener(e -> {

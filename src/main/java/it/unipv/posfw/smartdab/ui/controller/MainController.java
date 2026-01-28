@@ -39,7 +39,7 @@ public class MainController {
     }
 
     private void inizializzaView() {
-        mainFrame = new MainFrame();
+        mainFrame = new MainFrame(gestoreStanze);
         mainPanel = mainFrame.getMainPanel();
     }
 

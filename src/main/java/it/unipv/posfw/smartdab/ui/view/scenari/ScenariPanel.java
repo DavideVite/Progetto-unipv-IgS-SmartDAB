@@ -9,6 +9,7 @@ public class ScenariPanel extends JPanel {
     private JTable tabellaScenari;
     private DefaultTableModel tableModel;
     private JButton btnNuovo;
+    private JButton btnModifica;
     private JButton btnElimina;
     private ScenarioDetailPanel detailPanel;
 
@@ -54,8 +55,10 @@ public class ScenariPanel extends JPanel {
         // Bottoni
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnNuovo = new JButton("Nuovo");
+        btnModifica = new JButton("Modifica");
         btnElimina = new JButton("Elimina");
         btnPanel.add(btnNuovo);
+        btnPanel.add(btnModifica);
         btnPanel.add(btnElimina);
         leftPanel.add(btnPanel, BorderLayout.SOUTH);
 
@@ -78,6 +81,10 @@ public class ScenariPanel extends JPanel {
 
     public JButton getBtnNuovo() {
         return btnNuovo;
+    }
+
+    public JButton getBtnModifica() {
+        return btnModifica;
     }
 
     public JButton getBtnElimina() {

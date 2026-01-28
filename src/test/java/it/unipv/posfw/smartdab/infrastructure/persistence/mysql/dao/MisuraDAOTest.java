@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 
 import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 
 public class MisuraDAOTest {
 		
@@ -15,6 +16,9 @@ public class MisuraDAOTest {
 	@Test
 	public void testInsertMisura() {
 
+			// Prima creo la stanza se no mi dà un errore di foreign key (Davide)
+			Stanza stanzaTest = new Stanza("StanzaDiProva");
+			stanzaDAO.insertStanza(stanzaTest);
 		
 		MisuraPOJO m1 = new MisuraPOJO("M1", "Temperatura", "°C", 22.5, "S01", new Timestamp(System.currentTimeMillis()));
 		MisuraPOJO m2 = new MisuraPOJO("M2", "Luminosita", "lx", 300, "S03", new Timestamp(System.currentTimeMillis()));

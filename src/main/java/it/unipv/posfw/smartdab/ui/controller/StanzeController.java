@@ -2,11 +2,11 @@ package it.unipv.posfw.smartdab.ui.controller;
 
 import java.awt.CardLayout;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
+import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
 
@@ -15,11 +15,13 @@ public class StanzeController {
 	    private StanzeFormPanel formPanel;
 	    private JPanel container; //pannello che usa CardLayout
 	    private CardLayout layout;
+	    private GestoreStanze gestoreStanze;
 	    private int rigaSelezionata = -1;  //-1 significa nuovo inserimento
 
-	    public StanzeController(JPanel container, CardLayout layout) {
+	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze) {
 	    	this.container = container;
 	    	this.layout = layout;
+	    	this.gestoreStanze = gestoreStanze;
 	    }
 	    
 	    public void setViews(StanzePanel elenco, StanzeFormPanel form) {
@@ -50,8 +52,13 @@ public class StanzeController {
 	    		int riga = elencoPanel.getTabella().getSelectedRow();
 	    		int conferma = JOptionPane.showConfirmDialog(null,  "Sei sicuro di voler eliminare " + nome + "?", "Conferma", JOptionPane.YES_NO_OPTION);
 	    		if (conferma == JOptionPane.YES_OPTION) {
-	    			elencoPanel.rimuoviRigaTabella(riga);
-	    			JOptionPane.showMessageDialog(null,  "Stanza eliminata");
+	    			boolean successo = gestoreStanze.eliminaStanza(nome);
+	    			if(successo) {
+	    				elencoPanel.rimuoviRigaTabella(riga);
+	    				JOptionPane.showMessageDialog(null,  "Stanza eliminata");
+	    			} else {
+	    				JOptionPane.showMessageDialog(null, "Errore: impossibile eliminare la stanza (contiene dispositivi?)", "Errore", JOptionPane.ERROR_MESSAGE);
+	    			}
 	    		}
 	    	}
 	    }
@@ -60,25 +67,38 @@ public class StanzeController {
 	    	String id = formPanel.getId();
 	    	String nome = formPanel.getNome();
 	    	String mqStr = formPanel.getMq();
-	    	
+
 	    	if(nome.isEmpty() || mqStr.isEmpty()) {
 	    		JOptionPane.showMessageDialog(null,  "Compila tutti i campi", "Errore", JOptionPane.ERROR_MESSAGE);
 	    		return;
 	    	}
-	    	
+
 	    	try {
 	    		double mq = Double.parseDouble(mqStr);
-	    		
+
 	    		if(rigaSelezionata == -1) {
-	    			//caso 1: nuova stanza
-	    			Stanza nuovaStanza = new Stanza(id, nome,mq);
-	    			
-	    			elencoPanel.aggiungiRigaTabella(nuovaStanza.getId(), nuovaStanza.getNome(), nuovaStanza.getMq());
+	    			//caso 1: nuova stanza - usa GestoreStanze per salvare
+	    			Stanza nuovaStanza = gestoreStanze.creaStanza(id, nome, mq);
+
+	    			if(nuovaStanza != null) {
+	    				elencoPanel.aggiungiRigaTabella(nuovaStanza.getId(), nuovaStanza.getNome(), nuovaStanza.getMq());
+	    			} else {
+	    				JOptionPane.showMessageDialog(null, "Errore: esiste gia' una stanza con questo nome", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				return;
+	    			}
 	    		} else {
-	    			//caso 2: modifica
-	    			elencoPanel.aggiornaRigaTabella(rigaSelezionata, nome, mq);
+	    			//caso 2: modifica - usa GestoreStanze per aggiornare
+	    			String nomeOriginale = elencoPanel.getTabella().getValueAt(rigaSelezionata, 1).toString();
+	    			boolean successo = gestoreStanze.modificaNomeStanza(nomeOriginale, nome);
+
+	    			if(successo) {
+	    				elencoPanel.aggiornaRigaTabella(rigaSelezionata, nome, mq);
+	    			} else {
+	    				JOptionPane.showMessageDialog(null, "Errore: impossibile modificare la stanza", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				return;
+	    			}
 	    		}
-	    		
+
 	    		//torna alla lista
 	    		layout.show(container,  "LISTA_STANZE");
 	    		JOptionPane.showMessageDialog(null, "Operazione completata");

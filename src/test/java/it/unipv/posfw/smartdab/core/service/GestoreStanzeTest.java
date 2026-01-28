@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
-import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_Communicator;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_ON_OFF;
@@ -24,23 +23,17 @@ public class GestoreStanzeTest {
 
 	@BeforeEach
 	void setUp() {
-		Hub.getInstance("prod123");
 		casa = new Casa();
 		gestore = new GestoreStanze(casa);
 		communicator = new Lampada_Communicator();
-		Hub.getInstance().getAutenticazione().impostaPinIniziale("prod123", "12345");
 	}
 
 	@Test
 	public void testCreaStanzaConSuccesso() {
-		boolean risultato = gestore.creaStanza("S01", "Cucina", 20 , "12345", "prod123");
+		Stanza risultato = gestore.creaStanza("S01", "Cucina", 20);
 
-	    // Questo ti dirà in console se il problema è il PIN (torna false)
-	    System.out.println("Risultato creazione: " + risultato);
-
-	    assertTrue(risultato, "ERRORE: Il metodo ha restituito false. Controlla il PIN dell'Hub!");
-	    assertTrue(casa.esisteStanza("Cucina"));
-
+		assertNotNull(risultato, "La stanza dovrebbe essere stata creata");
+		assertTrue(casa.esisteStanza("Cucina"));
 	}
 
 	@Test

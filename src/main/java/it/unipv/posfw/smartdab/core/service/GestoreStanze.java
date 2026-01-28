@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
-import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
@@ -67,22 +66,23 @@ public class GestoreStanze {
     	return null;  	
     }
 
-    public boolean creaStanza(String id, String nomeStanza, double mqStanza, String pin, String passwordProduttore) {
-        if(!Hub.getInstance().getAutenticazione().verificaPin(pin)) {
-        	return false;
+    /**
+     * Crea una nuova stanza e la salva nel database.
+     * L'autenticazione e' gia' stata verificata all'avvio dell'applicazione.
+     * @param id L'identificatore della stanza (ignorato, verra' generato automaticamente)
+     * @return la Stanza creata, oppure null se esiste gia' una stanza con lo stesso nome
+     */
+    public Stanza creaStanza(String id, String nomeStanza, double mqStanza) {
+        if(casa.esisteStanza(nomeStanza)) {
+            return null;
         }
-      
-    	  if(casa.esisteStanza(nomeStanza)) {
-    		  return false;
-    		}
 
-    	Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
-    	casa.nuovaStanza(nuovaStanza);
+        Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
+        casa.nuovaStanza(nuovaStanza);
 
-    	// FIX: Usa il DAO iniettato invece di crearne uno nuovo
-    	stanzaDAO.insertStanza(nuovaStanza);
-    	return true;
-        }
+        stanzaDAO.insertStanza(nuovaStanza);
+        return nuovaStanza;
+    }
 
     public boolean modificaNomeStanza(String nome, String nuovoNome) {
     	Stanza s = casa.cercaStanza(nome); 
