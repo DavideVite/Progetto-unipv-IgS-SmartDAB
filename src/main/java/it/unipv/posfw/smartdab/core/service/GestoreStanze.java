@@ -33,16 +33,12 @@ public class GestoreStanze {
     	return null;  	
     }
 
-    public boolean creaStanza(String id, String nomeStanza, double mqStanza, String pin, String passwordProduttore) {
-        if(!Hub.getInstance().getAutenticazione().verificaPin(pin)) {
-        	return false;
-        }
-      
+    public boolean creaStanza(String nomeStanza, double mqStanza) {
     	  if(casa.esisteStanza(nomeStanza)) {
     		  return false;
     		}
 
-    	Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
+    	Stanza nuovaStanza = new Stanza(nomeStanza, mqStanza);
     	casa.nuovaStanza(nuovaStanza);
     	
     	StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();	
@@ -50,13 +46,14 @@ public class GestoreStanze {
     	return true;
         }
 
-    public boolean modificaNomeStanza(String nome, String nuovoNome) {
+    public boolean modificaStanza(String nome, String nuovoNome, double nuoviMq) {
     	Stanza s = casa.cercaStanza(nome); 
     	if (s!=null) {
     		if(casa.esisteStanza(nuovoNome)) {
     			return false;
     		}		 
     		 s.setNome(nuovoNome);
+    		 s.setMq(nuoviMq);
     		 
     		 StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();
     		 stanzaDAO.updateStanza(s);

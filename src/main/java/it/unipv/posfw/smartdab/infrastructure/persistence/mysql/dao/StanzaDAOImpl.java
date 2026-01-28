@@ -11,10 +11,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnecti
 
 public class StanzaDAOImpl implements StanzaDAO{
 
-	//compito di DatabaseConnection
-	//final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	//final String DB_URL = "jdbc:mysql://hostname:port/dbname", "username", "password";
-	
 	@Override
 	public void insertStanza(Stanza s) {
 		Connection conn = null;

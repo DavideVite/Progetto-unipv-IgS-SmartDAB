@@ -20,14 +20,26 @@ public class Stanza implements Observable, Observer{
 	 private List<Dispositivo> dispositivi = new ArrayList<>();
 	 private Map<String, Double> parametri = new HashMap<>();
 	 private List<Observer> observers = new ArrayList<>(); 
-
-	 public Stanza(String id, String nome, double mq) {
+	 
+	 //costruttore per nuove stanze
+	 public Stanza(String nome, double mq) {
 		 counter++;
 		 this.id = "S" + counter;
 		 this.nome = nome;	
 		 this.mq = mq;	  
 	 }
-
+	 
+	 //costruttore per il DAO
+	 public Stanza(String id, String nome, double mq) {
+		 this.id = id; //prende ID del database
+		 this.nome = nome;
+		 this.mq = mq;
+	 }
+	 
+	 public static void setCounter(int value) {
+		 counter = value;
+	 }
+ 
 	 public String getId() {
 		 return id;
 	 }
@@ -67,12 +79,6 @@ public class Stanza implements Observable, Observer{
 	     return false;
 	 }
 
-	 public void addDispositivo(Dispositivo d) {
-		 if (d != null) {
-			 this.dispositivi.add(d);
-		 }
-	 }
-
 	public void addDispositivo(Dispositivo d) {
 		if (d != null) {
 			this.dispositivi.add(d);
@@ -101,22 +107,20 @@ public class Stanza implements Observable, Observer{
 		observers.remove(observer);	     
 	}
 
-	@Override
-	public void notifyObservers(Object args) {
-		for (Observer o : observers) {
-			if (o instanceof SensoreFacade) {
-				SensoreFacade s = (SensoreFacade) o;
-				s.update(this, args);
-			}
-		}
-	}
+     @Override
+	 public void notifyObservers(Object args) {
+         for (Observer o : observers) {
+        		 o.update(this, args);
+        	 }
+         }
 
-	@Override
-	public void update(Observable o, Object arg) {
-		ObservableParameter obsParam = (ObservableParameter) o;
+     @Override
+     public void update(Observable o, Object arg) {
+         ObservableParameter obsParam = (ObservableParameter) o;
 
-		// String nome = obsParam.getParameterName();
-		double valore = obsParam.getValue();
+         DispositivoParameter paramEnum = obsParam.getParameterName();
+         String nomeStr = paramEnum.name();
+         double valore = obsParam.getValue();
 
      @Override
 	 public void removeObserver(Observer observer) {
