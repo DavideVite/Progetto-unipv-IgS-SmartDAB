@@ -87,9 +87,9 @@ public class StanzeController {
 	    				return;
 	    			}
 	    		} else {
-	    			//caso 2: modifica - usa GestoreStanze per aggiornare
+	    			//caso 2: modifica - usa GestoreStanze per aggiornare nome e mq
 	    			String nomeOriginale = elencoPanel.getTabella().getValueAt(rigaSelezionata, 1).toString();
-	    			boolean successo = gestoreStanze.modificaNomeStanza(nomeOriginale, nome);
+	    			boolean successo = gestoreStanze.modificaStanza(nomeOriginale, nome, mq);
 
 	    			if(successo) {
 	    				elencoPanel.aggiornaRigaTabella(rigaSelezionata, nome, mq);

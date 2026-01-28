@@ -12,7 +12,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ScenarioFormPanel extends JPanel {
 
@@ -47,8 +49,12 @@ public class ScenarioFormPanel extends JPanel {
     // Lista temporanea delle configurazioni
     private List<StanzaConfig> configurazioniTemp;
 
+    // Mappa nome stanza -> ID stanza per il corretto salvataggio nel DB
+    private Map<String, String> mappaStanzaNomeToId;
+
     public ScenarioFormPanel() {
         this.configurazioniTemp = new ArrayList<>();
+        this.mappaStanzaNomeToId = new HashMap<>();
         initComponents();
     }
 
@@ -220,11 +226,18 @@ public class ScenarioFormPanel extends JPanel {
     }
 
     private void aggiungiConfigurazione() {
-        String stanzaId = (String) comboStanza.getSelectedItem();
+        String stanzaNome = (String) comboStanza.getSelectedItem();
         DispositivoParameter param = (DispositivoParameter) comboParametro.getSelectedItem();
 
-        if (stanzaId == null || param == null) {
+        if (stanzaNome == null || param == null) {
             JOptionPane.showMessageDialog(this, "Seleziona stanza e parametro", "Errore", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Ottieni l'ID della stanza dalla mappa
+        String stanzaId = mappaStanzaNomeToId.get(stanzaNome);
+        if (stanzaId == null) {
+            JOptionPane.showMessageDialog(this, "Errore: ID stanza non trovato", "Errore", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -259,14 +272,14 @@ public class ScenarioFormPanel extends JPanel {
                 valoreStr = "";
         }
 
-        // Crea la configurazione
+        // Crea la configurazione con l'ID della stanza (per il DB)
         IParametroValue parametroValue = ParametroValueFactory.create(param, valoreStr);
         StanzaConfig config = new StanzaConfig(stanzaId, parametroValue, param);
         configurazioniTemp.add(config);
 
-        // Aggiorna tabella
+        // Aggiorna tabella (mostra il nome per l'utente, non l'ID)
         modelloConfig.addRow(new Object[]{
-            stanzaId,
+            stanzaNome,
             param.toString(),
             parametroValue.getDisplayString()
         });
@@ -349,10 +362,17 @@ public class ScenarioFormPanel extends JPanel {
         btnSalva.setText("Aggiorna");
     }
 
-    public void aggiornaListaStanze(List<String> stanze) {
+    /**
+     * Aggiorna la lista delle stanze disponibili nel form.
+     *
+     * @param stanzeMap Mappa nome stanza -> ID stanza
+     */
+    public void aggiornaListaStanze(Map<String, String> stanzeMap) {
         comboStanza.removeAllItems();
-        for (String stanza : stanze) {
-            comboStanza.addItem(stanza);
+        mappaStanzaNomeToId.clear();
+        mappaStanzaNomeToId.putAll(stanzeMap);
+        for (String nomeStanza : stanzeMap.keySet()) {
+            comboStanza.addItem(nomeStanza);
         }
     }
 

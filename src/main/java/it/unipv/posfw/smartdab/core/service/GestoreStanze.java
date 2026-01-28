@@ -12,15 +12,17 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 /**
  * Servizio per la gestione delle stanze della casa.
  *
- * REFACTORING: Dependency Injection del DAO
+ * REFACTORING: Dependency Injection del DAO e caricamento dal database.
  * - Prima: Il DAO veniva creato ad ogni operazione (new StanzaDAOImpl() in ogni metodo)
  * - Dopo: Il DAO viene iniettato nel costruttore e riutilizzato
+ * - Le stanze vengono caricate dal database all'avvio
  *
  * Vantaggi:
  * 1. Efficienza: una sola istanza del DAO invece di crearne una per ogni operazione
  * 2. Testabilita: possibilita di iniettare mock DAO nei test
  * 3. Dependency Inversion: dipendenza dall'interfaccia StanzaDAO, non dall'implementazione
  * 4. Separazione responsabilita: GestoreStanze non deve sapere come creare il DAO
+ * 5. Persistenza: le stanze sopravvivono al riavvio dell'applicazione
  */
 public class GestoreStanze {
     private final Casa casa;
@@ -30,6 +32,7 @@ public class GestoreStanze {
     /**
      * Costruttore con Dependency Injection.
      * Usa l'implementazione di default StanzaDAOImpl.
+     * Carica automaticamente le stanze dal database all'avvio.
      *
      * @param casa L'oggetto Casa da gestire
      */
@@ -40,6 +43,7 @@ public class GestoreStanze {
     /**
      * Costruttore con Dependency Injection esplicita del DAO.
      * Permette di iniettare mock DAO per i test.
+     * Carica automaticamente le stanze dal database all'avvio.
      *
      * @param casa L'oggetto Casa da gestire
      * @param stanzaDAO Il DAO per la persistenza delle stanze
@@ -47,6 +51,24 @@ public class GestoreStanze {
     public GestoreStanze(Casa casa, StanzaDAO stanzaDAO) {
         this.casa = casa;
         this.stanzaDAO = stanzaDAO;
+        caricaDalDatabase();
+    }
+
+    /**
+     * Carica tutte le stanze dal database e le inserisce nella Casa.
+     * Chiamato automaticamente nel costruttore.
+     */
+    private void caricaDalDatabase() {
+        try {
+            Set<Stanza> stanzeDalDb = stanzaDAO.readAllStanze();
+            for (Stanza stanza : stanzeDalDb) {
+                casa.nuovaStanza(stanza);
+            }
+            System.out.println("Caricate " + stanzeDalDb.size() + " stanze dal database");
+        } catch (Exception e) {
+            System.err.println("Errore durante il caricamento delle stanze dal database: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 	 public Casa getCasa() {
@@ -85,16 +107,31 @@ public class GestoreStanze {
     }
 
     public boolean modificaNomeStanza(String nome, String nuovoNome) {
-    	Stanza s = casa.cercaStanza(nome); 
-    	if (s!=null) {
-    		if(casa.esisteStanza(nuovoNome)) {
-    			return false;
-    		}		 
-    		 s.setNome(nuovoNome);
+    	return modificaStanza(nome, nuovoNome, -1);
+    }
 
-    		 // FIX: Usa il DAO iniettato invece di crearne uno nuovo
-    		 stanzaDAO.updateStanza(s);
-    		 return true;
+    /**
+     * Modifica una stanza esistente (nome e/o metri quadrati).
+     * @param nome Il nome attuale della stanza
+     * @param nuovoNome Il nuovo nome (puo' essere uguale al precedente)
+     * @param nuoviMq I nuovi metri quadrati (se <= 0, non viene modificato)
+     * @return true se la modifica e' avvenuta con successo, false altrimenti
+     */
+    public boolean modificaStanza(String nome, String nuovoNome, double nuoviMq) {
+    	Stanza s = casa.cercaStanza(nome);
+    	if (s!=null) {
+    		// Verifica che il nuovo nome non sia gia' usato da un'altra stanza
+    		if(!nome.equals(nuovoNome) && casa.esisteStanza(nuovoNome)) {
+    			return false;
+    		}
+    		s.setNome(nuovoNome);
+    		if(nuoviMq > 0) {
+    			s.setMq(nuoviMq);
+    		}
+
+    		// FIX: Usa il DAO iniettato invece di crearne uno nuovo
+    		stanzaDAO.updateStanza(s);
+    		return true;
     	 }
     	 return false;
     }

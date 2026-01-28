@@ -14,7 +14,9 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -180,17 +182,17 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
 
     /**
      * Aggiorna la lista delle stanze disponibili nel form.
-     * Ottiene i nomi delle stanze da GestoreStanze.
+     * Passa una mappa nome -> ID per permettere il corretto salvataggio nel DB.
      */
     private void aggiornaListaStanzeForm() {
-        List<String> nomiStanze = new ArrayList<>();
+        Map<String, String> stanzeMap = new HashMap<>();
         Set<Stanza> stanze = gestoreStanze.visualizzaStanze();
         if (stanze != null) {
             for (Stanza s : stanze) {
-                nomiStanze.add(s.getNome());
+                stanzeMap.put(s.getNome(), s.getId());
             }
         }
-        formPanel.aggiornaListaStanze(nomiStanze);
+        formPanel.aggiornaListaStanze(stanzeMap);
     }
 
     /**
