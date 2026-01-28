@@ -247,4 +247,39 @@ public class ImpostazioneManualeFlussoTest {
             return requestSent;
         }
     }
+
+    // ========== MOCK STANZA DAO ==========
+
+    /**
+     * Mock semplice di StanzaDAO per i test (non richiede connessione DB)
+     */
+    private static class MockStanzaDAO implements StanzaDAO {
+
+        @Override
+        public void insertStanza(Stanza s) {
+            // Mock: non fa nulla
+        }
+
+        @Override
+        public Stanza readStanza(String id) {
+            // Mock: restituisce null
+            return null;
+        }
+
+        @Override
+        public void updateStanza(Stanza s) {
+            // Mock: non fa nulla
+        }
+
+        @Override
+        public void deleteStanza(Stanza s) {
+            // Mock: non fa nulla
+        }
+
+        @Override
+        public Set<Stanza> readAllStanze() {
+            // Mock: restituisce set vuoto
+            return Set.of();
+        }
+    }
 }

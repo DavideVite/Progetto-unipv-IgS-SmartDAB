@@ -1,6 +1,8 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
@@ -34,8 +36,12 @@ public class TestUIScenariController {
             // Crea un mock semplice per ParametroManager (null-safe per il test UI)
             ParametroManager parametroManager = null; // In un test reale useresti un mock
 
-            // Crea il controller
-            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, parametroManager);
+            // Crea GestoreStanze con una Casa vuota per il test UI
+            Casa casa = new Casa();
+            GestoreStanze gestoreStanze = new GestoreStanze(casa);
+
+            // Crea il controller con tutti e 4 i parametri richiesti
+            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, parametroManager, gestoreStanze);
 
             // Aggiungi il pannello alla finestra
             frame.add(scenariPanel);

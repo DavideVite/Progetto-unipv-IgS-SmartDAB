@@ -14,6 +14,7 @@ import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_ON_OFF;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_Communicator;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
@@ -48,11 +49,16 @@ public class ScenarioControllerTest {
 		stanzaSoggiorno = new Stanza("S01", "Soggiorno", 25.0);
 		casa.nuovaStanza(stanzaSoggiorno);
 
-		// Setup lampada
+		// Setup lampada con la signature corretta
+		// 1. Creo il Topic prima
+		Topic topic = Topic.createTopic("Lamp01", stanzaSoggiorno, DispositivoParameter.LUMINOSITA);
+
+		// 2. Creo ObservableParameter
+		ObservableParameter obsParam = new ObservableParameter(DispositivoParameter.LUMINOSITA);
+
+		// 3. Creo la lampada con la signature corretta: (Topic, Lampada_Communicator, ObservableParameter, int)
 		Lampada_Communicator communicator = new Lampada_Communicator();
-		lampada = new Lampada_ON_OFF("Lamp01", communicator, 3000);
-		Topic topic = Topic.createTopic(stanzaSoggiorno, lampada, DispositivoParameter.LUMINOSITA);
-		lampada.setTopic(topic);
+		lampada = new Lampada_ON_OFF(topic, communicator, obsParam, 3000);
 		lampada.switchDispositivo();
 		stanzaSoggiorno.addDispositivo(lampada);
 
