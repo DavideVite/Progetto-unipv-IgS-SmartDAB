@@ -6,9 +6,10 @@ import java.util.Iterator;
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
-public class EventBus implements DispositiviObserver {
+public class EventBus implements DispositiviObserver, IEventBusClient {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
 	private static EventBus instance = null;
 	private Request request;

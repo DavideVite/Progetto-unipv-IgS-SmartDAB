@@ -13,7 +13,7 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 
 public class Stanza implements Observable, Observer{
-     private static int counter = 0;
+     private static int counter = 0;  //TODO verificare se torna a zero
 	 private String id;
 	 private String nome;
 	 private double mq;
@@ -106,6 +106,26 @@ public class Stanza implements Observable, Observer{
 	public void removeObserver(Observer observer) {
 		observers.remove(observer);	     
 	}
+
+     @Override
+	 public void notifyObservers(Object args) {
+         for (Observer o : observers) {
+        		 o.update(this, args);
+        	 }
+         }
+
+     @Override
+     public void update(Observable o, Object arg) {
+         ObservableParameter obsParam = (ObservableParameter) o;
+
+         DispositivoParameter paramEnum = obsParam.getParameterName();
+         String nomeStr = paramEnum.name();
+         double valore = obsParam.getValue();
+
+     @Override
+	 public void removeObserver(Observer observer) {
+    	 observers.remove(observer);	     
+     }
 
      @Override
 	 public void notifyObservers(Object args) {
