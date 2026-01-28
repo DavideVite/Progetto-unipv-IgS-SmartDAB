@@ -13,7 +13,7 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 
-public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
+public class StanzaConfigDAOImpl implements StanzaConfigDAO {
 
 	private static final String INSERT = "INSERT INTO ScenarioStanzaConfig (id, stanza, scenario, tipo_parametro, tipo_valore) VALUES (?, ?, ?, ?, ?)";
 	private static final String SELECT_BY_SCENARIO = "SELECT * FROM ScenarioStanzaConfig WHERE scenario = ?";
@@ -103,23 +103,14 @@ public class ScenarioStanzaConfigDAOImpl implements ScenarioStanzaConfigDAO {
 		}
 	}
 
-	/**
-	 * Serializza un IParametroValue in una stringa per il database.
-	 * Salva il rawValue di ParametroValue.
-	 */
 	private String serializeParametroValue(IParametroValue value) {
 		if (value instanceof ParametroValue) {
 			ParametroValue pv = (ParametroValue) value;
 			return pv.getRawValue();
 		}
-		// Fallback: usa getDisplayString()
 		return value.getDisplayString();
 	}
 
-	/**
-	 * Deserializza una stringa dal database in un IParametroValue.
-	 * Ricostruisce un ParametroValue usando il tipoParametro dalla riga del DB.
-	 */
 	private IParametroValue deserializeParametroValue(String serialized, DispositivoParameter tipoParametro) {
 		if (serialized == null || serialized.isEmpty()) {
 			return null;

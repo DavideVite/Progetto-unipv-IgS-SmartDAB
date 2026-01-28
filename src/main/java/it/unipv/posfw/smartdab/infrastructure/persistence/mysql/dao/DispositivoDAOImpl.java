@@ -45,7 +45,10 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 														r.getString(4), 
 														DispositivoStates.valueOf(r.getString(5)), 
 														r.getBoolean(6),
-														r.getr, 
+														// FIX: Completato codice incompleto "r.getr,"
+														// La colonna 7 contiene created_at (TIMESTAMP) -> LocalDateTime
+														// La colonna 8 contiene model (VARCHAR)
+														r.getTimestamp(7).toLocalDateTime(),
 														r.getString(8)
 														);
 				result.add(d);

@@ -8,16 +8,21 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import it.unipv.posfw.smartdab.ui.controller.StanzeAction;
+import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 
-public class StanzePanel extends JPanel {	
+public class StanzePanel extends JPanel {
 	private DefaultTableModel modello;  //variabile di istanza
 	private JTable tabella;
-	private StanzeAction controller;
-	
-	public StanzePanel(StanzeAction controller) {
+	private StanzeController controller;
+
+	// Costruttore vuoto per compatibilità con MainPanel
+	public StanzePanel() {
+		this(null);
+	}
+
+	public StanzePanel(StanzeController controller) {
 		this.controller = controller;
-		
+
 		setLayout(new BorderLayout(10,10));
 		
 		JLabel titolo = new JLabel("Elenco Stanze (clicca una riga per modificare o eliminare la stanza)", SwingConstants.CENTER);

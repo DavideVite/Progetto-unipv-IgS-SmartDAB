@@ -2,7 +2,7 @@ package it.unipv.posfw.smartdab.ui.view.stanze;
 import javax.swing.*;
 import java.awt.*;
 
-import it.unipv.posfw.smartdab.ui.controller.StanzeAction;
+import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 
 	public class TestUIStanze {
 
@@ -17,12 +17,12 @@ import it.unipv.posfw.smartdab.ui.controller.StanzeAction;
 	            JPanel container = new JPanel(layout);
 
 	            // 2. Il Controller
-	            StanzeAction action = new StanzeAction(container, layout);
+	            StanzeController controller = new StanzeController(container, layout);
 
-	            StanzePanel elenco = new StanzePanel(action);
-	            StanzeFormPanel form = new StanzeFormPanel(action);
+	            StanzePanel elenco = new StanzePanel(controller);
+	            StanzeFormPanel form = new StanzeFormPanel(controller);
 
-	            action.setViews(elenco, form);
+	            controller.setViews(elenco, form);
 
 	          
 	            container.add(elenco, "LISTA_STANZE");

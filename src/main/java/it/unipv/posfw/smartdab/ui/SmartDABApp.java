@@ -5,8 +5,8 @@ import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
-import it.unipv.posfw.smartdab.ui.controller.ScenariAction;
-import it.unipv.posfw.smartdab.ui.controller.StanzeAction;
+import it.unipv.posfw.smartdab.ui.controller.ScenariController;
+// import it.unipv.posfw.smartdab.ui.controller.StanzeController; // TODO: da riattivare quando si sistema l'architettura
 import it.unipv.posfw.smartdab.ui.view.MainFrame;
 
 import javax.swing.*;
@@ -25,8 +25,9 @@ public class SmartDABApp {
             MainFrame frame = new MainFrame();
 
             // 3. Crea Controller
-            new StanzeAction(frame.getMainPanel().getStanzePanel(), gestoreStanze);
-            new ScenariAction(frame.getMainPanel().getScenariPanel(), scenarioManager, parametroManager);
+            // TODO: StanzeController richiede (JPanel, CardLayout) - da rivedere l'architettura
+            // new StanzeController(frame.getMainPanel().getStanzePanel(), gestoreStanze);
+            new ScenariController(frame.getMainPanel().getScenariPanel(), scenarioManager, parametroManager, gestoreStanze);
 
             // 4. Mostra finestra
             frame.setVisible(true);

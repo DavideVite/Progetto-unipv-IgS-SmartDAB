@@ -11,8 +11,14 @@ import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer{
+/**
+ * FIX: Aggiunto RoomPort all'elenco delle interfacce implementate.
+ * Stanza gia' aveva i metodi getId() e getDispositivi() richiesti da RoomPort.
+ * Questo permette di usare Stanza come parametro in Topic.createTopic().
+ */
+public class Stanza implements Observable, Observer, RoomPort {
      private static int counter = 0;  //TODO verificare se torna a zero
 	 private String id;
 	 private String nome;
@@ -67,17 +73,12 @@ public class Stanza implements Observable, Observer{
 	     return false;
 	 }
 
+	 // CORREZIONE: Rimosso metodo addDispositivo duplicato (era presente due volte)
 	 public void addDispositivo(Dispositivo d) {
 		 if (d != null) {
 			 this.dispositivi.add(d);
 		 }
 	 }
-
-	public void addDispositivo(Dispositivo d) {
-		if (d != null) {
-			this.dispositivi.add(d);
-		}
-	}
 
 	public void removeDispositivo(Dispositivo d) {
 		if (d != null) {
@@ -101,45 +102,27 @@ public class Stanza implements Observable, Observer{
 		observers.remove(observer);	     
 	}
 
+	// CORREZIONE: Rimosso codice duplicato di notifyObservers (era presente due volte)
+	// CORREZIONE: Sostituito riferimento a SensoreFacade con chiamata generica a Observer
 	@Override
 	public void notifyObservers(Object args) {
 		for (Observer o : observers) {
-			if (o instanceof SensoreFacade) {
-				SensoreFacade s = (SensoreFacade) o;
-				s.update(this, args);
-			}
+			o.update(this, args);
 		}
 	}
 
+	// CORREZIONE: Rimosso metodo update incompleto e duplicato
+	// CORREZIONE: Mantenuta solo la versione completa che usa DispositivoParameter
 	@Override
 	public void update(Observable o, Object arg) {
 		ObservableParameter obsParam = (ObservableParameter) o;
 
-		// String nome = obsParam.getParameterName();
+		DispositivoParameter paramEnum = obsParam.getParameterName();
+		String nomeStr = paramEnum.name();
 		double valore = obsParam.getValue();
 
-     @Override
-	 public void removeObserver(Observer observer) {
-    	 observers.remove(observer);	     
-     }
-
-     @Override
-	 public void notifyObservers(Object args) {
-         for (Observer o : observers) {
-        		 o.update(this, args);
-        	 }
-         }
-
-     @Override
-     public void update(Observable o, Object arg) {
-         ObservableParameter obsParam = (ObservableParameter) o;
-
-         DispositivoParameter paramEnum = obsParam.getParameterName();
-         String nomeStr = paramEnum.name();
-         double valore = obsParam.getValue();
-
-         this.updateParameter(nomeStr, valore);
-         }
-     }
+		this.updateParameter(nomeStr, valore);
+	}
+}
 
 

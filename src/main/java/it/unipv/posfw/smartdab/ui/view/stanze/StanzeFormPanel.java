@@ -3,7 +3,7 @@ package it.unipv.posfw.smartdab.ui.view.stanze;
 import java.awt.*;
 import javax.swing.*;
 
-import it.unipv.posfw.smartdab.ui.controller.StanzeAction;
+import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 
 public class StanzeFormPanel extends JPanel{
 	private JTextField txtNome;
@@ -12,10 +12,10 @@ public class StanzeFormPanel extends JPanel{
 	private JButton btnElimina;
 	private JButton btnAnnulla;
 	private JLabel lblTitolo;
-	
-	private StanzeAction controller;
-	
-	public StanzeFormPanel(StanzeAction controller) {
+
+	private StanzeController controller;
+
+	public StanzeFormPanel(StanzeController controller) {
 		this.controller = controller;
 		
 		setLayout(new GridBagLayout());
