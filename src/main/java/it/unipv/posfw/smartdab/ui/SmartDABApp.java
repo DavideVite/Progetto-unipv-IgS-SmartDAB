@@ -21,7 +21,7 @@ public class SmartDABApp {
             ParametroManager parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
 
             // 2. Crea View (passa GestoreStanze per StanzeController)
-            MainFrame frame = new MainFrame(gestoreStanze);
+            MainFrame frame = new MainFrame(gestoreStanze, parametroManager);
 
             // 3. Crea Controller per Scenari
             new ScenariController(frame.getMainPanel().getScenariPanel(), scenarioManager, parametroManager, gestoreStanze);

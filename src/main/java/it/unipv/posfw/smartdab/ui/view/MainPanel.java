@@ -1,6 +1,7 @@
 package it.unipv.posfw.smartdab.ui.view;
 
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
+import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
@@ -19,11 +20,11 @@ public class MainPanel extends JPanel {
     private DispositivoPanel dispositivoPanel;
     private StanzeController stanzeController;
 
-    public MainPanel(GestoreStanze gestoreStanze) {
-        initComponents(gestoreStanze);
+    public MainPanel(GestoreStanze gestoreStanze, ParametroManager parametroManager) {
+        initComponents(gestoreStanze, parametroManager);
     }
 
-    private void initComponents(GestoreStanze gestoreStanze) {
+    private void initComponents(GestoreStanze gestoreStanze, ParametroManager parametroManager) {
         setLayout(new BorderLayout());
 
         tabbedPane = new JTabbedPane();
@@ -33,7 +34,7 @@ public class MainPanel extends JPanel {
         stanzeContainer = new JPanel(stanzeLayout);
 
         // Crea il controller per le stanze
-        stanzeController = new StanzeController(stanzeContainer, stanzeLayout, gestoreStanze);
+        stanzeController = new StanzeController(stanzeContainer, stanzeLayout, gestoreStanze, parametroManager);
 
         // Crea i pannelli delle stanze
         stanzePanel = new StanzePanel(stanzeController);
