@@ -1,7 +1,6 @@
 package it.unipv.posfw.smartdab.ui.view.scenari;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.enums.ParameterType;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
@@ -21,7 +20,6 @@ public class ScenarioFormPanel extends JPanel {
     // Dati scenario
     private JLabel lblTitolo;
     private JTextField txtNome;
-    private JComboBox<EnumScenarioType> comboTipo;
 
     // Tabella configurazioni
     private JTable tabellaConfig;
@@ -98,14 +96,6 @@ public class ScenarioFormPanel extends JPanel {
         txtNome = new JTextField(20);
         gbc.gridx = 1;
         panel.add(txtNome, gbc);
-
-        // Tipo
-        gbc.gridy = 2;
-        gbc.gridx = 0;
-        panel.add(new JLabel("Tipo:"), gbc);
-        comboTipo = new JComboBox<>(EnumScenarioType.values());
-        gbc.gridx = 1;
-        panel.add(comboTipo, gbc);
 
         return panel;
     }
@@ -319,10 +309,8 @@ public class ScenarioFormPanel extends JPanel {
             return;
         }
 
-        EnumScenarioType tipo = (EnumScenarioType) comboTipo.getSelectedItem();
-
         if (listener != null) {
-            listener.onSalva(nome, tipo, new ArrayList<>(configurazioniTemp));
+            listener.onSalva(nome, new ArrayList<>(configurazioniTemp));
         }
     }
 
@@ -332,7 +320,6 @@ public class ScenarioFormPanel extends JPanel {
         lblTitolo.setText("Nuovo Scenario");
         txtNome.setText("");
         txtNome.setEditable(true);
-        comboTipo.setSelectedItem(EnumScenarioType.PERSONALIZZATO);
         configurazioniTemp.clear();
         modelloConfig.setRowCount(0);
         btnSalva.setText("Salva");
@@ -344,8 +331,6 @@ public class ScenarioFormPanel extends JPanel {
         lblTitolo.setText("Modifica Scenario");
         txtNome.setText(scenario.getNome());
         txtNome.setEditable(false);
-        comboTipo.setSelectedItem(scenario.getTipo_scenario());
-
         // Carica configurazioni esistenti
         configurazioniTemp.clear();
         modelloConfig.setRowCount(0);
@@ -390,7 +375,7 @@ public class ScenarioFormPanel extends JPanel {
 
     // Interface per gli eventi
     public interface ScenarioFormListener {
-        void onSalva(String nome, EnumScenarioType tipo, List<StanzaConfig> configurazioni);
+        void onSalva(String nome, List<StanzaConfig> configurazioni);
         void onAnnulla();
     }
 }

@@ -102,6 +102,12 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             int row = panel.getTabellaScenari().getSelectedRow();
             if (row >= 0 && row < scenariList.size()) {
                 Scenario scenario = scenariList.get(row);
+                if (scenario.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
+                    JOptionPane.showMessageDialog(panel,
+                        "Gli scenari predefiniti non possono essere modificati",
+                        "Attenzione", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 mostraFormModificaScenario(scenario);
             } else {
                 JOptionPane.showMessageDialog(panel,
@@ -115,6 +121,12 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             int row = panel.getTabellaScenari().getSelectedRow();
             if (row >= 0 && row < scenariList.size()) {
                 Scenario scenario = scenariList.get(row);
+                if (scenario.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
+                    JOptionPane.showMessageDialog(panel,
+                        "Gli scenari predefiniti non possono essere eliminati",
+                        "Attenzione", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 int confirm = JOptionPane.showConfirmDialog(panel,
                     "Eliminare lo scenario '" + scenario.getNome() + "'?",
                     "Conferma", JOptionPane.YES_NO_OPTION);
@@ -238,26 +250,23 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
      * @param configurazioni La lista delle configurazioni stanza
      */
     @Override
-    public void onSalva(String nome, EnumScenarioType tipo, List<StanzaConfig> configurazioni) {
+    public void onSalva(String nome, List<StanzaConfig> configurazioni) {
         try {
             if (formPanel.isModifica()) {
                 // Modifica scenario esistente: rimuovi vecchie config e aggiungi nuove
                 Scenario scenario = formPanel.getScenarioCorrente();
-                // Rimuovi tutte le configurazioni esistenti
                 List<StanzaConfig> configEsistenti = new ArrayList<>(scenario.getConfigurazioni());
                 for (StanzaConfig config : configEsistenti) {
                     scenarioManager.rimuoviConfigurazione(scenario.getNome(), config);
                 }
-                // Aggiungi le nuove configurazioni
                 for (StanzaConfig config : configurazioni) {
                     scenarioManager.aggiungiConfigurazione(scenario.getNome(), config);
                 }
                 JOptionPane.showMessageDialog(formPanel, "Scenario aggiornato con successo!");
             } else {
-                // Creazione nuovo scenario
-                Scenario nuovoScenario = scenarioManager.creaScenario(nome, tipo);
+                // Creazione nuovo scenario (sempre PERSONALIZZATO per l'utente)
+                scenarioManager.creaScenario(nome, EnumScenarioType.PERSONALIZZATO);
 
-                // Aggiungi tutte le configurazioni
                 for (StanzaConfig config : configurazioni) {
                     scenarioManager.aggiungiConfigurazione(nome, config);
                 }

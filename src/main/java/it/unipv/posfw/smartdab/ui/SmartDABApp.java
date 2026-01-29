@@ -20,6 +20,9 @@ public class SmartDABApp {
             ScenarioManager scenarioManager = new ScenarioManager();
             ParametroManager parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
 
+            // 1b. Inizializza scenari predefiniti (Notte, Giorno, Assenza)
+            scenarioManager.inizializzaScenariPredefiniti(gestoreStanze);
+
             // 2. Crea View (passa GestoreStanze per StanzeController)
             MainFrame frame = new MainFrame(gestoreStanze);
 

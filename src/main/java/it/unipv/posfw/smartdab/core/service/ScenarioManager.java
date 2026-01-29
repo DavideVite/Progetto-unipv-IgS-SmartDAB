@@ -7,8 +7,10 @@ import java.util.Map;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
+import it.unipv.posfw.smartdab.factory.StanzaConfigFactory;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
 
@@ -257,5 +259,50 @@ public class ScenarioManager {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return null;
 		return scenario.getConfigurazioni();
+	}
+
+	// ===== SCENARI PREDEFINITI =====
+
+	/**
+	 * Crea gli scenari predefiniti (Notte, Giorno, Assenza) se non esistono già.
+	 * Ogni scenario viene creato con configurazioni per tutte le stanze presenti.
+	 */
+	public void inizializzaScenariPredefiniti(GestoreStanze gestoreStanze) {
+		java.util.Set<Stanza> stanze = gestoreStanze.visualizzaStanze();
+		if (stanze == null || stanze.isEmpty()) {
+			System.out.println("Nessuna stanza presente: scenari predefiniti non creati");
+			return;
+		}
+
+		if (!esisteScenario("Notte")) {
+			creaScenario("Notte", EnumScenarioType.PREDEFINITO);
+			for (Stanza s : stanze) {
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.TEMPERATURA, 18.0));
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.UMIDITA, 45.0));
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.LUMINOSITA, 0.0));
+			}
+			System.out.println("Scenario predefinito 'Notte' creato");
+		}
+
+		if (!esisteScenario("Giorno")) {
+			creaScenario("Giorno", EnumScenarioType.PREDEFINITO);
+			for (Stanza s : stanze) {
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.TEMPERATURA, 21.0));
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.UMIDITA, 45.0));
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.LUMINOSITA, 500.0));
+			}
+			System.out.println("Scenario predefinito 'Giorno' creato");
+		}
+
+		if (!esisteScenario("Assenza")) {
+			creaScenario("Assenza", EnumScenarioType.PREDEFINITO);
+			for (Stanza s : stanze) {
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.TEMPERATURA, 16.0));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(s.getId(), DispositivoParameter.LUMINOSITA, 0.0));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(s.getId(), DispositivoParameter.SENSORE_MOVIMENTO, true));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(s.getId(), DispositivoParameter.SENSORE_PRESENZA, true));
+			}
+			System.out.println("Scenario predefinito 'Assenza' creato");
+		}
 	}
 }
