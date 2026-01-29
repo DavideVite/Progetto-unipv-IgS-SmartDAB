@@ -14,7 +14,7 @@ public class SmartDABApp {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // 1. Inizializza Model
+            // 1. Inizializza Model/Service
             Casa casa = new Casa();
             GestoreStanze gestoreStanze = new GestoreStanze(casa);
             ScenarioManager scenarioManager = new ScenarioManager();
