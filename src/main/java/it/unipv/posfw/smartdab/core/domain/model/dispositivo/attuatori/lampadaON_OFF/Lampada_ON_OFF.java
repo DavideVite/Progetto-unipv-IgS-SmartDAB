@@ -1,7 +1,7 @@
 package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
+// FIX: Rimosso import duplicato di DispositivoParameter
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
@@ -64,23 +64,9 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 		
 		return 1;
 	}
-	
-	// Devo implementare controllo ON/OFF
-	
-	@Override
-	public int applyVariation(Object state) {
-		try {
-			
-			super.getParameter().setValue((int)state);
-			super.getParameter().notifyObservers(this);
-			
-		} catch(ClassCastException e) {
-			e.printStackTrace();
-			return 0;
-		}
-		
-		return 1;
-	}
+
+	// FIX: Rimosso metodo applyVariation() duplicato (era definito due volte identico)
+	// Il metodo era presente sia alle righe 54-66 che 71-83, causando errore di compilazione
 
 	@Override
 	public int action() {

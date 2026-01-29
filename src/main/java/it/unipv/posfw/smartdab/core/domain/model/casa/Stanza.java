@@ -11,8 +11,14 @@ import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-public class Stanza implements Observable, Observer{
+/**
+ * FIX: Aggiunto RoomPort all'elenco delle interfacce implementate.
+ * Stanza gia' aveva i metodi getId() e getDispositivi() richiesti da RoomPort.
+ * Questo permette di usare Stanza come parametro in Topic.createTopic().
+ */
+public class Stanza implements Observable, Observer, RoomPort {
      private static int counter = 0;  //TODO verificare se torna a zero
 	 private String id;
 	 private String nome;
@@ -102,25 +108,6 @@ public class Stanza implements Observable, Observer{
 		observers.add(observer);
 	}
 
-	@Override
-	public void removeObserver(Observer observer) {
-		observers.remove(observer);	     
-	}
-
-     @Override
-	 public void notifyObservers(Object args) {
-         for (Observer o : observers) {
-        		 o.update(this, args);
-        	 }
-         }
-
-     @Override
-     public void update(Observable o, Object arg) {
-         ObservableParameter obsParam = (ObservableParameter) o;
-
-         DispositivoParameter paramEnum = obsParam.getParameterName();
-         String nomeStr = paramEnum.name();
-         double valore = obsParam.getValue();
 
      @Override
 	 public void removeObserver(Observer observer) {
@@ -138,12 +125,12 @@ public class Stanza implements Observable, Observer{
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
 
-         DispositivoParameter paramEnum = obsParam.getParameterName();
-         String nomeStr = paramEnum.name();
-         double valore = obsParam.getValue();
+		DispositivoParameter paramEnum = obsParam.getParameterName();
+		String nomeStr = paramEnum.name();
+		double valore = obsParam.getValue();
 
-         this.updateParameter(nomeStr, valore);
-         }
-     }
+		this.updateParameter(nomeStr, valore);
+	}
+}
 
 

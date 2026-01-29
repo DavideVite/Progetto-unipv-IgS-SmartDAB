@@ -5,7 +5,7 @@ import java.util.List;
 
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 
-public interface ScenarioStanzaConfigDAO {
+public interface StanzaConfigDAO {
 
 	public void insertConfig(Connection conn, String scenarioId, StanzaConfig config);
 

@@ -19,7 +19,7 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnecti
 
 public class ScenarioDAOImpl implements ScenarioDAO {
 
-	private ScenarioStanzaConfigDAOImpl configDAO;
+	private StanzaConfigDAOImpl configDAO;
 
 	private static final String INSERT = "INSERT INTO Scenario (id, nome, tipo, created_at, updated_at, attivo) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String UPDATE = "UPDATE Scenario SET tipo = ?, attivo = ?, updated_at = ? WHERE id = ?";
@@ -33,7 +33,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 	private static final String COUNT = "SELECT COUNT(*) FROM Scenario";
 
 	public ScenarioDAOImpl() {
-		this.configDAO = new ScenarioStanzaConfigDAOImpl();
+		this.configDAO = new StanzaConfigDAOImpl();
 	}
 
 	@Override
