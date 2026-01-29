@@ -27,6 +27,13 @@ public class StanzeController {
 	    public void setViews(StanzePanel elenco, StanzeFormPanel form) {
 	    	this.elencoPanel = elenco;
 	    	this.formPanel = form;
+	    	caricaStanzeInTabella();
+	    }
+
+	    private void caricaStanzeInTabella() {
+	    	for (Stanza s : gestoreStanze.visualizzaStanze()) {
+	    		elencoPanel.aggiungiRigaTabella(s.getId(), s.getNome(), s.getMq());
+	    	}
 	    }
 	  
 	    public void mostraFormInserimento() {

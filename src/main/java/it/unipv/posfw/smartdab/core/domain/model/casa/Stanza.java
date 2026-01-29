@@ -108,25 +108,6 @@ public class Stanza implements Observable, Observer, RoomPort {
 		observers.add(observer);
 	}
 
-	@Override
-	public void removeObserver(Observer observer) {
-		observers.remove(observer);	     
-	}
-
-     @Override
-	 public void notifyObservers(Object args) {
-         for (Observer o : observers) {
-        		 o.update(this, args);
-        	 }
-         }
-
-     @Override
-     public void update(Observable o, Object arg) {
-         ObservableParameter obsParam = (ObservableParameter) o;
-
-         DispositivoParameter paramEnum = obsParam.getParameterName();
-         String nomeStr = paramEnum.name();
-         double valore = obsParam.getValue();
 
      @Override
 	 public void removeObserver(Observer observer) {
