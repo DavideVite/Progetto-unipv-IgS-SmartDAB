@@ -77,6 +77,22 @@ public class Stanza implements Observable, Observer, RoomPort {
 	 public void setMq(double mq) {
 		 this.mq=mq;
 	 }
+	 
+	 public static void setCounter(int value) {
+		 counter = value;
+	 }
+ 
+	 public String getId() {
+		 return id;
+	 }
+	 
+	 public double getMq() {
+		 return mq;
+	 }
+	 
+	 public void setMq(double mq) {
+		 this.mq=mq;
+	 }
 
 	 public String getNome() {
 		 return nome;

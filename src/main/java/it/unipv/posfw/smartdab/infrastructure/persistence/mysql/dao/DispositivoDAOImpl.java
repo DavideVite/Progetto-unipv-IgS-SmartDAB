@@ -36,21 +36,18 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			PreparedStatement s;
 			ResultSet r;
 			
-			String query = "SELECT * from Dispositivi LIMIT " + n;
+			String query = "SELECT * from Dispositivo LIMIT " + n;
 			s = connection.prepareStatement(query);
 			r = s.executeQuery(query);
 			
 			while(r.next()) {
 				DispositivoPOJO d = new DispositivoPOJO(r.getString(1), 
-														r.getString(2), 
-														DispositivoParameter.valueOf(r.getString(3)), 
-														r.getString(4), 
-														DispositivoStates.valueOf(r.getString(5)), 
-														r.getBoolean(6),
-														// FIX: Completato codice incompleto "r.getr,"
-														// La colonna 7 contiene created_at (TIMESTAMP) -> LocalDateTime
-														// La colonna 8 contiene model (VARCHAR)
-														r.getTimestamp(7).toLocalDateTime()
+														r.getString(8),
+														DispositivoParameter.valueOf(r.getString(2)),
+														r.getString(3),
+														DispositivoStates.valueOf(r.getString(4)), 
+														r.getBoolean(5),
+														r.getTimestamp(6).toLocalDateTime()
 														);
 				result.add(d);
 			} 

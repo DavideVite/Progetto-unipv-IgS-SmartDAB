@@ -1,6 +1,7 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
@@ -20,6 +21,7 @@ public class MainController {
     private GestoreStanze gestoreStanze;
     private ScenarioManager scenarioManager;
     private ParametroManager parametroManager;
+    private DispositiviManager dispositivoManager;
 
     // Sub-controllers
     private ScenariController scenariController;
@@ -36,10 +38,11 @@ public class MainController {
         gestoreStanze = new GestoreStanze(casa);
         scenarioManager = new ScenarioManager();
         parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
+        dispositivoManager = new DispositiviManager();
     }
 
     private void inizializzaView() {
-        mainFrame = new MainFrame(gestoreStanze, parametroManager);
+        mainFrame = new MainFrame(gestoreStanze);
         mainPanel = mainFrame.getMainPanel();
     }
 
@@ -57,7 +60,8 @@ public class MainController {
         // Controller per Dispositivi
         dispositivoController = new DispositivoController(
             mainPanel,
-            gestoreStanze
+            gestoreStanze,
+            dispositivoManager
         );
 
         // Listener per cambio tab

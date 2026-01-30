@@ -1,11 +1,11 @@
 package it.unipv.posfw.smartdab.core.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
-import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 
@@ -51,6 +51,20 @@ public class DispositiviManager {
         return d;
     }
     
+    public DispositivoPOJO aggiungiDispositivo(DispositivoPOJO d) {
+ 	
+ 	DispositivoPOJO d1 = d;
+ 	
+     if(dispositivi.contains(d1)) {
+         return null;
+     }
+
+     dispositivi.add(d1);
+
+     dao.insertDispositivo(d1);
+     return d1;
+ }
+    
     public boolean disableDispositivo(String id) {
     	if(dao.existsByNome(id)) {
     		dao.disableDispositivo(id);
@@ -60,4 +74,15 @@ public class DispositiviManager {
     		return false;
     	}
     } 
+    
+    public DispositivoPOJO getDispositivoById(String id) {
+    	Iterator<DispositivoPOJO> iter = dispositivi.iterator();
+    	DispositivoPOJO d;
+    	
+    	while(iter.hasNext()) {
+    		d = iter.next();
+    		if(d.getId().equals(id)) return d;
+    	}
+    	return null;
+    }
 }

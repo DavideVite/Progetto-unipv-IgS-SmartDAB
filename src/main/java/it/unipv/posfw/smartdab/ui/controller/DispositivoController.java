@@ -2,9 +2,8 @@ package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
+import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoFormPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
@@ -25,15 +24,17 @@ public class DispositivoController implements
     private DispositivoPanel dispositivoPanel;
     private DispositivoFormPanel formPanel;
     private GestoreStanze gestoreStanze;
+    private DispositiviManager dispositiviManager;
 
     // Dati in memoria (simulazione, in attesa di DAO completo)
-    private Map<String, DispositivoPOJO> dispositivi;
+//    private Map<String, DispositivoPOJO> dispositivi;
     private String filtroStanzaCorrente = "Tutte";
 
-    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze) {
+    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze, DispositiviManager dispositiviManager) {
         this.mainPanel = mainPanel;
         this.gestoreStanze = gestoreStanze;
-        this.dispositivi = new HashMap<>();
+//        this.dispositivi = new HashMap<>();
+        this.dispositiviManager = dispositiviManager; 
 
         inizializzaViste();
         aggiornaVista();
@@ -68,8 +69,8 @@ public class DispositivoController implements
     private void aggiornaListaDispositivi() {
         List<DispositivoPOJO> listaFiltrata = new ArrayList<>();
 
-        for (DispositivoPOJO d : dispositivi.values()) {
-            if (filtroStanzaCorrente.equals("Tutte") ||
+        for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
+            if (filtroStanzaCorrente != null && filtroStanzaCorrente.equals("Tutte") ||
                 d.getStanza().equals(filtroStanzaCorrente)) {
                 listaFiltrata.add(d);
             }
@@ -87,7 +88,7 @@ public class DispositivoController implements
 
     @Override
     public void onModificaDispositivo(String id) {
-        DispositivoPOJO dispositivo = dispositivi.get(id);
+        DispositivoPOJO dispositivo = dispositiviManager.getDispositivoById(id);
         if (dispositivo != null) {
             formPanel.preparaPerModifica(dispositivo);
             mostraFormDialog();
@@ -104,7 +105,7 @@ public class DispositivoController implements
         );
 
         if (conferma == JOptionPane.YES_OPTION) {
-            dispositivi.remove(id);
+            dispositiviManager.disableDispositivo(id);
             aggiornaListaDispositivi();
             JOptionPane.showMessageDialog(dispositivoPanel, "Dispositivo eliminato");
         }
@@ -119,7 +120,7 @@ public class DispositivoController implements
     @Override
     public void onStanzaSelezionata(String stanza) {
         List<DispositivoPOJO> listaStanza = new ArrayList<>();
-        for (DispositivoPOJO d : dispositivi.values()) {
+        for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
             if (d.getStanza().equals(stanza)) {
                 listaStanza.add(d);
             }
@@ -131,15 +132,15 @@ public class DispositivoController implements
     @Override
     public void onSalva(DispositivoPOJO dispositivo) {
         if (formPanel.isModifica()) {
-            dispositivi.put(dispositivo.getId(), dispositivo);
+            dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo aggiornato");
         } else {
-            if (dispositivi.containsKey(dispositivo.getId())) {
+            if (dispositiviManager.getDispositivoById(filtroStanzaCorrente) != null) {
                 JOptionPane.showMessageDialog(formPanel,
                     "ID già esistente", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            dispositivi.put(dispositivo.getId(), dispositivo);
+            dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo creato");
         }
         chiudiFormDialog();
@@ -181,8 +182,4 @@ public class DispositivoController implements
         return formPanel;
     }
 
-    // Metodo per aggiungere dispositivi da test o caricamento
-    public void aggiungiDispositivo(DispositivoPOJO dispositivo) {
-        dispositivi.put(dispositivo.getId(), dispositivo);
-    }
 }
