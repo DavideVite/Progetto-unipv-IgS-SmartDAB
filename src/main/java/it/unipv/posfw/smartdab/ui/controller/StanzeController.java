@@ -95,7 +95,7 @@ public class StanzeController {
 
 	    		if(rigaSelezionata == -1) {
 	    			//caso 1: nuova stanza - usa GestoreStanze per salvare
-	    			Stanza nuovaStanza = gestoreStanze.creaStanza(id, nome, mq);
+	    			Stanza nuovaStanza = gestoreStanze.creaStanza(nome, mq);
 
 	    			if(nuovaStanza != null) {
 	    				elencoPanel.aggiungiRigaTabella(nuovaStanza.getId(), nuovaStanza.getNome(), nuovaStanza.getMq());

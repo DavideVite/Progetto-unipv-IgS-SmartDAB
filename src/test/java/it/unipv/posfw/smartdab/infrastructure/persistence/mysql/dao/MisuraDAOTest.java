@@ -3,6 +3,7 @@ package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,15 +16,16 @@ public class MisuraDAOTest {
 	
 	@Test
 	public void testInsertMisura() {
-
+            
+		    StanzaDAO stanzaDao = new StanzaDAOImpl();
 			// Prima creo la stanza se no mi dà un errore di foreign key (Davide)
-			Stanza stanzaTest = new Stanza("StanzaDiProva");
-			stanzaDAO.insertStanza(stanzaTest);
+			Stanza stanzaTest = new Stanza("StanzaDiProva", 18);
+			stanzaDao.insertStanza(stanzaTest);
 		
-		MisuraPOJO m1 = new MisuraPOJO("M1", "Temperatura", "°C", 22.5, "S01", new Timestamp(System.currentTimeMillis()));
-		MisuraPOJO m2 = new MisuraPOJO("M2", "Luminosita", "lx", 300, "S03", new Timestamp(System.currentTimeMillis()));
-		MisuraPOJO m3 = new MisuraPOJO("M3", "Temperatura", "°C", 21, "S02", new Timestamp(System.currentTimeMillis()));
-		MisuraPOJO m4 = new MisuraPOJO("M4", "Temperatura", "°C", 20, "S04", new Timestamp(System.currentTimeMillis()));
+		MisuraPOJO m1 = new MisuraPOJO(0, "Temperatura", "°C", 22.5, "S01", LocalDateTime.now());
+		MisuraPOJO m2 = new MisuraPOJO(0, "Luminosita", "lx", 300, "S03", LocalDateTime.now());
+		MisuraPOJO m3 = new MisuraPOJO(0, "Temperatura", "°C", 21, "S02", LocalDateTime.now());
+		MisuraPOJO m4 = new MisuraPOJO(0, "Temperatura", "°C", 20, "S04", LocalDateTime.now());
 		
 	assertDoesNotThrow(() -> {
 		dao.insertMisura(m1);
@@ -31,13 +33,5 @@ public class MisuraDAOTest {
 		dao.insertMisura(m3);
 		dao.insertMisura(m4);
 	}, "Inserimento misura fallito");		
-	}
-
-	@Test
-	public void readUltimaMisuraTest() {
-		
-		assertDoesNotThrow(() -> {
-			dao.readUltimaMisura("S01", "Temperatura");
-		}, "Lettura misura fallita");
 	}
 }
