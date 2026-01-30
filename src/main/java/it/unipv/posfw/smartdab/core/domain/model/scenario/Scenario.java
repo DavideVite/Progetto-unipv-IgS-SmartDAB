@@ -14,7 +14,7 @@ public class Scenario {
 //	- formato : "2025-01-05T14:30:00"
 //	E' uno standard per gestire il tempo e permette vari modi di creazione e operazioni comuni.
 
-
+	private String id;
 	private String nome;
 	private List<StanzaConfig> configurazioni;
 	private EnumScenarioType tipo_scenario;
@@ -24,6 +24,7 @@ public class Scenario {
 
 
 	public Scenario(String nome) {
+		this.id = null;
 		this.nome = nome;
 		this.configurazioni = new ArrayList<>();
 		this.tipo_scenario = EnumScenarioType.PERSONALIZZATO;
@@ -33,13 +34,25 @@ public class Scenario {
 	}
 
 	public Scenario(String nome, EnumScenarioType tipo_scenario) {
+		this.id = null;
 		this.nome = nome;
 		this.configurazioni = new ArrayList<>();
 		this.tipo_scenario = tipo_scenario;
 		this.isActive = false;
 		this.data_creazione = LocalDateTime.now();
 		this.data_ultima_modifica = LocalDateTime.now();
+	}
 
+	// Costruttore completo per la ricostruzione dal database
+	public Scenario(String id, String nome, EnumScenarioType tipo_scenario, boolean isActive,
+			LocalDateTime data_creazione, LocalDateTime data_ultima_modifica) {
+		this.id = id;
+		this.nome = nome;
+		this.configurazioni = new ArrayList<>();
+		this.tipo_scenario = tipo_scenario;
+		this.isActive = isActive;
+		this.data_creazione = data_creazione;
+		this.data_ultima_modifica = data_ultima_modifica;
 	}
 
 	// I senguenti 2 metodi sono public per permettere a ScenarioManager di usarli.
@@ -75,14 +88,27 @@ public class Scenario {
 	 }
 
 
-	 // Getters
+	 // Getters e Setters
+	 public String getId() {
+		 return id;
+	 }
+
+	 public void setId(String id) {
+		 this.id = id;
+	 }
+
 	 public String getNome() {
 		 return nome;
 	 }
 
 	 public List<StanzaConfig> getConfigurazioni() {
 	        return configurazioni;
-	    }
+	 }
+
+	 public void setConfigurazioni(List<StanzaConfig> configurazioni) {
+		 this.configurazioni = configurazioni;
+		 this.data_ultima_modifica = LocalDateTime.now();
+	 }
 
 	 public EnumScenarioType getTipo_scenario() {
 		return tipo_scenario;

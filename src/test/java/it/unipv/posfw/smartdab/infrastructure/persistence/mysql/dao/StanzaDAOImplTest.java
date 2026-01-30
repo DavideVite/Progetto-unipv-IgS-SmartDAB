@@ -112,7 +112,12 @@ class StanzaDAOImplTest {
     @Order(6)
     @DisplayName("Test eliminazione stanza dal database")
     void testDeleteStanza() {
-        assertDoesNotThrow(() -> stanzaDAO.deleteStanza(testId));
+        // Leggiamo la stanza da eliminare
+        Stanza stanzaDaEliminare = stanzaDAO.readStanza(testId);
+        assertNotNull(stanzaDaEliminare, "La stanza dovrebbe esistere prima dell'eliminazione");
+
+        // deleteStanza richiede un oggetto Stanza, non una String
+        assertDoesNotThrow(() -> stanzaDAO.deleteStanza(stanzaDaEliminare));
 
         // Verifica che sia stata eliminata
         Stanza stanza = stanzaDAO.readStanza(testId);
