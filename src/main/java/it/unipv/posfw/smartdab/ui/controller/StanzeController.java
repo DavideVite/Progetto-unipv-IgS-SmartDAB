@@ -1,10 +1,12 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import java.awt.CardLayout;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
@@ -17,7 +19,7 @@ public class StanzeController {
 	    private CardLayout layout;
 	    private GestoreStanze gestoreStanze;
 	    private int rigaSelezionata = -1;  //-1 significa nuovo inserimento
-
+	    
 	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze) {
 	    	this.container = container;
 	    	this.layout = layout;
@@ -85,7 +87,7 @@ public class StanzeController {
 
 	    		if(rigaSelezionata == -1) {
 	    			//caso 1: nuova stanza - usa GestoreStanze per salvare
-	    			Stanza nuovaStanza = gestoreStanze.creaStanza(id, nome, mq);
+	    			Stanza nuovaStanza = gestoreStanze.creaStanza(nome, mq);
 
 	    			if(nuovaStanza != null) {
 	    				elencoPanel.aggiungiRigaTabella(nuovaStanza.getId(), nuovaStanza.getNome(), nuovaStanza.getMq());
@@ -131,5 +133,6 @@ public class StanzeController {
 	    public void annullaStanza() {
 	        layout.show(container, "LISTA_STANZE");
 	    }
+	    
 }
 

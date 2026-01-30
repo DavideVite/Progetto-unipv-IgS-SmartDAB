@@ -44,7 +44,19 @@ public class Stanza implements Observable, Observer, RoomPort {
 		 this.nome = nome;
 		 this.mq = mq;
 		 this.createdAt = createdAt;
-	 }
+		 
+		 try {
+		        // Estrae il numero dall'ID (es. da "S3" estrae 3)
+		        int idNumerico = Integer.parseInt(id.substring(1));
+		        
+		        // Se l'ID che arriva dal DB è più grande del counter attuale, aggiorna il counter
+		        if (idNumerico > counter) {
+		            counter = idNumerico;
+		        }
+		    } catch (Exception e) {
+		    	
+		    }
+		}
 	 
 	 public LocalDateTime getCreatedAt() { 
 		 return createdAt;

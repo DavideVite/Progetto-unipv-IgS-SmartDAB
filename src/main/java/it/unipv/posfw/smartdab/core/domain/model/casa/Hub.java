@@ -35,14 +35,9 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	        int maxId = 0;
             for (Stanza s : stanzeRecuperate) {
             	casa.nuovaStanza(s);
-            	
-            	//estrae il numero dall'Id
-            	int idNumerico = Integer.parseInt(s.getId().substring(1));
-            	if (idNumerico > maxId) 
-            		maxId = idNumerico;
+            
             }
-            Stanza.setCounter(maxId);
-	    }
+
             
          /*  for (DispositivoParameter param : DispositivoParameter.values()) {
             if (param == DispositivoParameter.UNKNOWN) continue;
@@ -70,13 +65,13 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
             		d.setState(pojo.getStato());
             	}
             	
-            }
+            } 
             
-            Scenario scenarioDao = new ScenarioDAOImpl();
+            Scenario scenarioDao = new ScenarioDAOImpl(); */
 	       
-	       this.gestoreStanze = new GestoreStanze(casa);
+	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao);
 
-	    }  */
+	    }  
 	    
 	    public static Hub getInstance(String passwordProduttore) {
 	    	if(instance==null) {
