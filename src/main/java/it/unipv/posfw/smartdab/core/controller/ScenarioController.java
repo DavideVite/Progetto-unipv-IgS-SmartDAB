@@ -44,7 +44,14 @@ public class ScenarioController {
 				if (!(valore instanceof Number)) {
 					throw new IllegalArgumentException("Valore deve essere numerico per " + tipoParametro);
 				}
-				return StanzaConfigFactory.creaConfigNumerico(stanzaId, tipoParametro, ((Number) valore).doubleValue());
+				double val = ((Number) valore).doubleValue();
+				if (tipoParametro.getMin() != null && val < tipoParametro.getMin()) {
+					throw new IllegalArgumentException("Valore " + val + " sotto il minimo consentito (" + tipoParametro.getMin() + " " + tipoParametro.getUnit() + ") per " + tipoParametro);
+				}
+				if (tipoParametro.getMax() != null && val > tipoParametro.getMax()) {
+					throw new IllegalArgumentException("Valore " + val + " sopra il massimo consentito (" + tipoParametro.getMax() + " " + tipoParametro.getUnit() + ") per " + tipoParametro);
+				}
+				return StanzaConfigFactory.creaConfigNumerico(stanzaId, tipoParametro, val);
 
 			case BOOLEAN:
 				if (!(valore instanceof Boolean)) {
@@ -56,7 +63,11 @@ public class ScenarioController {
 				if (!(valore instanceof String)) {
 					throw new IllegalArgumentException("Valore deve essere stringa per " + tipoParametro);
 				}
-				return StanzaConfigFactory.creaConfigEnum(stanzaId, tipoParametro, (String) valore);
+				String valEnum = (String) valore;
+				if (tipoParametro.getAllowedValues() != null && !tipoParametro.getAllowedValues().contains(valEnum)) {
+					throw new IllegalArgumentException("Valore \"" + valEnum + "\" non ammesso per " + tipoParametro + ". Valori consentiti: " + tipoParametro.getAllowedValues());
+				}
+				return StanzaConfigFactory.creaConfigEnum(stanzaId, tipoParametro, valEnum);
 
 			default:
 				throw new IllegalArgumentException("Tipo parametro non supportato: " + type);

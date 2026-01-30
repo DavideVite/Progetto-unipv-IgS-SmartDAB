@@ -3,6 +3,8 @@ package it.unipv.posfw.smartdab.ui.controller;
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoFormPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
