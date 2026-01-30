@@ -176,7 +176,6 @@ public class DispositivoPanel extends JPanel {
                 d.getParametro().toString(),
                 d.getStato().toString(),
                 d.isAttivo(),
-                d.getModel()
             });
         }
     }
@@ -190,7 +189,6 @@ public class DispositivoPanel extends JPanel {
                 d.getParametro().toString(),
                 d.getStato().toString(),
                 d.isAttivo(),
-                d.getModel()
             });
         }
     }

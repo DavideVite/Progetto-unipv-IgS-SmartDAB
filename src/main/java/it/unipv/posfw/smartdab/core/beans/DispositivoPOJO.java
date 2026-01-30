@@ -13,29 +13,26 @@ public class DispositivoPOJO {
 	private DispositivoStates stato;
 	private boolean attivo;
 	private LocalDateTime created_at;
-	private String model;
 	
 	public DispositivoPOJO(String id, String stanza, DispositivoParameter parametro, 
-						   String tipo, DispositivoStates stato, boolean attivo, String model) {
+						   String tipo, DispositivoStates stato, boolean attivo) {
 		this.id = id;
 		this.stanza = stanza;
 		this.parametro = parametro;
 		this.tipo = tipo.toUpperCase();
 		this.stato = stato;
 		this.attivo = attivo;
-		this.model = model;
 		created_at = LocalDateTime.now();
 	}
 	
 	public DispositivoPOJO(String id, String stanza, DispositivoParameter parametro, 
-			String tipo, DispositivoStates stato, boolean attivo, LocalDateTime t, String model) {
+			String tipo, DispositivoStates stato, boolean attivo, LocalDateTime t) {
 		this.id = id;
 		this.stanza = stanza;
 		this.parametro = parametro;
 		this.tipo = tipo.toUpperCase();
 		this.stato = stato;
 		this.attivo = attivo;
-		this.model = model;
 		created_at = t;
 	}
 	
@@ -101,14 +98,6 @@ public class DispositivoPOJO {
 
 	public void setParametro(DispositivoParameter parametro) {
 		this.parametro = parametro;
-	}
-
-	public String getModel() {
-		return model;
-	}
-
-	public void setModel(String model) {
-		this.model = model;
 	}
 	
 	

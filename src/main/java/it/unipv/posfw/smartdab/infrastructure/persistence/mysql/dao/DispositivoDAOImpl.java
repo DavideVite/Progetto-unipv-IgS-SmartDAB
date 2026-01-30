@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
@@ -48,8 +50,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 														// FIX: Completato codice incompleto "r.getr,"
 														// La colonna 7 contiene created_at (TIMESTAMP) -> LocalDateTime
 														// La colonna 8 contiene model (VARCHAR)
-														r.getTimestamp(7).toLocalDateTime(),
-														r.getString(8)
+														r.getTimestamp(7).toLocalDateTime()
 														);
 				result.add(d);
 			} 
@@ -67,5 +68,144 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 		}
 		
 		return result;
+	}
+
+	@Override
+	public boolean insertDispositivo(DispositivoPOJO d) {
+		if (existsByNome(d.getId())) {
+			System.out.println("Dispositivo " + d.getId() + " è già presente nel database");
+			return false;
+		}
+
+		PreparedStatement s = null;
+
+		try {
+			Connection connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+				s = connection.prepareStatement("INSERT INTO Dispositivo "
+						+ "(id, parametro, tipo, stato, attivo, created_at, model, stanza) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+				s.setString(1, d.getId());
+				s.setString(2, d.getParametro().toString());
+				s.setString(3, d.getTipo());
+				s.setString(4, d.getStato().toString());
+				s.setBoolean(5, d.isAttivo());
+				s.setTimestamp(6, Timestamp.valueOf(d.getCreated_at()));
+				s.setString(7, "");
+				s.setString(8, d.getStanza());
+
+				s.executeUpdate();
+				
+				System.out.println("Dispositivo " + d.getId() + " inserito correttamente");
+			}
+			
+			else return false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateDispositivo(DispositivoPOJO d) {
+		PreparedStatement s = null;
+		try {
+			Connection connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+				s = connection.prepareStatement("UPDATE Dispositivo SET attivo = ? WHERE id = ?");
+				s.setBoolean(1, d.isAttivo());
+
+				s.executeUpdate();
+
+				System.out.println("Dispositivo " + d.getId() + " aggiornato correttamente");
+			}
+			
+			else return false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+		
+	}
+
+	@Override
+	public boolean disableDispositivo(String id) {
+		PreparedStatement s = null;
+		try {
+			Connection connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+				s = connection.prepareStatement("UPDATE Dispositivo SET stato = ? WHERE id = ?");
+				s.setString(2, DispositivoStates.DISABLED.toString());
+				s.setString(2, id);
+
+				s.executeUpdate();
+
+				System.out.println("Dispositivo " + id + " disabilitato correttamente");
+			}
+			
+			else return false;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
+		
+	}
+
+	@Override
+	public boolean existsByNome(String name) {
+		Connection connection = null;
+		PreparedStatement s = null;
+		ResultSet r = null;
+
+		try {
+			connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+				s = connection.prepareStatement("SELECT COUNT(*) FROM Dispositivo WHERE nome = ?");
+				s.setString(1, name);
+				r = s.executeQuery();
+
+				if (r.next()) {
+					return r.getInt(1) > 0;
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (r != null) r.close();
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 }
