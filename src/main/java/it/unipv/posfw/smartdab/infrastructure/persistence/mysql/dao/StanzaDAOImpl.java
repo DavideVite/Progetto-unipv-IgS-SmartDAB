@@ -1,21 +1,16 @@
 package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
 public class StanzaDAOImpl implements StanzaDAO{
 
-	//compito di DatabaseConnection
-	//final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	//final String DB_URL = "jdbc:mysql://hostname:port/dbname", "username", "password";
-	
 	@Override
 	public void insertStanza(Stanza s) {
 		Connection conn = null;
@@ -59,7 +54,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		ResultSet rs = null;
 		Stanza s = null;	
 		
-		String sql = "SELECT * FROM stanza WHERE id = ?";
+		String sql = "SELECT * FROM STANZA WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -131,11 +126,11 @@ public class StanzaDAOImpl implements StanzaDAO{
 	}
 
 	@Override
-	public void deleteStanza(String id) {
+	public void deleteStanza(Stanza s) {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
-		String sql = "DELETE FROM stanza WHERE id = ?";
+		String sql = "DELETE FROM STANZA WHERE id = ?";
 		
 		try {
 			conn = DatabaseConnection.getConnection();
@@ -145,14 +140,14 @@ public class StanzaDAOImpl implements StanzaDAO{
 			pstmt = conn.prepareStatement(sql);
 			
 			//passiamo l'id
-			pstmt.setString(1,  id);
+			pstmt.setString(1,  s.getId());
 			
             int stanzaDaEliminare = pstmt.executeUpdate();
             
             if(stanzaDaEliminare > 0) {
-            	System.out.println("Stanza con ID " + id + "eliminata con successo dal database.");
+            	System.out.println("Stanza con nome " + s.getId() + "eliminata con successo dal database.");
             } else {
-            	System.out.println("Nessuna stanza trovata con ID: " + id);
+            	System.out.println("Nessuna stanza trovata con nome: " + s.getId());
             }
 		}
 	} catch (SQLException e) {
@@ -172,7 +167,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		Set<Stanza> stanza = new HashSet<>();	 
+		Set<Stanza> stanze = new HashSet<>();	 
 		
 		String sql = "SELECT * FROM stanza";
 		
@@ -192,7 +187,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 			  //creiamo oggetto con dati del DB
 			  Stanza s = new Stanza (id, nome, mq);
 			  
-			  stanza.add(s);
+			  stanze.add(s);
 		  }
 		}
 	} catch (SQLException e) {
@@ -207,6 +202,6 @@ public class StanzaDAOImpl implements StanzaDAO{
 		}		
 		
 	}
-	return stanza;
+	return stanze;
    }
 }

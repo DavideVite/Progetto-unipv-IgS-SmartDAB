@@ -5,5 +5,11 @@ import java.util.ArrayList;
 import it.unipv.posfw.smartdab.core.beans.CommunicationPOJO;
 
 public interface CommunicationDAO {
-	public ArrayList<CommunicationPOJO> selectN(int n);
+    ArrayList<CommunicationPOJO> selectN(int n);
+    
+	public boolean insertCommunication(CommunicationPOJO c);
+	
+	public boolean updateCommunication(CommunicationPOJO c);
+	
+	public boolean existsById(int id);
 }
