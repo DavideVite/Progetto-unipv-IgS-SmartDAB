@@ -37,37 +37,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
             	casa.nuovaStanza(s);
             
             }
-
-            
-         /*  for (DispositivoParameter param : DispositivoParameter.values()) {
-            if (param == DispositivoParameter.UNKNOWN) continue;
-            
-            MisuraPOJO ultimaMisura = misuraDao.readUltimaMisura(s.getId(), param.name());
-            if (ultimaMisura != null) {
-            	s.updateParameter(param.name(), ultimaMisura.getValore());
-            }
-            } */
-            
-          /*  DispositivoDAO dispositivoDao = new DispositivoDAOImpl();
-            //ArrayList<DispositivoPOJO> dispositiviSalvati = dispositivoDao.selectAll();
-            
-            for (DispositivoPOJO pojo : dispositiviTrovati) {
-            	
-            	Stanza stanzaDestinazione = casa.getStanzabyId(pojo.getStanza());
-            	
-            	if (stanzaDestinazione != null ) {
-            		Dispositivo d = new Dispositivo(pojo.getId(), pojo.getParametro());
-            		
-            		d.setState(pojo.isAttivo());
-            		
-            		stanzaDestinazione.addDispositivo(d);
-            		
-            		d.setState(pojo.getStato());
-            	}
-            	
-            } 
-            
-            Scenario scenarioDao = new ScenarioDAOImpl(); */
 	       
 	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao);
 
