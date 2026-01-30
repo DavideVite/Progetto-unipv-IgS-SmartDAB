@@ -18,10 +18,13 @@ Smart DAB ha l'obiettivo di migliorare la vivibilità e il comfort delle case ne
 
 - **sensore**: dispositivo che rileva parametri ambientali e invia le misurazioni al sistema.
 - **attuatore**: dispositivo che esegue azioni fisiche in risposta a comandi manuali, scenari o regole.
-- **scenario**: insieme di azioni predefinite, attivabili manualmente dall'utente, che coinvolgono una o più stanze e dispositivi.
-- **regola**: meccanismo automatico che attiva azioni al verificarsi di condizioni specifiche.
+- **scenario**: insieme di azioni predefinite, attivabili **manualmente** dall'utente, che coinvolgono una o più stanze e dispositivi. Uno scenario non possiede condizioni di attivazione automatica.
+- **regola**: meccanismo **automatico** che associa una condizione di attivazione (es. soglia di un sensore, orario) a uno scenario. Quando la condizione è soddisfatta, il sistema attiva lo scenario collegato senza intervento dell'utente.
 
 ### iv. Riferimenti
+
+- Documento di visione del progetto Smart DAB (v1.0)
+- IEEE 830-1998 – Recommended Practice for Software Requirements Specifications
 
 ### v. Descrizione del resto del documento
 
@@ -82,7 +85,7 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 
 **RFU7:** Al primo avvio del sistema, l'utente deve inserire la password fornita dal produttore per poter accedere alla configurazione. Dopo il primo avviamento l'utente deve scegliere un PIN che gli permette completo accesso al sistema. In assenza di PIN, gli utenti non possono gestire creazione ed eliminazione stanze, creare nuovi scenari e gestire procedure di configurazione/eliminazione dei singoli dispositivi.
 
-**RFU8:** L'utente può creare degli scenari che si attivano automaticamente in base a condizioni ambientali o eventi (es. soglia di temperatura, movimento, orario specifico).
+**RFU8:** L'utente può creare degli scenari che si attivano automaticamente (chiamati regole) in base a condizioni ambientali o eventi (es. soglia di temperatura, movimento, orario specifico).
 
 **RFU9:** Dall'interfaccia principale, l'utente accede alla lista delle automazioni esistenti visualizzando lo stato corrente (attivo/disattivo). L'utente può attivare, sospendere temporaneamente, eliminare o modificare le regole.
 
@@ -94,7 +97,7 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 
 **RFU13:** L'utente può visualizzare statistiche relative alle misurazioni dei sensori (es. temperatura, umidità, consumi). L'utente può visualizzare lo storico delle azioni eseguite all'interno del sistema (es. attivazione scenari, modifiche ai parametri).
 
-**RFU14:** L'utente deve ricevere delle notifiche, in caso di guasti o malfunzionamenti dei dispositivi, su tutte le hub della casa e sullo smartphone dell'utente.
+**RFU14:** L'utente deve ricevere delle notifiche, in caso di guasti o malfunzionamenti dei dispositivi, tramite l'interfaccia dell'hub. Il sistema prevede inoltre la possibilità di estendere le notifiche ad altri canali (es. e-mail) in versioni future.
 
 **RFU15:** Le richieste e le impostazioni dell'utente devono essere eseguite in maniera rigida evitando errori di comunicazione e perdite di richieste, qualora queste ultime risultino valide e non pericolose.
 
@@ -118,9 +121,9 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 
 **RFS9:** Il sistema monitora continuamente le condizioni e attiva le regole quando soddisfatte. Se il sistema non rileva degli attuatori, funzionerà attivando quelli disponibili. Se il sistema non rileva il sensore alla base della condizione di attivazione, la regola viene sospesa automaticamente e non può essere attivata.
 
-**RFS10:** Il sistema identifica e classifica le incompatibilità secondo 2 categorie: conflitti tollerabili (warning) e conflitti potenzialmente gravi (error). Il sistema gestisce il conflitto manuale-scenario informando l'utente che l'impostazione manuale disattiva la regola per quel dispositivo. In situazioni pericolose il sistema agisce senza l'intervento dell'utente.
+**RFS10:** Il sistema identifica e classifica le incompatibilità secondo 2 categorie: conflitti tollerabili (warning, es. impostazione manuale che sovrascrive uno scenario attivo) e conflitti potenzialmente gravi (error, es. attivazione simultanea di riscaldamento e condizionamento nella stessa stanza). Il sistema gestisce il conflitto manuale-scenario informando l'utente che l'impostazione manuale disattiva la regola per quel dispositivo. In situazioni pericolose il sistema agisce senza l'intervento dell'utente.
 
-**RFS11:** Ogni dispositivo deve fornire il proprio consumo energetico su richiesta del sistema. Il sistema suggerisce un uso ottimizzato dei dispositivi presenti.
+**RFS11:** Ogni dispositivo deve fornire il proprio consumo energetico su richiesta del sistema. Il sistema calcola il consumo aggregato per stanza e per tipologia, e segnala all'utente i dispositivi con consumo superiore alla media.
 
 **RFS12:** Il sistema deve aggiornare le previsioni con una frequenza regolare. Il sistema deve presentare le previsioni in modo chiaro tramite grafici e valori numerici. Le previsioni devono adattarsi automaticamente se vengono attivati scenari che influenzano i parametri.
 
@@ -132,8 +135,21 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 
 ### Non funzionali
 
-- L'interfaccia grafica deve essere gestita in maniera tale da essere intuitiva e senza che ci siano rischi di blocco
-- Il sistema deve essere scritto in linguaggio Java
-- La base di dati dovrà essere gestita con MySQL
-- Le interrogazioni alla base di dati devono essere effettuate attraverso linguaggio SQL
-- Il sistema deve essere ultimato entro fine Gennaio 2026
+#### Usabilità
+- L'interfaccia grafica deve essere intuitiva e non deve presentare blocchi durante l'interazione. Le operazioni principali (attivazione scenario, visualizzazione stanze) devono essere raggiungibili in non più di 3 click dalla schermata principale.
+
+#### Prestazioni
+- Il sistema deve rispondere ai comandi dell'utente in tempi ragionevoli nell'ambito di un'esecuzione locale (simulazione).
+
+#### Affidabilità
+- Il sistema deve gestire errori di comunicazione con i dispositivi senza arresti imprevisti, notificando l'utente in caso di anomalie.
+
+
+#### Vincoli tecnologici
+- Il sistema deve essere scritto in linguaggio Java.
+- La base di dati dovrà essere gestita con MySQL.
+- Le interrogazioni alla base di dati devono essere effettuate attraverso linguaggio SQL.
+- L'interfaccia grafica deve essere realizzata tramite Java Swing.
+
+#### Vincoli di progetto
+- Il sistema deve avere un primo rilascio entro fine Gennaio 2026. Dopo è stata prevista una seconda iterazione. 
