@@ -1,118 +1,138 @@
 ```
 src/
-├── core/                                   
+├── core/
 │   │
-│   ├── domain/                              # --- ENTITIES LAYER ---
+│   ├── domain/                                     # --- ENTITIES LAYER ---
 │   │   │
-│   │   ├── model/                           # Entità di dominio
+│   │   ├── model/                                  # Entità di dominio
 │   │   │   ├── casa/
 │   │   │   │   ├── Casa.java
-│   │   │   │   └── Stanza.java
+│   │   │   │   ├── Stanza.java
 │   │   │   │   └── Hub.java
 │   │   │   │
 │   │   │   ├── dispositivo/
 │   │   │   │   ├── Dispositivo.java
-│   │   │   │   ├── sensori
-│   │   │   │   │   ├── Sensore.java        
-│   │   │   │   │   ├── SensorI.java
-│   │   │   │   │   └── SensorII.java
-│   │   │   │   └── attuatori/
-│   │   │   │       ├── Attuatore.java       
-│   │   │   │       ├── AttuatoreI.java
-│   │   │   │       └── AttuatoreII.java
+│   │   │   │   ├── attuatori/
+│   │   │   │   │   └── lampadaON_OFF/
+│   │   │   │   │       ├── Lampada_ON_OFF.java
+│   │   │   │   │       ├── Lampada_Communicator.java
+│   │   │   │   │       ├── Lampada_DispatcherBootstrap.java
+│   │   │   │   │       └── commands/
+│   │   │   │   │           ├── StateUpdateCommand.java
+│   │   │   │   │           └── SwitchCommand.java
+│   │   │   │   └── dispatcher/
+│   │   │   │       ├── CommandDispatcher.java
+│   │   │   │       └── IDispatcherBootstrap.java
+│   │   │   │
+│   │   │   ├── command/
+│   │   │   │   └── ICommand.java
 │   │   │   │
 │   │   │   ├── scenario/
 │   │   │   │   ├── Scenario.java
-│   │   │   │   └── ScenarioRoomConfig.java
+│   │   │   │   └── StanzaConfig.java
 │   │   │   │
 │   │   │   ├── parametro/
-│   │   │   │   └── ObservableParameter.java
+│   │   │   │   ├── IParametroValue.java
+│   │   │   │   ├── ObservableParameter.java
+│   │   │   │   └── ParametroValue.java
 │   │   │   │
 │   │   │   └── utente/
 │   │   │       └── Autenticazione.java
 │   │   │
-│   │   ├── valueobject/                     
-│   │   │   ├── ParametroValue.java
-│   │   │   ├── Conflict.java
-│   │   │   
-│   │   ├── enums/
-│   │   │   ├── Messaggio.java     
-│   │   │   ├── DeviceState.java             
-│   │   │   ├── ConflictType.java
-│   │   │   └── ScenarioState.java
-│   │   │
-│   │   └── exception/                       # Eccezioni di dominio
-│   |                          
-│   │── beans/                            
-│   │   ├── ScenarioPOJO.java
-│   │   ├── ParametroPOJO.java
-│   │   ├── LogAzionePOJO.java
-│   │   └── ConflictPOJO.java
+│   │   └── enums/
+│   │       ├── DispositivoParameter.java
+│   │       ├── DispositivoStates.java
+│   │       ├── EnumScenarioType.java
+│   │       ├── EnumTipoParametro.java
+│   │       ├── Message.java
+│   │       └── ParameterType.java
 │   │
-│   ├── service/
-│   │   ├── GestoreStanze.java                            # --- DOMAIN SERVICES ---                                
+│   ├── beans/
+│   │   ├── CommunicationPOJO.java
+│   │   ├── DispositivoPOJO.java
+│   │   └── MisuraPOJO.java
+│   │
+│   ├── controller/
+│   │   └── ScenarioController.java
+│   │
+│   ├── service/                                    # --- DOMAIN SERVICES ---
+│   │   ├── GestoreStanze.java
 │   │   ├── ScenarioManager.java
-│   │   ├── ParametroManager.java
-│   │   ├── ConflictValidator.java
-│   │   └── strategy/                        
+│   │   └── ParametroManager.java
 │   │
-│   └── port/                                
+│   └── port/
+│       ├── communication/
+│       │   ├── ICommunicator.java
+│       │   └── observer/
+│       │       ├── Observable.java
+│       │       └── Observer.java
 │       │
-│       ├── outbound/                       
-│             ├── repository/
-│         │   ├── IScenarioRepository.java
-│         │   ├── IParametroRepository.java
-│         │   └── ILogRepository.java
-│         │
-│         ├── registry/                    
-│         │   ├── IDeviceRegistry.java
-│         │   └── IStanzaRegistry.java
-│         │
-│         └── communication/
-│             └── ICommunicator.java
+│       ├── device/
+│       │   └── DevicePort.java
+│       │
+│       ├── messaging/
+│       │   └── IEventBusClient.java
+│       │
+│       └── room/
+│           └── RoomPort.java
 │
-├── infrastructure/                          # === OUTER LAYER - Frameworks & Drivers ===
+├── infrastructure/                                 # === OUTER LAYER - Frameworks & Drivers ===
 │   │
-│   ├── persistence/                         # --- DATABASE ---
-│   │   │
-│   │   ├── mysql/
-│   │   │   ├── repository/
-│   │   │          ├── ScenarioRepositoryImpl.java
-│   │   │          ├── ParametroRepositoryImpl.java
-│   │   │          └── LogRepositoryImpl.jav
-│   │   │
-│   │   ├── DatabaseConnection.java
-│   │   └── StoricoDatiImpl.java
+│   ├── persistence/                                # --- DATABASE ---
+│   │   └── mysql/
+│   │       ├── DatabaseConnection.java
+│   │       └── dao/
+│   │           ├── CommunicationDAO.java
+│   │           ├── CommunicationDAOImpl.java
+│   │           ├── DispositivoDAO.java
+│   │           ├── DispositivoDAOImpl.java
+│   │           ├── MisuraDAO.java
+│   │           ├── MisuraDAOImpl.java
+│   │           ├── ScenarioDAO.java
+│   │           ├── ScenarioDAOImpl.java
+│   │           ├── StanzaConfigDAO.java
+│   │           ├── StanzaConfigDAOImpl.java
+│   │           ├── StanzaDAO.java
+│   │           └── StanzaDAOImpl.java
 │   │
-│   ├── messaging/                           # --- EVENT BUS ---
-│   │   ├── EventBus.java
-│   │
-│   └── logging/
-│       └── LogAdmin.java
+│   └── messaging/                                  # --- EVENT BUS ---
+│       ├── EventBus.java
+│       ├── DispositiviObserver.java
+│       ├── request/
+│       │   └── Request.java
+│       └── topic/
+│           └── Topic.java
 │
-├── adapter/                                 # === INTERFACE ADAPTERS ===
-│   │
-│   ├── inbound/                             # --- Driving Adapters ---
-│   │   │
-│   │   ├── controller/                      # REST/API Controllers
-│   │   │   ├── ScenarioController.java
-│   │   │   ├── ParametroController.java
-│   │   │   └── StanzaController.java
-│   │   │
-│   │   ├── facade/                         
-│   │   │   └── SensoreFacade.java
-│   │   │   └── AttuatoreFacade.java
-│   │   │
+├── adapter/                                        # === INTERFACE ADAPTERS ===
+│   └── facade/
+│       ├── SensoreFacade.java
+│       └── AttuatoreFacade.java
 │
-├── Factory/                                  # === CONFIGURATION ===
-│   │
+├── factory/                                        # === CONFIGURATION ===
 │   ├── EventBusFactory.java
+│   ├── ParametroValueFactory.java
+│   └── StanzaConfigFactory.java
 │
-└── shared/                                 
+└── ui/                                             # === USER INTERFACE ===
+    ├── SmartDABApp.java
     │
-    ├── util/
-    │   ├── DateTimeUtils.java
-    └── constant/
-        └── ApplicationConstants.java
-
+    ├── controller/
+    │   ├── DispositivoController.java
+    │   ├── MainController.java
+    │   ├── ScenariController.java
+    │   └── StanzeController.java
+    │
+    └── view/
+        ├── MainFrame.java
+        ├── MainPanel.java
+        ├── dispositivi/
+        │   ├── DispositivoFormPanel.java
+        │   └── DispositivoPanel.java
+        ├── scenari/
+        │   ├── ScenarioDetailPanel.java
+        │   ├── ScenarioFormPanel.java
+        │   └── ScenariPanel.java
+        └── stanze/
+            ├── StanzeFormPanel.java
+            └── StanzePanel.java
 ```

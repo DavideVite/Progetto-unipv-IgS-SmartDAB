@@ -252,7 +252,15 @@ public class ScenarioFormPanel extends JPanel {
                     return;
                 }
                 try {
-                    Double.parseDouble(valoreStr);
+                    double val = Double.parseDouble(valoreStr);
+                    if (param.getMin() != null && val < param.getMin()) {
+                        JOptionPane.showMessageDialog(this, "Valore sotto il minimo consentito (" + param.getMin() + " " + param.getUnit() + ")", "Errore", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (param.getMax() != null && val > param.getMax()) {
+                        JOptionPane.showMessageDialog(this, "Valore sopra il massimo consentito (" + param.getMax() + " " + param.getUnit() + ")", "Errore", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(this, "Valore numerico non valido", "Errore", JOptionPane.ERROR_MESSAGE);
                     return;

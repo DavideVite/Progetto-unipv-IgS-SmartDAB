@@ -3,9 +3,13 @@ package it.unipv.posfw.smartdab.core.service;
 import java.util.List;
 import java.util.Set;
 
+import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 
@@ -28,29 +32,32 @@ public class GestoreStanze {
     private final Casa casa;
     // FIX: DAO iniettato nel costruttore invece di creato ad ogni operazione
     private final StanzaDAO stanzaDAO;
+    private final MisuraDAO misuraDAO;
 
     /**
      * Costruttore con Dependency Injection.
-     * Usa l'implementazione di default StanzaDAOImpl.
-     * Carica automaticamente le stanze dal database all'avvio.
+     * Usa le implementazioni di default.
+     * Carica automaticamente le stanze e le ultime misure dal database all'avvio.
      *
      * @param casa L'oggetto Casa da gestire
      */
     public GestoreStanze(Casa casa) {
-        this(casa, new StanzaDAOImpl());
+        this(casa, new StanzaDAOImpl(), new MisuraDAOImpl());
     }
 
     /**
-     * Costruttore con Dependency Injection esplicita del DAO.
+     * Costruttore con Dependency Injection esplicita dei DAO.
      * Permette di iniettare mock DAO per i test.
-     * Carica automaticamente le stanze dal database all'avvio.
+     * Carica automaticamente le stanze e le ultime misure dal database all'avvio.
      *
      * @param casa L'oggetto Casa da gestire
      * @param stanzaDAO Il DAO per la persistenza delle stanze
+     * @param misuraDAO Il DAO per la lettura delle misure
      */
-    public GestoreStanze(Casa casa, StanzaDAO stanzaDAO) {
+    public GestoreStanze(Casa casa, StanzaDAO stanzaDAO, MisuraDAO misuraDAO) {
         this.casa = casa;
         this.stanzaDAO = stanzaDAO;
+        this.misuraDAO = misuraDAO;
         caricaDalDatabase();
     }
 
@@ -63,11 +70,30 @@ public class GestoreStanze {
             Set<Stanza> stanzeDalDb = stanzaDAO.readAllStanze();
             for (Stanza stanza : stanzeDalDb) {
                 casa.nuovaStanza(stanza);
+                caricaUltimeMisure(stanza);
             }
             System.out.println("Caricate " + stanzeDalDb.size() + " stanze dal database");
         } catch (Exception e) {
             System.err.println("Errore durante il caricamento delle stanze dal database: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Carica le ultime misure dal database per ogni tipo di parametro numerico
+     * e popola la mappa parametri della stanza.
+     */
+    private void caricaUltimeMisure(Stanza stanza) {
+        for (DispositivoParameter param : DispositivoParameter.values()) {
+            try {
+                MisuraPOJO ultima = misuraDAO.readUltimaMisura(stanza.getId(), param.name());
+                if (ultima != null) {
+                    stanza.updateParameter(param.name(), ultima.getValore());
+                }
+            } catch (Exception e) {
+                System.err.println("Errore caricamento misura " + param.name()
+                        + " per stanza " + stanza.getNome() + ": " + e.getMessage());
+            }
         }
     }
 
