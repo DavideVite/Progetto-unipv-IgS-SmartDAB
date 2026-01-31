@@ -12,4 +12,6 @@ public interface MisuraDAO {
 	
 	public List<MisuraPOJO> readUltimeMisurePerStanza ();
 
+	public MisuraPOJO readUltimaMisura(String idStanza, String tipo);
+
 }
