@@ -1,10 +1,12 @@
 package it.unipv.posfw.smartdab.ui;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
+import it.unipv.posfw.smartdab.ui.controller.DispositivoController;
 import it.unipv.posfw.smartdab.ui.controller.ScenariController;
 import it.unipv.posfw.smartdab.ui.view.MainFrame;
 
@@ -19,14 +21,18 @@ public class SmartDABApp {
             GestoreStanze gestoreStanze = new GestoreStanze(casa);
             ScenarioManager scenarioManager = new ScenarioManager();
             ParametroManager parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
-
+            DispositiviManager dispositiviManager = new DispositiviManager();
+            
             // 2. Crea View (passa GestoreStanze per StanzeController)
             MainFrame frame = new MainFrame(gestoreStanze, parametroManager);
 
             // 3. Crea Controller per Scenari
             new ScenariController(frame.getMainPanel().getScenariPanel(), scenarioManager, parametroManager, gestoreStanze);
-
-            // 4. Mostra finestra
+            
+            // 4. Crea Controller per dispositivi
+            new DispositivoController(frame.getMainPanel(), gestoreStanze, dispositiviManager);
+            
+            // 5. Mostra finestra
             frame.setVisible(true);
         });
     }

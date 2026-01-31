@@ -120,12 +120,12 @@ public class GestoreStanze {
      * @param id L'identificatore della stanza (ignorato, verra' generato automaticamente)
      * @return la Stanza creata, oppure null se esiste gia' una stanza con lo stesso nome
      */
-    public Stanza creaStanza(String id, String nomeStanza, double mqStanza) {
+    public Stanza creaStanza(String nomeStanza, double mqStanza) {
         if(casa.esisteStanza(nomeStanza)) {
             return null;
         }
 
-        Stanza nuovaStanza = new Stanza(id, nomeStanza, mqStanza);
+        Stanza nuovaStanza = new Stanza(nomeStanza, mqStanza);
         casa.nuovaStanza(nuovaStanza);
 
         stanzaDAO.insertStanza(nuovaStanza);

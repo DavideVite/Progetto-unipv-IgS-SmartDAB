@@ -177,7 +177,7 @@ public class DispositivoFormPanel extends JPanel {
         comboParametro.setSelectedItem(dispositivo.getParametro());
         comboStato.setSelectedItem(dispositivo.getStato());
         chkAttivo.setSelected(dispositivo.isAttivo());
-        txtModello.setText(dispositivo.getModel());
+        txtModello.setText("");
         btnSalva.setText("Aggiorna");
     }
 
