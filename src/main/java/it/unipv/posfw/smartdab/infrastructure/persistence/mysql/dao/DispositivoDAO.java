@@ -13,5 +13,5 @@ public interface DispositivoDAO {
 	
 	public boolean disableDispositivo(String id);
 	
-	public boolean existsByNome(String name);
+	public boolean existsById(String id);
 }

@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
+import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class EventBus implements DispositiviObserver, IEventBusClient {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
+	private DispositiviManager dispositiviManager;
 	private static EventBus instance = null;
 	private Request request;
 	
@@ -30,6 +34,16 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	
 	public void setRequest(Request request) {
 		this.request = request;
+	}
+	
+	public boolean addDispositivo(Dispositivo d) {
+		if(dispositivi.add(d)) {
+			dispositiviManager.aggiungiDispositivo(new DispositivoPOJO(d));
+			return true;
+		}
+		
+		System.out.println("Il dispositivo " + d.getTopic().getId() + " è già presente nella lista");
+		return false;
 	}
 	
 	public Dispositivo searchDispositivoByName(String name) {
@@ -77,14 +91,14 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 				).getCommunicator().processRequest(request);
 	}
 	
-	private EventBus() {
-
+	private EventBus(DispositiviManager dm) {
+		dispositiviManager = dm;
 	}
 	
 	// Singleton
-	public static EventBus getInstance() {
+	public static EventBus getInstance(DispositiviManager dm) {
 		if(instance == null) {
-			instance = new EventBus();
+			instance = new EventBus(dm);
 		}
 		
 		return instance;
@@ -100,11 +114,11 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	@Override
 	public Message update(Request request) {
 		
-		// Verifico se il messaggio arrivato è pertinente alla funzionalità
-		if(request.getType().equals(Message.UPDATE + "." + Message.PARAMETER)) {
+		String type = request.getType();
+		
+		// Verifico se il messaggio arrivato è pertinente alla funzionalità di un sensore
+		if(type.equals(Message.UPDATE + "." + Message.PARAMETER)) {
 			setRequest(request);
-
-			// Verifica se il parametro esiste nella stanza...
 
 			// Prendi tutti gli iscritti al topic
 			ArrayList<Dispositivo> subs = getSubscribers();
@@ -116,10 +130,18 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 					if(sendRequest(request).equals(Message.ACK)) break;
 
 					// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo
-					else if(i == 9) 
+					else if(i == 9) {
 						System.out.println("Dispositivo " + request.getTopic().getId() + " non ha risposto");
+						
+					}
 				}
 			}
+		}
+		
+		else if(type.equals(Message.ONLINE.toString()) || type.equals(Message.OFFLINE.toString())) {
+			searchDispositivoByName(request.getTopic().getId()).setState(
+									type.equals(Message.ONLINE.toString()) ? 
+									DispositivoStates.ALIVE : DispositivoStates.DISABLED);
 		}
 		
 		return Message.ACK;
