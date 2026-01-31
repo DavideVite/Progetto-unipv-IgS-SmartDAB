@@ -38,7 +38,7 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
             
             }
 	       
-	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao);
+	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao, misuraDao);
 
 	    }  
 	    

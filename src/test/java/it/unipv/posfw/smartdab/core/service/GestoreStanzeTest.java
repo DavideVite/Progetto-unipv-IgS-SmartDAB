@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +32,7 @@ public class GestoreStanzeTest {
 
 	@Test
 	public void testCreaStanzaConSuccesso() {
-		Stanza risultato = gestore.creaStanza("S01", "Cucina", 20);
+		Stanza risultato = gestore.creaStanza("S01", 20);
 
 		assertNotNull(risultato, "La stanza dovrebbe essere stata creata");
 		assertTrue(casa.esisteStanza("Cucina"));
@@ -38,7 +40,7 @@ public class GestoreStanzeTest {
 
 	@Test
 	public void testModificaNomeStanza() {
-		casa.nuovaStanza(new Stanza("S02", "Bagno", 10));
+		casa.nuovaStanza(new Stanza("S02", "Bagno", 10, LocalDateTime.now()));
 
 		boolean modificato = gestore.modificaNomeStanza("Bagno", "Bagno Ospiti");
 
@@ -49,7 +51,7 @@ public class GestoreStanzeTest {
 
 	@Test
 	public void testEliminaStanzaNonVuota() {
-		Stanza cucina = new Stanza("S03", "Cucina", 20.0);
+		Stanza cucina = new Stanza("S03", "Cucina", 20.0, LocalDateTime.now());
 		casa.nuovaStanza(cucina);
 
 		// Creo il Topic per la lampada

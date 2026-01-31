@@ -2,6 +2,8 @@ package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
@@ -12,7 +14,7 @@ public class StanzaDAOTest1 {
 		public void insertStanzaTest() {
 			StanzaDAO dao = new StanzaDAOImpl();
 			
-			Stanza s = new Stanza("S02", "Cucina", 18.5);
+			Stanza s = new Stanza("S02", "Cucina", 18.5, LocalDateTime.now());
 			
 			assertDoesNotThrow(() -> {
 				dao.insertStanza(s);

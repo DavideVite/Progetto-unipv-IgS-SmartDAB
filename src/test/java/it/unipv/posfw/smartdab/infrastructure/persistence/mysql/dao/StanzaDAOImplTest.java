@@ -1,5 +1,6 @@
 package it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ class StanzaDAOImplTest {
     @Order(1)
     @DisplayName("Test inserimento stanza nel database")
     void testInsertStanza() {
-        Stanza stanza = new Stanza(testId, "Cucina Test", 25.5);
+        Stanza stanza = new Stanza(testId, "Cucina Test", 25.5, LocalDateTime.now());
 
         assertDoesNotThrow(() -> stanzaDAO.insertStanza(stanza));
         System.out.println("✓ Stanza inserita con ID: " + testId);
@@ -78,7 +79,7 @@ class StanzaDAOImplTest {
         assertNotNull(stanza, "La stanza dovrebbe esistere prima dell'update");
 
         // Creiamo una stanza con lo stesso ID ma dati modificati
-        Stanza stanzaModificata = new Stanza(testId, "Soggiorno Modificato", 40.0);
+        Stanza stanzaModificata = new Stanza(testId, "Soggiorno Modificato", 40.0, LocalDateTime.now());
 
         assertDoesNotThrow(() -> stanzaDAO.updateStanza(stanzaModificata));
 

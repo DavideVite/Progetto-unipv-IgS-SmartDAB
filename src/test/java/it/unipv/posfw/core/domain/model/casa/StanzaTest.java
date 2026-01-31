@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
+
 public class StanzaTest {
 
 		private Stanza stanza;
@@ -21,7 +23,7 @@ public class StanzaTest {
 
 		@BeforeEach
 		void setUp() {
-			stanza = new Stanza("ID1", "Soggiorno", 25.5);
+			stanza = new Stanza("ID1", "Soggiorno", 25.5, LocalDateTime.now());
 			communicator = new Lampada_Communicator();
 	}
 
