@@ -86,7 +86,7 @@ public class GestoreStanze {
     private void caricaUltimeMisure(Stanza stanza) {
         for (DispositivoParameter param : DispositivoParameter.values()) {
             try {
-                MisuraPOJO ultima = misuraDAO.readUltimaMisura(stanza.getId(), param.name());
+                MisuraPOJO ultima = misuraDAO.readUltimeMisura(stanza.getId(), param.name());
                 if (ultima != null) {
                     stanza.updateParameter(param.name(), ultima.getValore());
                 }
