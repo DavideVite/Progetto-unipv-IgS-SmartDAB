@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Stanza` (
   `id` VARCHAR(50) NOT NULL,
   `nome` VARCHAR(100) NOT NULL,
   `mq` DOUBLE NOT NULL,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP ,
+  `created_at` DATETIME,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -71,11 +71,11 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`Misura` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `tipo` VARCHAR(50) NULL,
-  `unita` VARCHAR(50) NULL,
+  `tipo` VARCHAR(30) NULL,
+  `unita` VARCHAR(30) NULL,
   `valore` DOUBLE NOT NULL,
   `stanza` VARCHAR(50) NULL,
-  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `timestamp` DATETIME,
   PRIMARY KEY (`id`),
   INDEX `id_idx` (`stanza` ASC) VISIBLE,
   CONSTRAINT `fk_misura_stanza`
