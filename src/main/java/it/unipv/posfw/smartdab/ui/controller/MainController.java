@@ -38,6 +38,7 @@ public class MainController {
         casa = new Casa();
         gestoreStanze = new GestoreStanze(casa);
         scenarioManager = new ScenarioManager();
+        gestoreStanze.addStanzaListener(scenarioManager);
         parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
         dispositivoManager = new DispositiviManager();
     }
