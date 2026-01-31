@@ -165,7 +165,52 @@ public class MisuraDAOImpl implements MisuraDAO {
 		}
 	}
 		return ultimeMisure;
-	
+
+	}
+
+	@Override
+	public MisuraPOJO readUltimaMisura(String idStanza, String tipo) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT * FROM misura WHERE stanza = ? AND tipo = ? ORDER BY timestamp DESC LIMIT 1";
+
+		try {
+			conn = DatabaseConnection.getConnection();
+
+			if (conn != null) {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, idStanza);
+				pstmt.setString(2, tipo);
+				rs = pstmt.executeQuery();
+
+				if (rs.next()) {
+					int id = rs.getInt("id");
+					String unita = rs.getString("unita");
+					double valore = rs.getDouble("valore");
+
+					java.sql.Timestamp sqlTimestamp = rs.getTimestamp("timestamp");
+					LocalDateTime data = null;
+					if (sqlTimestamp != null) {
+						data = sqlTimestamp.toLocalDateTime();
+					}
+
+					return new MisuraPOJO(id, tipo, unita, valore, idStanza, data);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 }

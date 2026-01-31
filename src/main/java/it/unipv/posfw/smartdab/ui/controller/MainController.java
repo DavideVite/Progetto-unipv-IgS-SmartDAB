@@ -8,8 +8,8 @@ import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
 import it.unipv.posfw.smartdab.ui.view.MainFrame;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
-
-import javax.swing.*;
+import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
+import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
 
 public class MainController {
 
@@ -24,6 +24,7 @@ public class MainController {
     private DispositiviManager dispositivoManager;
 
     // Sub-controllers
+    private StanzeController stanzeController;
     private ScenariController scenariController;
     private DispositivoController dispositivoController;
 
@@ -42,14 +43,28 @@ public class MainController {
     }
 
     private void inizializzaView() {
-        mainFrame = new MainFrame(gestoreStanze);
+        mainFrame = new MainFrame();
         mainPanel = mainFrame.getMainPanel();
     }
 
     private void inizializzaController() {
+        // Controller per Stanze
+        StanzePanel stanzePanel = mainPanel.getStanzePanel();
+        StanzeFormPanel stanzeFormPanel = mainPanel.getStanzeFormPanel();
+
+        stanzeController = new StanzeController(
+            mainPanel.getStanzeContainer(),
+            mainPanel.getStanzeLayout(),
+            gestoreStanze,
+            parametroManager
+        );
+
+        // Collega controller alle view
+        stanzePanel.setController(stanzeController);
+        stanzeFormPanel.setController(stanzeController);
+        stanzeController.setViews(stanzePanel, stanzeFormPanel);
+
         // Controller per Scenari
-        // FIX: Aggiunto gestoreStanze per permettere a ScenariController di ottenere
-        // la lista delle stanze disponibili per il form di creazione scenari
         scenariController = new ScenariController(
             mainPanel.getScenariPanel(),
             scenarioManager,
@@ -91,6 +106,10 @@ public class MainController {
     }
 
     // Getters per accesso ai controller
+    public StanzeController getStanzeController() {
+        return stanzeController;
+    }
+
     public ScenariController getScenariController() {
         return scenariController;
     }

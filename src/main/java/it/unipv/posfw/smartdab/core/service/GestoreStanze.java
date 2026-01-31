@@ -162,6 +162,15 @@ public class GestoreStanze {
     	 return false;
     }
 
+    public Stanza cercaStanzaPerId(String id) {
+        for (Stanza s : casa.getStanze()) {
+            if (s.getId().equals(id)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
     public boolean eliminaStanza(String nomeStanza) {
     	if(casa.esisteStanza(nomeStanza)) {
     		Stanza s = casa.cercaStanza(nomeStanza);

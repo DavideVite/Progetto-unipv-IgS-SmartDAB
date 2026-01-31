@@ -3,7 +3,6 @@ package it.unipv.posfw.smartdab.core.controller;
 import java.util.List;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.enums.ParameterType;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
@@ -29,7 +28,7 @@ public class ScenarioController {
 	 * Crea uno scenario vuoto.
 	 */
 	public Scenario creaScenarioVuoto(String nome) {
-		return scenarioManager.creaScenario(nome, EnumScenarioType.PERSONALIZZATO);
+		return scenarioManager.creaScenario(nome);
 	}
 
 	/**
