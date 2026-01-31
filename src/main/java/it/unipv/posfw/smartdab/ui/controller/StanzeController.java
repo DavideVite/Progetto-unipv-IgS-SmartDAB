@@ -7,6 +7,8 @@ import java.awt.Insets;
 
 import javax.swing.*;
 
+import java.util.Map;
+
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
@@ -140,6 +142,16 @@ public class StanzeController {
 	    
 	    public void annullaStanza() {
 	        layout.show(container, "LISTA_STANZE");
+	    }
+
+	    public void mostraDettagliStanza(String id, String nome) {
+	    	Stanza stanza = gestoreStanze.cercaStanzaPerId(id);
+	    	if (stanza != null) {
+	    		Map<String, Double> parametri = stanza.getParametri();
+	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri);
+	    	} else {
+	    		elencoPanel.getDettaglioPanel().pulisci();
+	    	}
 	    }
 
 	    private void mostraDialogParametroManuale(String stanzaId) {

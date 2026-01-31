@@ -14,6 +14,7 @@ public class StanzePanel extends JPanel {
 	private DefaultTableModel modello;  //variabile di istanza
 	private JTable tabella;
 	private StanzeController controller;
+	private StanzeDettaglioPanel dettaglioPanel;
 
 	// Costruttore vuoto per compatibilità con MainPanel
 	public StanzePanel() {
@@ -24,56 +25,74 @@ public class StanzePanel extends JPanel {
 		this.controller = controller;
 
 		setLayout(new BorderLayout(10,10));
-		
-		JLabel titolo = new JLabel("Elenco Stanze (clicca una riga per modificare o eliminare la stanza)", SwingConstants.CENTER);
-		add(titolo, BorderLayout.NORTH);	    
-		
+
+		JLabel titolo = new JLabel("Elenco Stanze (clicca per dettagli, doppio click per modificare)", SwingConstants.CENTER);
+		add(titolo, BorderLayout.NORTH);
+
 		String[] colonne = {"id", "nome", "mq"};
-        
+
 		modello = new DefaultTableModel(colonne, 0);
 		tabella = new JTable(modello);
-		
-		add(new JScrollPane(tabella), BorderLayout.CENTER);
-		
-		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 		tabella.setRowHeight(30);
 		tabella.setShowVerticalLines(false);
-		
+
+		// Pannello dettagli parametri
+		dettaglioPanel = new StanzeDettaglioPanel();
+
+		// SplitPane: tabella sopra, dettagli sotto
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				new JScrollPane(tabella), dettaglioPanel);
+		splitPane.setResizeWeight(0.6);
+		splitPane.setDividerLocation(200);
+		add(splitPane, BorderLayout.CENTER);
+
+		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 		JPanel pnlSud = new JPanel();
 		JButton btnNuovaStanza = new JButton("Aggiungi Nuova Stanza");
 		pnlSud.add(btnNuovaStanza);
 		add(pnlSud, BorderLayout.SOUTH);
-		
+
 		btnNuovaStanza.addActionListener(e -> {
-			if (controller != null) {
-				controller.mostraFormInserimento();
-			} else {
-				System.out.println("Errore: Il controller è null");
+			if (this.controller != null) {
+				this.controller.mostraFormInserimento();
 			}
 		});
-		
+
 		tabella.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(e.getClickCount() == 1) {
-					int riga = tabella.getSelectedRow();
-					if (riga != -1) {
-		                // Recuperiamo i dati dalla riga selezionata
-		                String id = tabella.getValueAt(riga, 0).toString();
-		                String nome = tabella.getValueAt(riga, 1).toString();
-		                String mq = tabella.getValueAt(riga, 2).toString();
-		                
-		                controller.gestisceSelezioneStanza(id, nome, mq);
+				int riga = tabella.getSelectedRow();
+				if (riga == -1) return;
+
+				String id = tabella.getValueAt(riga, 0).toString();
+				String nome = tabella.getValueAt(riga, 1).toString();
+				String mq = tabella.getValueAt(riga, 2).toString();
+
+				if (e.getClickCount() == 1) {
+					// Single click: mostra dettagli parametri
+					if (StanzePanel.this.controller != null) {
+						StanzePanel.this.controller.mostraDettagliStanza(id, nome);
+					}
+				} else if (e.getClickCount() == 2) {
+					// Double click: modifica/elimina/imposta parametro
+					if (StanzePanel.this.controller != null) {
+						StanzePanel.this.controller.gestisceSelezioneStanza(id, nome, mq);
+					}
 				}
 			}
-		  }
 		});
 	}
-	
+
+	public void setController(StanzeController controller) {
+		this.controller = controller;
+	}
+
 	public void aggiungiRigaTabella(String id, String nome, double mq) {
 		modello.addRow(new Object[] {id, nome, mq});
 	}
-	
+
 	public void rimuoviRigaTabella(int riga) {
 		if (riga != -1) {
 			modello.removeRow(riga);
@@ -81,10 +100,14 @@ public class StanzePanel extends JPanel {
 	}
 	public void aggiornaRigaTabella(int riga, String nome, double mq) {
 		modello.setValueAt(nome, riga, 1);
-		modello.setValueAt(mq, riga, 2);		
+		modello.setValueAt(mq, riga, 2);
 	}
-	
+
 	public JTable getTabella() {
 		return tabella;
+	}
+
+	public StanzeDettaglioPanel getDettaglioPanel() {
+		return dettaglioPanel;
 	}
 }

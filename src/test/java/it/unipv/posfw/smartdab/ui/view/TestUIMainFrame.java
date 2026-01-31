@@ -9,8 +9,7 @@ import java.awt.*;
 
 /**
  * Test interattivo per MainFrame e MainPanel.
- * Poiche' MainPanel richiede StanzeController per StanzePanel,
- * questo test crea manualmente la struttura dell'interfaccia.
+ * Crea manualmente la struttura dell'interfaccia senza servizi reali.
  */
 public class TestUIMainFrame {
 
@@ -26,8 +25,8 @@ public class TestUIMainFrame {
             CardLayout cardLayout = new CardLayout();
             JPanel stanzeContainer = new JPanel(cardLayout);
 
-            // Crea il controller per StanzePanel
-            StanzeController stanzeController = new StanzeController(stanzeContainer, cardLayout);
+            // Crea il controller per StanzePanel (senza servizi per il test)
+            StanzeController stanzeController = new StanzeController(stanzeContainer, cardLayout, null, null);
 
             // Crea i pannelli
             StanzePanel stanzePanel = new StanzePanel(stanzeController);
@@ -63,7 +62,8 @@ public class TestUIMainFrame {
             System.out.println("\nPuoi interagire con l'interfaccia:");
             System.out.println("- Tab 'Stanze': visualizza lista stanze con dati di esempio");
             System.out.println("- Tab 'Scenari': visualizza pannello scenari (vuoto)");
-            System.out.println("- Clicca su una stanza per selezionarla");
+            System.out.println("- Clicca su una stanza per vedere i dettagli");
+            System.out.println("- Doppio click su una stanza per modificarla");
             System.out.println("- Clicca 'Aggiungi Nuova Stanza' per testare il bottone");
 
             // Mostra la finestra
