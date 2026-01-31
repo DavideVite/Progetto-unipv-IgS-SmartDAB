@@ -23,6 +23,8 @@ import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 // FIX: Aggiunto import StanzaDAO per MockStanzaDAO
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
+
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -46,7 +48,7 @@ public class ImpostazioneManualeFlussoTest {
     void setUp() {
         // Setup casa e stanza
         casa = new Casa();
-        stanzaSoggiorno = new Stanza("S01", "Soggiorno", 25.0);
+        stanzaSoggiorno = new Stanza("S01", "Soggiorno", 25.0, LocalDateTime.now());
         casa.nuovaStanza(stanzaSoggiorno);
 
         /*
@@ -81,7 +83,7 @@ public class ImpostazioneManualeFlussoTest {
         stanzaSoggiorno.addDispositivo(lampada);
 
         // Setup managers con mock DAO (non serve connessione DB per i test)
-        gestoreStanze = new GestoreStanze(casa, new MockStanzaDAO());
+        gestoreStanze = new GestoreStanze(casa, new MockStanzaDAO(), null);
         mockEventBus = new MockEventBusClient();
         parametroManager = new ParametroManager(gestoreStanze, mockEventBus);
     }

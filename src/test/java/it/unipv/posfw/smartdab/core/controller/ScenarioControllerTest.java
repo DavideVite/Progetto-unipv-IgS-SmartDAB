@@ -2,6 +2,7 @@ package it.unipv.posfw.smartdab.core.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ public class ScenarioControllerTest {
 
 		// Setup casa e stanza per i test di attivazione
 		casa = new Casa();
-		stanzaSoggiorno = new Stanza("S01", "Soggiorno", 25.0);
+		stanzaSoggiorno = new Stanza("S01", "Soggiorno", 25.0, LocalDateTime.now());
 		casa.nuovaStanza(stanzaSoggiorno);
 
 		// Setup lampada con la signature corretta

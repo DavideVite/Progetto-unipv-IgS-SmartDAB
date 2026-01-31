@@ -3,6 +3,8 @@ package it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +31,7 @@ public class TopicTest {
 
 		// Effettuo test su implementazioni concrete
 		deviceId = "lamp1";
-		r = new Stanza("1", "room1", 0.0);
+		r = new Stanza("1", "room1", 0.0, LocalDateTime.now());
 		p = Lampada_ON_OFF.parameter;
 
 		// Creo prima il Topic

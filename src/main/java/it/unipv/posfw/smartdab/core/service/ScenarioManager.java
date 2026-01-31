@@ -138,7 +138,7 @@ public class ScenarioManager {
 	 * Crea uno scenario con il tipo specificato.
 	 * Solo il sistema può creare scenari PREDEFINITI (tramite inizializzaScenariPredefiniti).
 	 */
-	Scenario creaScenario(String nome, EnumScenarioType tipo) {
+	public Scenario creaScenario(String nome, EnumScenarioType tipo) {
 		if (esisteScenario(nome)){
 			throw new IllegalArgumentException("Scenario con nome '" + nome + "' esiste già");
 		}
