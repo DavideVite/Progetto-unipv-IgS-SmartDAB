@@ -1,5 +1,6 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.port.communication.observer.StanzaListener;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
@@ -33,6 +35,7 @@ public class GestoreStanze {
     // FIX: DAO iniettato nel costruttore invece di creato ad ogni operazione
     private final StanzaDAO stanzaDAO;
     private final MisuraDAO misuraDAO;
+    private final List<StanzaListener> stanzaListeners = new ArrayList<>();
 
     /**
      * Costruttore con Dependency Injection.
@@ -129,6 +132,7 @@ public class GestoreStanze {
         casa.nuovaStanza(nuovaStanza);
 
         stanzaDAO.insertStanza(nuovaStanza);
+        notificaStanzaAggiunta(nuovaStanza);
         return nuovaStanza;
     }
 
@@ -179,6 +183,7 @@ public class GestoreStanze {
 
     			// FIX: Usa il DAO iniettato invece di crearne uno nuovo
        		    stanzaDAO.deleteStanza(s);
+       		    notificaStanzaRimossa(s);
     			return true;
     		} else {
     			System.out.println("Errore: la stanza contiene ancora dispositivi");
@@ -187,7 +192,29 @@ public class GestoreStanze {
     	}
     	System.out.println("Errore: la stanza non esiste");
     	return false;
-    }    
+    }
+
+    // ===== GESTIONE LISTENERS =====
+
+    public void addStanzaListener(StanzaListener listener) {
+        stanzaListeners.add(listener);
+    }
+
+    public void removeStanzaListener(StanzaListener listener) {
+        stanzaListeners.remove(listener);
+    }
+
+    private void notificaStanzaAggiunta(Stanza stanza) {
+        for (StanzaListener listener : stanzaListeners) {
+            listener.onStanzaAggiunta(stanza);
+        }
+    }
+
+    private void notificaStanzaRimossa(Stanza stanza) {
+        for (StanzaListener listener : stanzaListeners) {
+            listener.onStanzaRimossa(stanza);
+        }
+    }
 }
 
 

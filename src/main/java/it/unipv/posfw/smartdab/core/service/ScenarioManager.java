@@ -1,5 +1,6 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
+import it.unipv.posfw.smartdab.core.port.communication.observer.StanzaListener;
 import it.unipv.posfw.smartdab.factory.StanzaConfigFactory;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
@@ -29,7 +31,7 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
  * 2. Testabilita: possibilita di iniettare mock DAO nei test
  * 3. Coerenza: stesso pattern di GestoreStanze
  */
-public class ScenarioManager {
+public class ScenarioManager implements StanzaListener {
 
 	private Map<String, Scenario> scenari;
 	private final ScenarioDAO scenarioDAO;
@@ -330,5 +332,74 @@ public class ScenarioManager {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return null;
 		return scenario.getConfigurazioni();
+	}
+
+	// ===== STANZA LISTENER =====
+
+	/**
+	 * Callback invocato quando viene aggiunta una nuova stanza.
+	 * Aggiunge le configurazioni predefinite per la nuova stanza
+	 * a tutti gli scenari predefiniti esistenti.
+	 */
+	@Override
+	public void onStanzaAggiunta(Stanza stanza) {
+		String stanzaId = stanza.getId();
+
+		// Notte: temperatura 18, umidita 45, luminosita 50
+		if (esisteScenario("Notte")) {
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.TEMPERATURA, 18.0));
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.UMIDITA, 45.0));
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.LUMINOSITA, 50.0));
+		}
+
+		// Giorno: temperatura 21, umidita 45, luminosita 500
+		if (esisteScenario("Giorno")) {
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.TEMPERATURA, 21.0));
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.UMIDITA, 45.0));
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.LUMINOSITA, 500.0));
+		}
+
+		// Assenza: temperatura 16, luminosita 0, sensori attivi
+		if (esisteScenario("Assenza")) {
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.TEMPERATURA, 16.0));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanzaId, DispositivoParameter.LUMINOSITA, 0.0));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanzaId, DispositivoParameter.SENSORE_PRESENZA, true));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanzaId, DispositivoParameter.SENSORE_MOVIMENTO, true));
+		}
+
+		System.out.println("Scenari predefiniti aggiornati per la nuova stanza: " + stanza.getNome());
+	}
+
+	/**
+	 * Callback invocato quando viene rimossa una stanza.
+	 * Rimuove tutte le configurazioni relative alla stanza
+	 * da tutti gli scenari predefiniti.
+	 */
+	@Override
+	public void onStanzaRimossa(Stanza stanza) {
+		String stanzaId = stanza.getId();
+
+		for (Scenario scenario : scenari.values()) {
+			if (scenario.getTipo_scenario() != EnumScenarioType.PREDEFINITO) {
+				continue;
+			}
+
+			List<StanzaConfig> daRimuovere = new ArrayList<>();
+			for (StanzaConfig config : scenario.getConfigurazioni()) {
+				if (config.getStanzaId().equals(stanzaId)) {
+					daRimuovere.add(config);
+				}
+			}
+
+			for (StanzaConfig config : daRimuovere) {
+				scenario.rimuoviConfigurazione(config);
+			}
+
+			if (!daRimuovere.isEmpty()) {
+				scenarioDAO.updateScenario(scenario);
+			}
+		}
+
+		System.out.println("Configurazioni rimosse dagli scenari predefiniti per la stanza: " + stanza.getNome());
 	}
 }
