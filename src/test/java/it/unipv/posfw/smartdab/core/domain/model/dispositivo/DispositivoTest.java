@@ -12,6 +12,8 @@ import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 
@@ -28,7 +30,7 @@ public class DispositivoTest {
 	@BeforeAll
 	public static void initTest() {
 		// Creo una Stanza per il Topic
-		Stanza stanza = new Stanza("S01", "TestRoom", 20.0);
+		Stanza stanza = new Stanza("S01", "TestRoom", 20.0, LocalDateTime.now());
 		DispositivoParameter param = DispositivoParameter.LUMINOSITA;
 
 		// Creo il Topic

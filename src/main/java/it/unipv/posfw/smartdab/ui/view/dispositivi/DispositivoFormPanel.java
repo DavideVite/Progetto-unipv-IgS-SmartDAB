@@ -149,8 +149,7 @@ public class DispositivoFormPanel extends JPanel {
             (DispositivoParameter) comboParametro.getSelectedItem(),
             (String) comboTipo.getSelectedItem(),
             (DispositivoStates) comboStato.getSelectedItem(),
-            chkAttivo.isSelected(),
-            txtModello.getText().trim()
+            chkAttivo.isSelected()
         );
     }
 
