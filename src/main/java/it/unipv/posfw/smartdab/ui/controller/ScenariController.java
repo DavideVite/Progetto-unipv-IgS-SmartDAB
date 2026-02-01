@@ -4,6 +4,8 @@ import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
@@ -28,7 +30,7 @@ import java.util.Set;
  * - Il bottone "Nuovo" ora apre il form completo invece di un semplice input dialog
  * - Implementato ScenarioFormListener per gestire salvataggio e annullamento
  */
-public class ScenariController implements ScenarioFormPanel.ScenarioFormListener {
+public class ScenariController implements ScenarioFormPanel.ScenarioFormListener, Observer {
 
     private ScenariPanel panel;
     private ScenarioManager scenarioManager;
@@ -60,7 +62,17 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
         this.formPanel = new ScenarioFormPanel();
         this.formPanel.setListener(this);
 
+        // Registra il controller come Observer dello ScenarioManager
+        scenarioManager.addObserver(this);
+
         addListeners();
+        aggiornaTabella();
+    }
+
+    // ==================== Observer Pattern ====================
+
+    @Override
+    public void update(Observable o, Object arg) {
         aggiornaTabella();
     }
 
@@ -89,7 +101,6 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     } else {
                         scenarioManager.disattivaScenario(scenario.getNome());
                     }
-                    aggiornaDettaglio(row);
                 }
             }
         });
@@ -120,7 +131,6 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     "Conferma", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     scenarioManager.eliminaScenario(scenario.getNome());
-                    aggiornaTabella();
                     panel.getDetailPanel().pulisci();
                 }
             }
@@ -138,12 +148,6 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                 s.getNome(),
                 s.getTipo_scenario().toString()
             });
-        }
-    }
-
-    private void aggiornaDettaglio(int row) {
-        if (row >= 0 && row < scenariList.size()) {
-            panel.getDetailPanel().mostraScenario(scenariList.get(row));
         }
     }
 
@@ -267,7 +271,6 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             }
 
             chiudiFormDialog();
-            aggiornaTabella();
 
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(formPanel, ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
