@@ -9,6 +9,8 @@ import java.util.Set;
 
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.service.strategy.ImmediateActivationStrategy;
+import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
@@ -38,6 +40,11 @@ public class ScenarioManager implements Observable {
 	private Map<String, Scenario> scenari;
 	private final ScenarioDAO scenarioDAO;
 	private final List<Observer> observers = new ArrayList<>();
+	private ScenarioActivationStrategy activationStrategy = new ImmediateActivationStrategy();
+
+	public void setActivationStrategy(ScenarioActivationStrategy strategy) {
+		this.activationStrategy = strategy;
+	}
 
 	@Override
 	public void addObserver(Observer observer) { observers.add(observer); }
@@ -240,16 +247,11 @@ public class ScenarioManager implements Observable {
 		// Persiste lo stato di attivazione nel database
 		scenarioDAO.updateScenario(scenario);
 
-		// Esegui le configurazioni
-		boolean tuttiSuccesso = true;
-		for (StanzaConfig config : scenario.getConfigurazioni()) {
-			if (!parametroManager.applicaStanzaConfig(config)) {
-				tuttiSuccesso = false;
-				// Continua comunque con le altre configurazioni
-			}
-		}
+		// Delega l'esecuzione delle configurazioni alla strategy
+		boolean result = activationStrategy.attiva(scenario, parametroManager);
+
 		notifyObservers("SCENARIO_ATTIVATO");
-		return tuttiSuccesso;
+		return result;
 	}
 
 
