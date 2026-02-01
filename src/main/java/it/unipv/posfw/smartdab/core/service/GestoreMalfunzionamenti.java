@@ -2,17 +2,22 @@ package it.unipv.posfw.smartdab.core.service;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.strategy.MalfunzionamentoStrategy;
 
-public class GestoreMalfunzionamenti {
+public class GestoreMalfunzionamenti{
 	
-	private Map<Dispositivo, Integer> tentativiFalliti = new HashMap<>();
+	private Map<String, Integer> tentativiFalliti = new HashMap<>();
+	private DispositivoDAO dispositivoDao;
+	private IEventBusMalfunzionamenti eventBus;
     
     //Associa il tipo di parametro alla sua strategia specifica presente nel file
 	private Map<DispositivoParameter, MalfunzionamentoStrategy> mappeStrategie = new HashMap<>();
@@ -22,7 +27,17 @@ public class GestoreMalfunzionamenti {
 	
 	public GestoreMalfunzionamenti(MalfunzionamentoStrategy strategiaDefault) {
 		this.strategiaDefault = strategiaDefault;
+		this.dispositivoDao = new DispositivoDAOImpl();
+		caricaDispositiviDalDB();
 		caricaConfigurazione(); // Metodo per leggere il file .properties
+	}
+	
+	private void caricaDispositiviDalDB() {
+		List<DispositivoPOJO> lista = dispositivoDao.selectN(100);
+		for(DispositivoPOJO p: lista) {
+			//uso l'ID come chiave
+			tentativiFalliti.put(p.getId(), 0);
+		}		
 	}
 	
 	private void caricaConfigurazione() {
@@ -51,44 +66,28 @@ public class GestoreMalfunzionamenti {
         }	
 	}
 	
-	public void controllaConnessione(Dispositivo d, Object value) {
+	public void controllaConnessione(DispositivoPOJO pojo, Object value) {
+
+			
 		if (value == null) {
-	     
-		    //Se il dispositivo è già disabilitato, usciamo subito
-	        if (d.getState() != DispositivoStates.DISABLED) {
-	    
-			////cerca d nella mappa, se lo trova restituisce il numero di fallimenti salvati precedentemente
+	    	String id = pojo.getId();
+			////cerca id nella mappa, se lo trova restituisce il numero di fallimenti salvati precedentemente
 			//se non lo trova restituisce 0
-			int conteggio = tentativiFalliti.getOrDefault(d,0) + 1;   
-			tentativiFalliti.put(d, conteggio);
+			int conteggio = tentativiFalliti.getOrDefault(id,0) + 1;   
+			tentativiFalliti.put(id, conteggio);
 			
 			//Cerca nella mappa se esiste una strategia speciale
             //Se non la trova, usa quella standard
-			MalfunzionamentoStrategy strategyDaUsare = mappeStrategie.getOrDefault(d.getTopic().getParameter(), strategiaDefault);
+			MalfunzionamentoStrategy strategyDaUsare = mappeStrategie.getOrDefault(pojo.getParametro(), strategiaDefault);
 			
 			//uso la strategia
-			if(strategyDaUsare.deveDisabilitare(d, value, conteggio)) {
-				disabilitaDispositivo(d);
+			if(strategyDaUsare.deveDisabilitare(null, value, conteggio)) {
+			eventBus.disableDispositivo(pojo);
+			
 			}
-	        }
 		} else {
 			// Se il valore NON è null, il dispositivo sta comunicando correttamente
-			tentativiFalliti.put(d,0); // Resetta il contatore dei fallimenti
-			
-			//se era disabilitato viene portato allo stato ALIVE
-			if(d.getState() == DispositivoStates.DISABLED) {
-				d.setState(DispositivoStates.ALIVE);
+			tentativiFalliti.put(pojo.getId(),0); // Resetta il contatore dei fallimenti
 			}
 		}
-	}
-	
-	private void disabilitaDispositivo(Dispositivo d) {
-		// Cambia lo stato interno in DISABLED
-		d.setState(DispositivoStates.DISABLED);
-		
-		// Se il dispositivo è acceso lo spegne 
-		if(d.isActive()) {
-			d.switchDispositivo();
-		}
-	}
 }
