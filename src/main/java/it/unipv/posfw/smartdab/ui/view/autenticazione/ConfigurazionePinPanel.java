@@ -33,14 +33,22 @@ public class ConfigurazionePinPanel extends JPanel{
 		gbc.gridy = 2;
 		add(txtPin, gbc);
 		
-		btnConferma = new JButton("Configura PIN e accedi");
+		btnConferma = new JButton("Accedi");
 		btnConferma.setPreferredSize(new Dimension(200, 40));
 		gbc.gridy = 3;
 		add(btnConferma, gbc);
 		
 		btnConferma.addActionListener(e -> {
 			String pinInserito = txtPin.getText();
-			controller.configuraNuovoPin(pinInserito);
+			if (PersistenzaManager.caricaPin() == null) {
+		        //primo avvio -> salviamo il PIN scelto
+		        System.out.println("Salvataggio nuovo PIN...");
+		        controller.configuraNuovoPin(pinInserito);
+		    } else {
+		        //avvii successivi -> verifichiamo se è quello giusto
+		        System.out.println("Verifica PIN esistente...");
+		        controller.verificaPinEsistente(pinInserito);
+		    }
 		});
 	}
 	public void svuotaCampo() {
