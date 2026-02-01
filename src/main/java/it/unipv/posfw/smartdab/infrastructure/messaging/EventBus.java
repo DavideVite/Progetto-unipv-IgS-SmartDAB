@@ -68,9 +68,16 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		
 		while(iter.hasNext()) {
 			d = iter.next();
+			
+			// Confronto le caratteristiche dei dispositivi con quelle ricercate e verifico che
+			// non siano disabilitati o in conflitto
+			
 			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
 			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
-			   request.getTopic().getId().equals(d.getTopic().getId())) {
+			   request.getTopic().getId().equals(d.getTopic().getId()) &&
+			   
+			   (d.getState().toString().equals(DispositivoStates.DISABLED.toString()) ||
+				d.getState().toString().equals(DispositivoStates.CONFLICT.toString()))) {
 				
 				// Se il dispositivo è un attuatore lo inserisco, altrimenti passo avanti
 				
@@ -120,19 +127,30 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		if(type.equals(Message.UPDATE + "." + Message.PARAMETER)) {
 			setRequest(request);
 
-			// Prendi tutti gli iscritti al topic
-			ArrayList<Dispositivo> subs = getSubscribers();
-			Iterator<Dispositivo> iterSubs = subs.iterator();
+			// Prendi tutti gli iscritti al topic e itera
+			Iterator<Dispositivo> iterSubs = getSubscribers().iterator();
+			Dispositivo d;
 
 			while(iterSubs.hasNext()) {
+				d = iterSubs.next();
+				
 				// Manda richiesta
 				for(int i = 0; i < 10; i++) {
-					if(sendRequest(request).equals(Message.ACK)) break;
+					
+					// Se la richiesta va a buon fine
+					if(sendRequest(request).equals(Message.ACK)) {
+						
+						// Se un dispositivo in stato UNKNOWN risponde, allora è ALIVE
+						if(d.getState().toString().equals(DispositivoStates.UNKNOWN.toString()))
+							d.setState(DispositivoStates.ALIVE);
+							break;
+					}
 
 					// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo
 					else if(i == 9) {
 						System.out.println("Dispositivo " + request.getTopic().getId() + " non ha risposto");
-						
+						// Il suo stato attuale è ignoto data l'assenza di risposta
+						d.setState(DispositivoStates.UNKNOWN);
 					}
 				}
 			}
