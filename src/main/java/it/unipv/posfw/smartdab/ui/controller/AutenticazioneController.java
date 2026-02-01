@@ -5,6 +5,8 @@ import java.awt.CardLayout;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import it.unipv.posfw.smartdab.ui.view.autenticazione.PersistenzaManager;
+
 public class AutenticazioneController {
 	
 	private JPanel container;
@@ -32,12 +34,22 @@ public class AutenticazioneController {
 	public void configuraNuovoPin(String pin) {
 		// \\d{5} d è un digit (cifra numerica da 0 a 9), 5 è il quantificatore
 		if(pin != null && pin.matches("\\d{5}") ) {
+			PersistenzaManager.salvaPin(pin);
 			if(azioneSuccesso != null) {
 				azioneSuccesso.run(); //chiude login e apre main frame
 			}
 		} else {
 			JOptionPane.showMessageDialog(container, "Il PIN deve essere composto da 5 cifre numeriche", "Errore Formato", JOptionPane.WARNING_MESSAGE);
 		}
+	}
+	
+	public void verificaPinEsistente(String pinInserito) {
+	    String pinSalvato = PersistenzaManager.caricaPin();
+	    if(pinInserito.equals(pinSalvato)) {
+	        if(azioneSuccesso != null) azioneSuccesso.run();
+	    } else {
+	        JOptionPane.showMessageDialog(container, "PIN errato!");
+	    }
 	}
 
 }
