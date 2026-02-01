@@ -51,5 +51,5 @@ public abstract class Dispositivo implements DevicePort {
 	}
 	
 	// Il dispositivo fa qualcosa, ma dipende dalla specializzazione
-	public abstract int action();
+	public abstract int action(Object args);
 }

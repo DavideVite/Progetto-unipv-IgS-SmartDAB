@@ -21,7 +21,7 @@ public class RilevatoreFumo extends SensoreFacade {
 	public void update(Observable o, Object args) {
 		if(args.toString().equals(DispositivoParameter.FUMO.getTrueLabel())) {
 			setSmoke_detected(true);
-			action();
+			publishMeasure();
 		}
 		else if(args.toString().equals(DispositivoParameter.FUMO.getFalseLabel())) 
 			setSmoke_detected(false);
@@ -33,7 +33,7 @@ public class RilevatoreFumo extends SensoreFacade {
 	}
 
 	@Override
-	public int action() {
+	public int action(Object args) {
 		publishMeasure();
 		System.out.println("Attenzione: rilevato fumo nella stanza " + this.getTopic().getRoom());
 		return 0;

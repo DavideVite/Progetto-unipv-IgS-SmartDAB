@@ -69,7 +69,7 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	// Il metodo era presente sia alle righe 54-66 che 71-83, causando errore di compilazione
 
 	@Override
-	public int action() {
+	public int action(Object args) {
 		switchDispositivo();
 		return applyVariation(illuminazione);
 	}
