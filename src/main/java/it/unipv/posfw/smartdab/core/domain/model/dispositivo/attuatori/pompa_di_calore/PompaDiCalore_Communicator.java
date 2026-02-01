@@ -1,4 +1,4 @@
-package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF;
+package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.pompa_di_calore;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,21 +10,19 @@ import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.DispositiviObserver;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
-public class Lampada_Communicator implements ICommunicator {
-
-	private DevicePort dispositivo;
+public class PompaDiCalore_Communicator implements ICommunicator {
+	
 	private ArrayList<DispositiviObserver> observers = new ArrayList<>();
 	private CommandDispatcher dispatcher;
+	private DevicePort dispositivo;
 	
-	
-	public Lampada_Communicator() {
-		Lampada_DispatcherBootstrap boot = new Lampada_DispatcherBootstrap();
+	public PompaDiCalore_Communicator() {
+		PompaDiCalore_DispatcherBootstrap boot = new PompaDiCalore_DispatcherBootstrap();
 		dispatcher = boot.createDispatcher();
 	}
 	
 	@Override
 	public Message processRequest(Request request) {
-		
 		// Ricavo il comnando ed eseguo
 		
 		try {
@@ -36,19 +34,19 @@ public class Lampada_Communicator implements ICommunicator {
 		
 		return Message.ACK;
 	}
-	
+
 	@Override
 	public void addObserver(DispositiviObserver observer) {
 		if(observer != null) observers.add(observer);
 		else System.out.println("Osservatore non valido");
 	}
-	
+
 	@Override
 	public void removeObserver(DispositiviObserver observer) {
 		if(observers.remove(observer)) System.out.println("Osservatore " + observer.toString() + " è stato rimosso");
 		else System.out.println("Osservatore " + observer.toString() + " non presente nella lista");
 	}
-	
+
 	@Override
 	public void notifyObservers(Object args) {
 
@@ -56,7 +54,6 @@ public class Lampada_Communicator implements ICommunicator {
 		Request request = Request.createRequest(dispositivo.getTopic(), 
 												dispositivo.isActive() ? Message.ONLINE.toString() : Message.OFFLINE.toString(), 
 												String.valueOf(args));
-		
 		if(request != null) {
 			Iterator<DispositiviObserver> iter = observers.iterator();
 
@@ -66,9 +63,11 @@ public class Lampada_Communicator implements ICommunicator {
 		}
 		else System.out.println("Richiesta non istanziata correttamente");
 	}
-	
-	protected void setDevicePort(DevicePort d) {
-		if(d != null) dispositivo = d;
-		else System.out.println("DevicePort non impostata");
+
+	public void setDispositivo(DevicePort dispositivo) {
+		this.dispositivo = dispositivo;
 	}
+	
+	
+
 }

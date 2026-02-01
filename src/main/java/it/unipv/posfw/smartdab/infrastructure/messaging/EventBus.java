@@ -82,8 +82,10 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
 			   request.getTopic().getId().equals(d.getTopic().getId()) &&
 			   
-			   (d.getState().toString().equals(DispositivoStates.DISABLED.toString()) ||
-				d.getState().toString().equals(DispositivoStates.CONFLICT.toString()))) {
+			   !(d.getState().toString().equals(DispositivoStates.DISABLED.toString()) ||
+				 d.getState().toString().equals(DispositivoStates.CONFLICT.toString())	 )
+			   
+				) {
 				
 				// Se il dispositivo è un attuatore lo inserisco, altrimenti passo avanti
 				
@@ -118,7 +120,7 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	}
 
 	
-	// Metodo esclusivo dei sensori che misurano dei parametri
+	// Metodo esclusivo dei sensori che misurano dei parametri o per aggiornare lo stato dei dispositivi
 	
 	// topic = "home/room/sensore/parameter"
 	// type = "UPDATE.PARAMETER"

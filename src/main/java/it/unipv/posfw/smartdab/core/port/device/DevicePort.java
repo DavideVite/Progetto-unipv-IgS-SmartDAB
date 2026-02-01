@@ -9,4 +9,5 @@ public interface DevicePort {
 	void setState(DispositivoStates state);
 	boolean isActive();
 	void switchDispositivo();
+	int action(Object args);
 }

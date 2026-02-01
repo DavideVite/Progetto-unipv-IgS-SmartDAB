@@ -38,7 +38,7 @@ public class Termometro extends SensoreFacade {
 	}
 
 	@Override
-	public int action() {
+	public int action(Object args) {
 		publishMeasure();
 		return 0;
 	}
