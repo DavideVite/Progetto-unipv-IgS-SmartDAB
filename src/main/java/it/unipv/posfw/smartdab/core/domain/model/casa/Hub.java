@@ -2,14 +2,8 @@ package it.unipv.posfw.smartdab.core.domain.model.casa;
 
 import java.util.Set;
 
-import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
-import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.utente.Autenticazione;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
