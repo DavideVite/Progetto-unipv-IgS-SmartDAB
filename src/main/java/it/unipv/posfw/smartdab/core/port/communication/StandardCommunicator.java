@@ -45,7 +45,7 @@ public class StandardCommunicator implements ICommunicator {
 
 	@Override
 	public void notifyObservers(Object args) {
-		Request request = Request.createRequest(dispositivo.getTopic(), Message.UPDATE + "." + Message.PARAMETER, String.valueOf(args));
+		Request request = Request.createRequest(dispositivo.getTopic(), Message.UPDATE + "." + Message.PARAMETER, args);
 		
 		if(request != null) {
 			Iterator<DispositiviObserver> iter = observers.iterator();
