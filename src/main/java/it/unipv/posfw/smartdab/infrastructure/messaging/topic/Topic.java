@@ -1,13 +1,6 @@
 package it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import it.unipv.posfw.smartdab.core.port.room.RoomPort;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.port.device.DevicePort;
-import it.unipv.posfw.smartdab.core.port.room.RoomPort;
-import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
 // Questa classe definisce un nuovo abstract type topic semi-strutturato

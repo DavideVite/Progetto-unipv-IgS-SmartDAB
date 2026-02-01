@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
