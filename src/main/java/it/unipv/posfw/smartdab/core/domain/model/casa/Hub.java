@@ -60,5 +60,10 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	    public Autenticazione getAutenticazione() {
 	    	return autenticazione;
 	    }
+	    
+	    // Aggiungo un metodo che mette in contatto l'event bus con l'HUB
+	    public void receiveCommunication() {
+	    	
+	    }
 	} 
 

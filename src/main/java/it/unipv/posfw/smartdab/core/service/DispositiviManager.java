@@ -66,7 +66,7 @@ public class DispositiviManager {
  }
     
     public boolean disableDispositivo(String id) {
-    	if(dao.existsByNome(id)) {
+    	if(dao.existsById(id)) {
     		dao.disableDispositivo(id);
     		return true;
     	} else {

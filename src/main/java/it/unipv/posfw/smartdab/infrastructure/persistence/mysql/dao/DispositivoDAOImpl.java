@@ -69,7 +69,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 
 	@Override
 	public boolean insertDispositivo(DispositivoPOJO d) {
-		if (existsByNome(d.getId())) {
+		if (existsById(d.getId())) {
 			System.out.println("Dispositivo " + d.getId() + " è già presente nel database");
 			return false;
 		}
@@ -175,7 +175,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 	}
 
 	@Override
-	public boolean existsByNome(String name) {
+	public boolean existsById(String id) {
 		Connection connection = null;
 		PreparedStatement s = null;
 		ResultSet r = null;
@@ -184,8 +184,8 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			connection = DatabaseConnection.getConnection();
 
 			if (connection != null) {
-				s = connection.prepareStatement("SELECT COUNT(*) FROM Dispositivo WHERE nome = ?");
-				s.setString(1, name);
+				s = connection.prepareStatement("SELECT COUNT(*) FROM Dispositivo WHERE id = ?");
+				s.setString(1, id);
 				r = s.executeQuery();
 
 				if (r.next()) {
