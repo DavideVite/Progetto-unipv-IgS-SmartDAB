@@ -53,8 +53,6 @@ Una volta che il dispositivo è stato registrato correttamente, verrà poi inser
 
 ## **Use Case UC2: Impostazione manuale parametri**
 
-(dai requisiti RF 3\)
-
 *Scope*: Progetto Smart DAB  
 *Level*: Utente  
 *Primary actor*: Utente  
@@ -62,7 +60,6 @@ Una volta che il dispositivo è stato registrato correttamente, verrà poi inser
 
 * Utente: vuole gestire velocemente e facilmente l’impostazione degli attuatori 
 
-	
 
 **Preconditions:**  
 L’utente deve essersi autenticato. Devono esserci le stanze e i dispositivi che appartengono a quella stanza 
@@ -87,9 +84,10 @@ Il nuovo valore per quel l'attuatore sovrascrive il valore precedente. Il cambio
 *Primary actor*: Utente  
 **Stakeholders and interests:**
 
-* Utente: vuole creare
+* Utente: vuole creare uno scenario personalizzato per automatizzare le impostazioni di una o più stanze.
 
-**Preconditions:** L’utente deve essersi autenticato. Devono esserci le stanze e i dispositivi che appartengono a quella stanza .
+
+**Preconditions:** L'utente deve essersi autenticato con il PIN. Devono esistere stanze con dispositivi configurati.
 
 **Postconditions:** Lo scenario è salvato nel database del sistema ed è disponibile per l'attivazione.
 
@@ -97,12 +95,12 @@ Il nuovo valore per quel l'attuatore sovrascrive il valore precedente. Il cambio
 
 1. L'utente accede alla sezione per la gestione degli scenari e richiede la creazione di un nuovo scenario.  
 2. L'utente assegna un nome univoco allo scenario.  
-3. L'utente seleziona una stanza   
-4. Il sistema mostra i dispositivi disponibili in quella stanza  
-5. L'utente seleziona uno o più dispositivi e ne imposta il valore desiderato per questo specifico scenario  
-6. *L'utente ripete i passi 3-5 fino a che ha selezionato tutti i dispositivi di interesse*  
+3. L'utente seleziona una stanza e un parametro (es. temperatura, illuminazione).
+4. Il sistema permette solo l'inserimento dei valori ammessi per quel parametro.
+5. L'utente imposta il valore desiderato per quel parametro in quella stanza.
+6. *L'utente ripete i passi 3-5 per aggiungere ulteriori configurazioni.  
 7. L'utente conferma il salvataggio dello scenario.  
-8. Il sistema valida che non vi siano conflitti logici tra i comandi impostati (es. Riscaldamento ON e Condizionatore ON nella stessa stanza).  
+8. Il sistema valida che non vi siano conflitti logici tra le configurazioni impostate (es. riscaldamento ON e condizionamento ON nella stessa stanza). 
 9. Il sistema salva lo scenario nel database e conferma l'avvenuta creazione. 
 
 ## **Use Case UC4: Attivazione scenario** 
@@ -110,6 +108,9 @@ Il nuovo valore per quel l'attuatore sovrascrive il valore precedente. Il cambio
 *Scope*: Progetto Smart DAB  
 *Level*: Utente  
 *Primary actor*: Utente
+**Stakeholders and interests:**
+
+* Utente: vuole attivare rapidamente una configurazione della casa senza impostare ogni dispositivo singolarmente.
 
 **Preconditions:** Esiste almeno uno scenario configurato nel sistema.
 
