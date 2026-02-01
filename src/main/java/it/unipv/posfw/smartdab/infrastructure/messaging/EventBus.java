@@ -61,6 +61,12 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		return null;
 	}
 	
+	// Metodo per rilevazione di malfunzionamenti
+	public void disableDispositivo(DispositivoPOJO d) {
+		searchDispositivoByName(d.getId()).setState(DispositivoStates.DISABLED);
+		dispositiviManager.disableDispositivo(d.getId());
+	}
+	
 	public ArrayList<Dispositivo> getSubscribers() {
 		Iterator<Dispositivo> iter = dispositivi.iterator();
 		ArrayList<Dispositivo> subs = new ArrayList<>();
