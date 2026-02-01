@@ -1,5 +1,6 @@
 package it.unipv.posfw.smartdab.core.port.communication.observer;
 
+
 public interface Observable {
 
 	public void addObserver(Observer observer);

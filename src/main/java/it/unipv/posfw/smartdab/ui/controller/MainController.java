@@ -21,6 +21,7 @@ public class MainController {
     private GestoreStanze gestoreStanze;
     private ScenarioManager scenarioManager;
     private ParametroManager parametroManager;
+    private DispositiviManager dispositiviManager;
     private DispositiviManager dispositivoManager;
 
     // Sub-controllers
@@ -38,7 +39,8 @@ public class MainController {
         casa = new Casa();
         gestoreStanze = new GestoreStanze(casa);
         scenarioManager = new ScenarioManager();
-        parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance());
+        dispositiviManager = new DispositiviManager();
+        parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance(dispositiviManager));
         dispositivoManager = new DispositiviManager();
     }
 

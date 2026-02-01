@@ -2,8 +2,11 @@ package it.unipv.posfw.smartdab.core.beans;
 
 import java.time.LocalDateTime;
 
+import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.adapter.facade.SensoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 
 public class DispositivoPOJO {
 	private String id;
@@ -34,6 +37,26 @@ public class DispositivoPOJO {
 		this.stato = stato;
 		this.attivo = attivo;
 		created_at = t;
+	}
+	
+	public DispositivoPOJO(Dispositivo d) {
+		this.id = d.getTopic().getId();
+		this.stanza = d.getTopic().getRoom();
+		this.parametro = d.getTopic().getParameter();
+		
+		try {
+			d = (AttuatoreFacade)d;
+			this.tipo = "ATTUATORE";
+		} catch(ClassCastException e) {
+			d = (SensoreFacade)d;
+			this.tipo = "SENSORE";
+		} finally {
+			this.tipo = "NESSUNO";
+		}
+		
+		this.stato = d.getState();
+		this.attivo = d.isActive();
+		created_at = LocalDateTime.now();
 	}
 	
 	public String getId() {
