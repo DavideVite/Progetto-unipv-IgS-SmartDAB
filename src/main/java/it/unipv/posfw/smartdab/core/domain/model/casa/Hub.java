@@ -16,6 +16,8 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 		private Autenticazione autenticazione;
 	    private GestoreStanze gestoreStanze;
 	    
+	    private boolean sistemaSbloccato = false;
+	    
 	    private Hub(String passwordProduttore) {
            this.autenticazione =new Autenticazione(passwordProduttore);
 
@@ -26,7 +28,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	    	Set<Stanza> stanzeRecuperate = stanzaDao.readAllStanze(); 
 	        Casa casa = new Casa();    		
 	        
-	        int maxId = 0;
             for (Stanza s : stanzeRecuperate) {
             	casa.nuovaStanza(s);
             
@@ -35,6 +36,15 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao, misuraDao);
 
 	    }  
+	    
+	    //metodo per sbloccare il sistema all'accensione
+	    public boolean accedi(String pin) {
+	    	if (autenticazione.verificaPin(pin)) {
+	    		this.sistemaSbloccato = true;
+	    		return true;
+	    	}
+	    	return false;
+	    }
 	    
 	    public static Hub getInstance(String passwordProduttore) {
 	    	if(instance==null) {
@@ -47,8 +57,15 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	    	return instance;
 	    }
 	    
+	    //per accedere all'hub il sistema deve essere sbloccato
 	    public GestoreStanze getGestoreStanze() {
+	    	if (sistemaSbloccato) {
 	    	return gestoreStanze;
+	    	}
+	    	else {
+	    		System.out.println("Sistema bloccato, inserire il PIN");
+	    		return null;
+	    	}
 	    }
 	    
 	    public Autenticazione getAutenticazione() {
@@ -60,4 +77,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	    	
 	    }
 	} 
+
+
 
