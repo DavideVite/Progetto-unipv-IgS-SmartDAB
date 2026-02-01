@@ -53,20 +53,20 @@ public class ParametroManager {
     public boolean impostaParametro(String stanzaId, DispositivoParameter tipoParametro, IParametroValue valore) {
         if (!valore.isValid()) return false;
 
+        Stanza stanza = gestoreStanze.cercaStanzaPerId(stanzaId);
+        if (stanza == null) return false;
+
+        // Tenta invio via EventBus se esiste un dispositivo di dominio
         Dispositivo dispositivo = getDispositivoIdoneo(stanzaId, tipoParametro);
-        if (dispositivo == null) return false;
-
-        boolean successo = inviaComando(dispositivo, tipoParametro, valore);
-
-        if (successo) {
-            Stanza stanza = gestoreStanze.cercaStanzaPerId(stanzaId);
-            if (stanza != null) {
-                double valoreNumerico = estraiValoreNumerico(tipoParametro, valore);
-                stanza.updateTarget(tipoParametro.name(), valoreNumerico);
-            }
+        if (dispositivo != null) {
+            inviaComando(dispositivo, tipoParametro, valore);
         }
 
-        return successo;
+        // Aggiorna sempre il target della stanza direttamente
+        double valoreNumerico = estraiValoreNumerico(tipoParametro, valore);
+        stanza.updateTarget(tipoParametro.name(), valoreNumerico);
+
+        return true;
     }
 
     private double estraiValoreNumerico(DispositivoParameter tipo, IParametroValue valore) {

@@ -1,6 +1,7 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
@@ -26,15 +27,13 @@ public class DispositivoController implements
     private GestoreStanze gestoreStanze;
     private DispositiviManager dispositiviManager;
 
-    // Dati in memoria (simulazione, in attesa di DAO completo)
-//    private Map<String, DispositivoPOJO> dispositivi;
+    private Map<String, String> mapNomeToId = new HashMap<>();
     private String filtroStanzaCorrente = "Tutte";
 
     public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze, DispositiviManager dispositiviManager) {
         this.mainPanel = mainPanel;
         this.gestoreStanze = gestoreStanze;
-//        this.dispositivi = new HashMap<>();
-        this.dispositiviManager = dispositiviManager; 
+        this.dispositiviManager = dispositiviManager;
 
         inizializzaViste();
         aggiornaVista();
@@ -56,10 +55,12 @@ public class DispositivoController implements
 
     private void aggiornaListaStanze() {
         List<String> nomiStanze = new ArrayList<>();
+        mapNomeToId.clear();
         Set<Stanza> stanze = gestoreStanze.visualizzaStanze();
         if (stanze != null) {
             for (Stanza s : stanze) {
                 nomiStanze.add(s.getNome());
+                mapNomeToId.put(s.getNome(), s.getId());
             }
         }
         dispositivoPanel.aggiornaListaStanze(nomiStanze);
@@ -68,10 +69,11 @@ public class DispositivoController implements
 
     private void aggiornaListaDispositivi() {
         List<DispositivoPOJO> listaFiltrata = new ArrayList<>();
+        String filtroId = mapNomeToId.get(filtroStanzaCorrente);
 
         for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
-            if (filtroStanzaCorrente != null && filtroStanzaCorrente.equals("Tutte") ||
-                d.getStanza().equals(filtroStanzaCorrente)) {
+            if (filtroStanzaCorrente == null || filtroStanzaCorrente.equals("Tutte") ||
+                d.getStanza().equals(filtroId)) {
                 listaFiltrata.add(d);
             }
         }
@@ -120,8 +122,9 @@ public class DispositivoController implements
     @Override
     public void onStanzaSelezionata(String stanza) {
         List<DispositivoPOJO> listaStanza = new ArrayList<>();
+        String stanzaId = mapNomeToId.get(stanza);
         for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
-            if (d.getStanza().equals(stanza)) {
+            if (d.getStanza().equals(stanzaId)) {
                 listaStanza.add(d);
             }
         }
@@ -131,11 +134,17 @@ public class DispositivoController implements
     // Implementazione DispositivoFormListener
     @Override
     public void onSalva(DispositivoPOJO dispositivo) {
+        // Il form usa il nome della stanza, ma il DB vuole l'ID
+        String stanzaId = mapNomeToId.get(dispositivo.getStanza());
+        if (stanzaId != null) {
+            dispositivo.setStanza(stanzaId);
+        }
+
         if (formPanel.isModifica()) {
             dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo aggiornato");
         } else {
-            if (dispositiviManager.getDispositivoById(filtroStanzaCorrente) != null) {
+            if (dispositiviManager.getDispositivoById(dispositivo.getId()) != null) {
                 JOptionPane.showMessageDialog(formPanel,
                     "ID già esistente", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -143,6 +152,17 @@ public class DispositivoController implements
             dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo creato");
         }
+        // Inizializza il parametro nella stanza se non esiste ancora
+        String idStanza = dispositivo.getStanza();
+        Stanza stanza = gestoreStanze.cercaStanzaPerId(idStanza);
+        if (stanza != null) {
+            DispositivoParameter param = dispositivo.getParametro();
+            if (stanza.getParametri().get(param.name()) == null) {
+                double valoreIniziale = param.getMin() != null ? param.getMin() : 0.0;
+                stanza.updateParameter(param.name(), valoreIniziale);
+            }
+        }
+
         chiudiFormDialog();
         aggiornaListaDispositivi();
     }

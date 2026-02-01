@@ -93,6 +93,10 @@ public class StanzeDettaglioPanel extends JPanel {
         }
     }
 
+    public JTable getTabella() {
+        return tabella;
+    }
+
     public void pulisci() {
         modello.setRowCount(0);
         titoloLabel.setText("Seleziona una stanza per vedere i parametri");
