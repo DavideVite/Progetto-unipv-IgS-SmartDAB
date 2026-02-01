@@ -148,7 +148,8 @@ public class StanzeController {
 	    	Stanza stanza = gestoreStanze.cercaStanzaPerId(id);
 	    	if (stanza != null) {
 	    		Map<String, Double> parametri = stanza.getParametri();
-	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri);
+	    		Map<String, Double> parametriTarget = stanza.getParametriTarget();
+	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri, parametriTarget);
 	    	} else {
 	    		elencoPanel.getDettaglioPanel().pulisci();
 	    	}

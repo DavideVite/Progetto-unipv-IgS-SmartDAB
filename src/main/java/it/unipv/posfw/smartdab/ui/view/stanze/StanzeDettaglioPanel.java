@@ -21,7 +21,7 @@ public class StanzeDettaglioPanel extends JPanel {
         titoloLabel = new JLabel("Seleziona una stanza per vedere i parametri", SwingConstants.CENTER);
         add(titoloLabel, BorderLayout.NORTH);
 
-        String[] colonne = {"Parametro", "Valore", "Unità"};
+        String[] colonne = {"Parametro", "Valore Attuale", "Target", "Unità"};
         modello = new DefaultTableModel(colonne, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -37,7 +37,7 @@ public class StanzeDettaglioPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void mostraParametri(String nomeStanza, Map<String, Double> parametri) {
+    public void mostraParametri(String nomeStanza, Map<String, Double> parametri, Map<String, Double> parametriTarget) {
         modello.setRowCount(0);
         titoloLabel.setText("Parametri di: " + nomeStanza);
 
@@ -51,32 +51,45 @@ public class StanzeDettaglioPanel extends JPanel {
             double valore = entry.getValue();
 
             String valoreFormattato;
+            String targetFormattato = "-";
             String unita = "";
 
             try {
                 DispositivoParameter param = DispositivoParameter.valueOf(nomeParametro);
-                if (param.getType() == ParameterType.BOOLEAN) {
-                    valoreFormattato = valore == 1.0 ? param.getTrueLabel() : param.getFalseLabel();
-                } else if (param.getType() == ParameterType.ENUM) {
-                    int idx = (int) valore;
-                    if (param.getAllowedValues() != null && idx >= 0 && idx < param.getAllowedValues().size()) {
-                        valoreFormattato = param.getAllowedValues().get(idx);
-                    } else {
-                        valoreFormattato = String.valueOf(valore);
-                    }
-                } else {
-                    if (valore == Math.floor(valore)) {
-                        valoreFormattato = String.valueOf((int) valore);
-                    } else {
-                        valoreFormattato = String.format("%.2f", valore);
-                    }
+
+                valoreFormattato = formattaValore(param, valore);
+
+                if (param.getType() != ParameterType.BOOLEAN && param.getType() != ParameterType.ENUM) {
                     unita = param.getUnit() != null ? param.getUnit() : "";
+                }
+
+                // Formatta il target se presente
+                if (parametriTarget != null && parametriTarget.containsKey(nomeParametro)) {
+                    double valoreTarget = parametriTarget.get(nomeParametro);
+                    targetFormattato = formattaValore(param, valoreTarget);
                 }
             } catch (IllegalArgumentException e) {
                 valoreFormattato = String.valueOf(valore);
             }
 
-            modello.addRow(new Object[]{nomeParametro, valoreFormattato, unita});
+            modello.addRow(new Object[]{nomeParametro, valoreFormattato, targetFormattato, unita});
+        }
+    }
+
+    private String formattaValore(DispositivoParameter param, double valore) {
+        if (param.getType() == ParameterType.BOOLEAN) {
+            return valore == 1.0 ? param.getTrueLabel() : param.getFalseLabel();
+        } else if (param.getType() == ParameterType.ENUM) {
+            int idx = (int) valore;
+            if (param.getAllowedValues() != null && idx >= 0 && idx < param.getAllowedValues().size()) {
+                return param.getAllowedValues().get(idx);
+            }
+            return String.valueOf(valore);
+        } else {
+            if (valore == Math.floor(valore)) {
+                return String.valueOf((int) valore);
+            }
+            return String.format("%.2f", valore);
         }
     }
 
