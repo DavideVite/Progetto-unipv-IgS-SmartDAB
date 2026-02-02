@@ -22,9 +22,13 @@ public class ParametroManager {
 
     // Trova primo attuatore idoneo nella stanza che supporta il parametro richiesto
     public Dispositivo getDispositivoIdoneo(String stanzaId, DispositivoParameter tipoParametro) {
-        List<Dispositivo> dispositivi = gestoreStanze.getDispositiviPerStanza(stanzaId);
+        
+    	List<Dispositivo> dispositivi = gestoreStanze.getDispositiviPerStanza(stanzaId);
+        
         if (dispositivi == null) return null;
 
+        
+        
         for (Dispositivo d : dispositivi) {
             // 1. Verifica se è un attuatore tramite cast
             try {

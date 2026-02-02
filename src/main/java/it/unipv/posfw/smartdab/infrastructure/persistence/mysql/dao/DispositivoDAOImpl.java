@@ -13,11 +13,13 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
 public class DispositivoDAOImpl implements DispositivoDAO{
+	
+	private CommunicationDAOImpl communicationDAO;
 	private Connection connection;
 	public final int MAX_N = 100;
 	
 	public DispositivoDAOImpl() {
-
+		communicationDAO = new CommunicationDAOImpl();
 	}
 	
 	public ArrayList<DispositivoPOJO> selectN(int n) {
@@ -171,6 +173,41 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 		}
 		return true;
 		
+	}
+	
+	@Override
+	public boolean deleteDispositivo(String id) {
+		Connection connection = null;
+		PreparedStatement s = null;
+		
+		if(!existsById(id)) {
+			System.out.println("Dispositivo non presente nel db");
+			return false;
+		}
+		
+		try {
+			connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+				
+				communicationDAO.deleteCommunicationByDispositivoId(id);
+				
+				s = connection.prepareStatement("DELETE FROM Dispositivo WHERE id = ?");
+				s.setString(1, id);
+				int rowsAffected = s.executeUpdate();
+				return rowsAffected > 0;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 
 	@Override

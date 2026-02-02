@@ -22,7 +22,7 @@ public class DispositiviManager {
 		caricaDalDatabase();
 	}
 	
-    private void caricaDalDatabase() {
+    public void caricaDalDatabase() {
         try {
             dispositivi = dao.selectN(100);
             System.out.println("Caricati " + dispositivi.size() + " dispositivi dal database");
@@ -55,7 +55,7 @@ public class DispositiviManager {
  	
  	DispositivoPOJO d1 = d;
  	
-     if(dispositivi.contains(d1)) {
+     if(dispositivi.contains(d1) || dao.existsById(d.getId())) {
          return null;
      }
 
@@ -68,6 +68,16 @@ public class DispositiviManager {
     public boolean disableDispositivo(String id) {
     	if(dao.existsById(id)) {
     		dao.disableDispositivo(id);
+    		return true;
+    	} else {
+    		System.out.println("Errore: il dispositivo non esiste");
+    		return false;
+    	}
+    } 
+    
+    public boolean deleteDispositivo(String id) {
+    	if(dao.existsById(id)) {
+    		dao.deleteDispositivo(id);
     		return true;
     	} else {
     		System.out.println("Errore: il dispositivo non esiste");

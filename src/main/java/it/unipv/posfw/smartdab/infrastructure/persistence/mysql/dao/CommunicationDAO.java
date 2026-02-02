@@ -12,4 +12,6 @@ public interface CommunicationDAO {
 	public boolean updateCommunication(CommunicationPOJO c);
 	
 	public boolean existsById(int id);
+	
+	public boolean deleteCommunicationByDispositivoId(String id);
 }

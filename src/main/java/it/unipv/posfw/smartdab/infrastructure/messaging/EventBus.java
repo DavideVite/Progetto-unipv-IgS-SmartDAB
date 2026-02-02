@@ -9,10 +9,11 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBus_dispositiviAdder;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
-public class EventBus implements DispositiviObserver, IEventBusClient {
+public class EventBus implements DispositiviObserver, IEventBusClient, IEventBus_dispositiviAdder {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
 	private DispositiviManager dispositiviManager;
 	private static EventBus instance = null;
@@ -102,6 +103,7 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	}
 	
 	public Message sendRequest(Request request) {
+		System.out.println("Sono qui");
 		return searchDispositivoByName(request.getTopic().toString()
 				).getCommunicator().processRequest(request);
 	}

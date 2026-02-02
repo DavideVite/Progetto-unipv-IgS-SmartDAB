@@ -151,6 +151,8 @@ public class Stanza implements Observable, Observer, RoomPort {
 
 		this.updateParameter(nomeStr, valore);
 	}
+     
+     
 }
 
 
