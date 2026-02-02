@@ -105,13 +105,13 @@ public class GestoreStanze {
     	return casa.getStanze();
     }
 
-    public List<Dispositivo> getDispositiviPerStanza(String nomeStanza) {
-    	Stanza s = casa.cercaStanza(nomeStanza);
+    public List<Dispositivo> getDispositiviPerStanza(String stanzaId) {
+    	Stanza s = cercaStanzaPerId(stanzaId);
 
     	if(s != null) {
     		return s.getDispositivi();
     	}
-    	return null;  	
+    	return null;
     }
 
     /**

@@ -4,6 +4,8 @@ import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
@@ -26,6 +28,8 @@ public class StanzeController {
 	    private GestoreStanze gestoreStanze;
 	    private ParametroManager parametroManager;
 	    private int rigaSelezionata = -1;  //-1 significa nuovo inserimento
+	    private String stanzaCorrenteId;
+	    private String stanzaCorrenteNome;
 
 	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze, ParametroManager parametroManager) {
 	    	this.container = container;
@@ -38,6 +42,17 @@ public class StanzeController {
 	    	this.elencoPanel = elenco;
 	    	this.formPanel = form;
 	    	caricaStanzeInTabella();
+
+	    	// Doppio click sulla tabella dettagli per impostare un parametro
+	    	elencoPanel.getDettaglioPanel().getTabella().addMouseListener(new MouseAdapter() {
+	    		@Override
+	    		public void mouseClicked(MouseEvent e) {
+	    			if (e.getClickCount() == 2 && stanzaCorrenteId != null) {
+	    				mostraDialogParametroManuale(stanzaCorrenteId);
+	    				mostraDettagliStanza(stanzaCorrenteId, stanzaCorrenteNome);
+	    			}
+	    		}
+	    	});
 	    }
 
 	    private void caricaStanzeInTabella() {
@@ -79,6 +94,7 @@ public class StanzeController {
 	    		}
 	    	} else if (scelta == 2) {  //IMPOSTA PARAMETRO MANUALE
 	    		mostraDialogParametroManuale(id);
+	    		mostraDettagliStanza(id, nome);
 	    	}
 	    }
 	    
@@ -145,10 +161,13 @@ public class StanzeController {
 	    }
 
 	    public void mostraDettagliStanza(String id, String nome) {
+	    	this.stanzaCorrenteId = id;
+	    	this.stanzaCorrenteNome = nome;
 	    	Stanza stanza = gestoreStanze.cercaStanzaPerId(id);
 	    	if (stanza != null) {
 	    		Map<String, Double> parametri = stanza.getParametri();
-	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri);
+	    		Map<String, Double> parametriTarget = stanza.getParametriTarget();
+	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri, parametriTarget);
 	    	} else {
 	    		elencoPanel.getDettaglioPanel().pulisci();
 	    	}

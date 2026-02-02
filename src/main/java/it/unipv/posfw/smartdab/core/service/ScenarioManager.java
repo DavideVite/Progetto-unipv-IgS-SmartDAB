@@ -1,10 +1,16 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.service.strategy.ImmediateActivationStrategy;
+import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
@@ -29,10 +35,27 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
  * 2. Testabilita: possibilita di iniettare mock DAO nei test
  * 3. Coerenza: stesso pattern di GestoreStanze
  */
-public class ScenarioManager {
+public class ScenarioManager implements Observable {
 
 	private Map<String, Scenario> scenari;
 	private final ScenarioDAO scenarioDAO;
+	private final List<Observer> observers = new ArrayList<>();
+	private ScenarioActivationStrategy activationStrategy = new ImmediateActivationStrategy();
+
+	public void setActivationStrategy(ScenarioActivationStrategy strategy) {
+		this.activationStrategy = strategy;
+	}
+
+	@Override
+	public void addObserver(Observer observer) { observers.add(observer); }
+
+	@Override
+	public void removeObserver(Observer observer) { observers.remove(observer); }
+
+	@Override
+	public void notifyObservers(Object args) {
+		for (Observer o : observers) o.update(this, args);
+	}
 
 	/**
 	 * Costruttore con Dependency Injection.
@@ -149,6 +172,7 @@ public class ScenarioManager {
 			// Persistenza nel database
 			scenarioDAO.insertScenario(scenario);
 
+			notifyObservers("SCENARIO_CREATO");
 			return scenario;
 		}
 
@@ -165,6 +189,7 @@ public class ScenarioManager {
 		// Persistenza nel database
 		scenarioDAO.insertScenario(scenario);
 
+		notifyObservers("SCENARIO_CREATO");
 		return scenario;
 	}
 
@@ -191,6 +216,7 @@ public class ScenarioManager {
 		// Rimuovi dalla mappa in memoria
 		scenari.remove(nomeScenario);
 
+		notifyObservers("SCENARIO_ELIMINATO");
 		return eliminatoDalDb;
 	}
 
@@ -221,15 +247,11 @@ public class ScenarioManager {
 		// Persiste lo stato di attivazione nel database
 		scenarioDAO.updateScenario(scenario);
 
-		// Esegui le configurazioni
-		boolean tuttiSuccesso = true;
-		for (StanzaConfig config : scenario.getConfigurazioni()) {
-			if (!parametroManager.applicaStanzaConfig(config)) {
-				tuttiSuccesso = false;
-				// Continua comunque con le altre configurazioni
-			}
-		}
-		return tuttiSuccesso;
+		// Delega l'esecuzione delle configurazioni alla strategy
+		boolean result = activationStrategy.attiva(scenario, parametroManager);
+
+		notifyObservers("SCENARIO_ATTIVATO");
+		return result;
 	}
 
 
@@ -241,6 +263,7 @@ public class ScenarioManager {
 			// Persiste lo stato di disattivazione nel database
 			scenarioDAO.updateScenario(scenario);
 
+			notifyObservers("SCENARIO_DISATTIVATO");
 			return true;
 		}
 		return false;

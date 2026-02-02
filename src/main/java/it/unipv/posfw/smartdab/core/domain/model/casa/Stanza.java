@@ -13,6 +13,7 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
+import it.unipv.posfw.smartdab.core.service.strategy.ParameterSyncFunction;
 
 /**
  * FIX: Aggiunto RoomPort all'elenco delle interfacce implementate.
@@ -27,7 +28,9 @@ public class Stanza implements Observable, Observer, RoomPort {
 	 private LocalDateTime createdAt;
 	 private List<Dispositivo> dispositivi = new ArrayList<>();
 	 private Map<String, Double> parametri = new HashMap<>();
-	 private List<Observer> observers = new ArrayList<>(); 
+	 private Map<String, Double> parametriTarget = new HashMap<>();
+	 private ParameterSyncFunction syncFunction = (current, target) -> target;
+	 private List<Observer> observers = new ArrayList<>();
 	 
 	 //costruttore per nuove stanze
 	 public Stanza(String nome, double mq) {
@@ -121,6 +124,22 @@ public class Stanza implements Observable, Observer, RoomPort {
 		this.parametri.put(nomeParametro, nuovoValore);
 
 		notifyObservers(nomeParametro);
+	}
+
+	public void updateTarget(String nomeParametro, double valoreTarget) {
+		this.parametriTarget.put(nomeParametro, valoreTarget);
+		double current = this.parametri.getOrDefault(nomeParametro, valoreTarget);
+		double nuovoValore = syncFunction.apply(current, valoreTarget);
+		this.parametri.put(nomeParametro, nuovoValore);
+		notifyObservers(nomeParametro);
+	}
+
+	public Map<String, Double> getParametriTarget() {
+		return parametriTarget;
+	}
+
+	public void setSyncFunction(ParameterSyncFunction syncFunction) {
+		this.syncFunction = syncFunction;
 	}
 
 	@Override
