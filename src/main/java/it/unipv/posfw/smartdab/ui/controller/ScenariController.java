@@ -66,7 +66,19 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
         scenarioManager.addObserver(this);
 
         addListeners();
+        aggiornaMappaStanzeDetail();
         aggiornaTabella();
+    }
+
+    private void aggiornaMappaStanzeDetail() {
+        Map<String, String> idToNome = new HashMap<>();
+        Set<Stanza> stanze = gestoreStanze.visualizzaStanze();
+        if (stanze != null) {
+            for (Stanza s : stanze) {
+                idToNome.put(s.getId(), s.getNome());
+            }
+        }
+        panel.getDetailPanel().aggiornaMappaStanze(idToNome);
     }
 
     // ==================== Observer Pattern ====================

@@ -44,13 +44,11 @@ public class DispositivoPOJO {
 		this.stanza = d.getTopic().getRoom();
 		this.parametro = d.getTopic().getParameter();
 		
-		try {
-			d = (AttuatoreFacade)d;
+		if (d instanceof AttuatoreFacade) {
 			this.tipo = "ATTUATORE";
-		} catch(ClassCastException e) {
-			d = (SensoreFacade)d;
+		} else if (d instanceof SensoreFacade) {
 			this.tipo = "SENSORE";
-		} finally {
+		} else {
 			this.tipo = "NESSUNO";
 		}
 		

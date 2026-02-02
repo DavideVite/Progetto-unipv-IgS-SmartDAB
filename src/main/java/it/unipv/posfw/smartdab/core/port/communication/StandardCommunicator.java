@@ -25,10 +25,18 @@ public class StandardCommunicator implements ICommunicator {
 
 	@Override
 	public Message processRequest(Request request) {
-		if(dispositivo.getState().toString().equals(DispositivoStates.ALIVE.toString())) 
-			return Message.ACK;
-		
-		return Message.ERROR;
+		if (!dispositivo.getState().toString().equals(DispositivoStates.ALIVE.toString())) {
+			return Message.ERROR;
+		}
+
+		// Esegui l'azione sul dispositivo con il valore della request
+		try {
+			dispositivo.action(request.getVal());
+		} catch (Exception e) {
+			System.out.println("StandardCommunicator: errore durante action - " + e.getMessage());
+			return Message.ERROR;
+		}
+		return Message.ACK;
 	}
 
 	@Override

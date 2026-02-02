@@ -41,9 +41,14 @@ public class PompaDiCalore extends AttuatoreFacade {
 	@Override
 	public int action(Object state) {
 		if(state == null) return applyVariation(state);
-		
+
 		try {
-			setTemp_setpoint((double) state);
+			double valore = (double) state;
+			setTemp_setpoint(valore);
+
+			// Aggiorna l'ObservableParameter con il target e notifica la Stanza
+			this.getParameter().setValue(valore);
+			this.getParameter().notifyObservers(this);
 		} catch(ClassCastException e) {
 			System.out.println("Stato inserito non valido");
 		}

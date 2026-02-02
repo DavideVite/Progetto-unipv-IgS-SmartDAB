@@ -6,6 +6,8 @@ import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ScenarioDetailPanel extends JPanel {
 
@@ -14,9 +16,15 @@ public class ScenarioDetailPanel extends JPanel {
     private JLabel lblStato;
     private JTable tabellaConfig;
     private DefaultTableModel configTableModel;
+    private Map<String, String> mappaIdToNome = new HashMap<>();
 
     public ScenarioDetailPanel() {
         initComponents();
+    }
+
+    public void aggiornaMappaStanze(Map<String, String> idToNome) {
+        this.mappaIdToNome.clear();
+        this.mappaIdToNome.putAll(idToNome);
     }
 
     private void initComponents() {
@@ -63,8 +71,9 @@ public class ScenarioDetailPanel extends JPanel {
 
         configTableModel.setRowCount(0);
         for (StanzaConfig config : scenario.getConfigurazioni()) {
+            String stanzaDisplay = mappaIdToNome.getOrDefault(config.getStanzaId(), config.getStanzaId());
             configTableModel.addRow(new Object[]{
-                config.getStanzaId(),
+                stanzaDisplay,
                 config.getTipo_parametro().toString(),
                 config.getParametro().getDisplayString()
             });

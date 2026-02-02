@@ -8,22 +8,20 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class DispositivoPanel extends JPanel {
 
-    private JTabbedPane tabbedPane;
-
-    // Tab vista globale
+    // Vista globale
     private JTable tabellaGlobale;
     private DefaultTableModel modelloGlobale;
     private JComboBox<String> comboFiltroStanza;
     private JButton btnNuovo;
     private JButton btnElimina;
 
-    // Tab vista per stanza
-    private JComboBox<String> comboSelezioneStanza;
-    private JTable tabellaPerStanza;
-    private DefaultTableModel modelloPerStanza;
+    // Mappa ID stanza -> Nome stanza per visualizzazione
+    private Map<String, String> mappaIdToNome = new HashMap<>();
 
     // Listener per eventi
     private DispositivoPanelListener listener;
@@ -41,12 +39,8 @@ public class DispositivoPanel extends JPanel {
         titolo.setFont(titolo.getFont().deriveFont(Font.BOLD, 16f));
         add(titolo, BorderLayout.NORTH);
 
-        // TabbedPane per le due viste
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Vista Globale", creaVistaGlobale());
-        tabbedPane.addTab("Per Stanza", creaVistaPerStanza());
-
-        add(tabbedPane, BorderLayout.CENTER);
+        // Vista globale con filtro per stanza
+        add(creaVistaGlobale(), BorderLayout.CENTER);
     }
 
     private JPanel creaVistaGlobale() {
@@ -126,65 +120,19 @@ public class DispositivoPanel extends JPanel {
         return panel;
     }
 
-    private JPanel creaVistaPerStanza() {
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-
-        // Selezione stanza
-        JPanel selezionePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        selezionePanel.add(new JLabel("Seleziona stanza:"));
-        comboSelezioneStanza = new JComboBox<>();
-        selezionePanel.add(comboSelezioneStanza);
-        panel.add(selezionePanel, BorderLayout.NORTH);
-
-        // Tabella dispositivi stanza
-        String[] colonne = {"ID", "Tipo", "Parametro", "Stato", "Attivo", "Modello"};
-        modelloPerStanza = new DefaultTableModel(colonne, 0) {
-            @Override
-            public Class<?> getColumnClass(int column) {
-                if (column == 4) return Boolean.class;
-                return String.class;
-            }
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        tabellaPerStanza = new JTable(modelloPerStanza);
-        tabellaPerStanza.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabellaPerStanza.setRowHeight(25);
-        panel.add(new JScrollPane(tabellaPerStanza), BorderLayout.CENTER);
-
-        // Listener selezione stanza
-        comboSelezioneStanza.addActionListener(e -> {
-            if (listener != null) {
-                String stanza = (String) comboSelezioneStanza.getSelectedItem();
-                listener.onStanzaSelezionata(stanza);
-            }
-        });
-
-        return panel;
+    public void aggiornaMappaStanze(Map<String, String> idToNome) {
+        this.mappaIdToNome.clear();
+        this.mappaIdToNome.putAll(idToNome);
     }
 
     // Metodi per aggiornare le tabelle
     public void aggiornaListaGlobale(List<DispositivoPOJO> dispositivi) {
         modelloGlobale.setRowCount(0);
         for (DispositivoPOJO d : dispositivi) {
+            String stanzaDisplay = mappaIdToNome.getOrDefault(d.getStanza(), d.getStanza());
             modelloGlobale.addRow(new Object[]{
                 d.getId(),
-                d.getStanza(),
-                d.getTipo(),
-                d.getParametro().toString(),
-                d.getStato().toString(),
-                d.isAttivo(),
-            });
-        }
-    }
-
-    public void aggiornaListaPerStanza(List<DispositivoPOJO> dispositivi) {
-        modelloPerStanza.setRowCount(0);
-        for (DispositivoPOJO d : dispositivi) {
-            modelloPerStanza.addRow(new Object[]{
-                d.getId(),
+                stanzaDisplay,
                 d.getTipo(),
                 d.getParametro().toString(),
                 d.getStato().toString(),
@@ -196,11 +144,9 @@ public class DispositivoPanel extends JPanel {
     public void aggiornaListaStanze(List<String> stanze) {
         comboFiltroStanza.removeAllItems();
         comboFiltroStanza.addItem("Tutte");
-        comboSelezioneStanza.removeAllItems();
 
         for (String stanza : stanze) {
             comboFiltroStanza.addItem(stanza);
-            comboSelezioneStanza.addItem(stanza);
         }
     }
 
@@ -230,6 +176,5 @@ public class DispositivoPanel extends JPanel {
         void onModificaDispositivo(String id);
         void onEliminaDispositivo(String id);
         void onFiltroStanzaChanged(String stanza);
-        void onStanzaSelezionata(String stanza);
     }
 }

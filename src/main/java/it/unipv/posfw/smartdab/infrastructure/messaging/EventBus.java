@@ -41,7 +41,16 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 			dispositiviManager.aggiungiDispositivo(new DispositivoPOJO(d));
 			return true;
 		}
-		
+
+		System.out.println("Il dispositivo " + d.getTopic().getId() + " è già presente nella lista");
+		return false;
+	}
+
+	// Aggiunge solo in memoria, senza persistere nel DB (usato al boot dal DispositivoLoader)
+	public boolean addDispositivoInMemory(Dispositivo d) {
+		if(dispositivi.add(d)) {
+			return true;
+		}
 		System.out.println("Il dispositivo " + d.getTopic().getId() + " è già presente nella lista");
 		return false;
 	}
@@ -102,8 +111,9 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	}
 	
 	public Message sendRequest(Request request) {
-		return searchDispositivoByName(request.getTopic().toString()
-				).getCommunicator().processRequest(request);
+		Dispositivo target = searchDispositivoByName(request.getTopic().getId());
+		if (target == null) return Message.ERROR;
+		return target.getCommunicator().processRequest(request);
 	}
 	
 	private EventBus(DispositiviManager dm) {
@@ -147,11 +157,12 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 					
 					// Se la richiesta va a buon fine
 					if(sendRequest(request).equals(Message.ACK)) {
-						
+
 						// Se un dispositivo in stato UNKNOWN risponde, allora è ALIVE
-						if(d.getState().toString().equals(DispositivoStates.UNKNOWN.toString()))
+						if(d.getState().toString().equals(DispositivoStates.UNKNOWN.toString())) {
 							d.setState(DispositivoStates.ALIVE);
-							break;
+						}
+						break;
 					}
 
 					// Se il dispositivo non risponde a 10 chiamate allora vado al prossimo

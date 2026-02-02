@@ -59,12 +59,14 @@ public class ParametroManager {
         // Tenta invio via EventBus se esiste un dispositivo di dominio
         Dispositivo dispositivo = getDispositivoIdoneo(stanzaId, tipoParametro);
         if (dispositivo != null) {
+            // Il flusso EventBus -> Dispositivo -> ObservableParameter -> Stanza
+            // aggiornera' automaticamente parametri e parametriTarget della stanza
             inviaComando(dispositivo, tipoParametro, valore);
+        } else {
+            // Fallback: nessun attuatore disponibile, aggiorna direttamente il target
+            double valoreNumerico = estraiValoreNumerico(tipoParametro, valore);
+            stanza.updateTarget(tipoParametro.name(), valoreNumerico);
         }
-
-        // Aggiorna sempre il target della stanza direttamente
-        double valoreNumerico = estraiValoreNumerico(tipoParametro, valore);
-        stanza.updateTarget(tipoParametro.name(), valoreNumerico);
 
         return true;
     }
@@ -94,7 +96,12 @@ public class ParametroManager {
 
     // Invio all'EventBus tramite IEventBusClient
     private boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore) {
-        Request request = Request.createRequest(dispositivo.getTopic(), "SETPOINT", valore);
+        // Estrai il valore numerico: i comandi dei dispositivi si aspettano un Double, non un IParametroValue
+        double valoreNumerico = estraiValoreNumerico(tipo, valore);
+
+        // Il tipo del comando deve corrispondere alla chiave registrata nel dispatcher (es. "UPDATE.SETPOINT")
+        String commandType = Message.UPDATE + "." + Message.SETPOINT;
+        Request request = Request.createRequest(dispositivo.getTopic(), commandType, valoreNumerico);
 
         // Flusso: setRequest -> sendRequest
         eventBusClient.setRequest(request);

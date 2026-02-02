@@ -1,19 +1,26 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
+import java.awt.Frame;
+import java.awt.Window;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
+import it.unipv.posfw.smartdab.core.service.DispositivoLoader;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoFormPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class DispositivoController implements
         DispositivoPanel.DispositivoPanelListener,
@@ -24,14 +31,17 @@ public class DispositivoController implements
     private DispositivoFormPanel formPanel;
     private GestoreStanze gestoreStanze;
     private DispositiviManager dispositiviManager;
+    private DispositivoLoader dispositivoLoader;
 
     private Map<String, String> mapNomeToId = new HashMap<>();
     private String filtroStanzaCorrente = "Tutte";
 
-    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze, DispositiviManager dispositiviManager) {
+    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze,
+                                 DispositiviManager dispositiviManager, DispositivoLoader dispositivoLoader) {
         this.mainPanel = mainPanel;
         this.gestoreStanze = gestoreStanze;
         this.dispositiviManager = dispositiviManager;
+        this.dispositivoLoader = dispositivoLoader;
 
         inizializzaViste();
         aggiornaVista();
@@ -61,6 +71,13 @@ public class DispositivoController implements
                 mapNomeToId.put(s.getNome(), s.getId());
             }
         }
+        // Aggiorna la mappa ID -> Nome per visualizzazione nomi nelle tabelle
+        Map<String, String> mapIdToNome = new HashMap<>();
+        for (Map.Entry<String, String> entry : mapNomeToId.entrySet()) {
+            mapIdToNome.put(entry.getValue(), entry.getKey());
+        }
+        dispositivoPanel.aggiornaMappaStanze(mapIdToNome);
+
         dispositivoPanel.aggiornaListaStanze(nomiStanze);
         formPanel.aggiornaListaStanze(nomiStanze);
     }
@@ -117,18 +134,6 @@ public class DispositivoController implements
         aggiornaListaDispositivi();
     }
 
-    @Override
-    public void onStanzaSelezionata(String stanza) {
-        List<DispositivoPOJO> listaStanza = new ArrayList<>();
-        String stanzaId = mapNomeToId.get(stanza);
-        for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
-            if (d.getStanza().equals(stanzaId)) {
-                listaStanza.add(d);
-            }
-        }
-        dispositivoPanel.aggiornaListaPerStanza(listaStanza);
-    }
-
     // Implementazione DispositivoFormListener
     @Override
     public void onSalva(DispositivoPOJO dispositivo) {
@@ -150,6 +155,10 @@ public class DispositivoController implements
             dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo creato");
         }
+
+        // Crea l'oggetto dominio e collegalo a Stanza + EventBus
+        dispositivoLoader.caricaSingolo(dispositivo);
+
         // Inizializza il parametro nella stanza se non esiste ancora
         String idStanza = dispositivo.getStanza();
         Stanza stanza = gestoreStanze.cercaStanzaPerId(idStanza);
