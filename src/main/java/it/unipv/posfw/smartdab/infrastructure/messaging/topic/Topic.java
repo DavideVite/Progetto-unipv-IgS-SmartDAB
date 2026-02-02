@@ -84,7 +84,7 @@ public class Topic {
 	}
 	
 	private static boolean checkId(String id) {
-		String idx = "[A-Za-z]{1,17}[0-9]{0,3}";
+		String idx = "[A-Za-z]{1,17}\\d{0,3}";
 		if(id != null) return id.matches(idx);
 		return false;
 	}
