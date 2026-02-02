@@ -4,6 +4,8 @@ import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
@@ -12,13 +14,15 @@ import java.util.Map;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
 
-public class StanzeController {
+public class StanzeController implements Observer {
 	    private StanzePanel elencoPanel;
 	    private StanzeFormPanel formPanel;
 	    private JPanel container; //pannello che usa CardLayout
@@ -26,6 +30,9 @@ public class StanzeController {
 	    private GestoreStanze gestoreStanze;
 	    private ParametroManager parametroManager;
 	    private int rigaSelezionata = -1;  //-1 significa nuovo inserimento
+	    private String stanzaCorrenteId;
+	    private String stanzaCorrenteNome;
+	    private Stanza stanzaOsservata;
 
 	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze, ParametroManager parametroManager) {
 	    	this.container = container;
@@ -38,6 +45,17 @@ public class StanzeController {
 	    	this.elencoPanel = elenco;
 	    	this.formPanel = form;
 	    	caricaStanzeInTabella();
+
+	    	// Doppio click sulla tabella dettagli per impostare un parametro
+	    	elencoPanel.getDettaglioPanel().getTabella().addMouseListener(new MouseAdapter() {
+	    		@Override
+	    		public void mouseClicked(MouseEvent e) {
+	    			if (e.getClickCount() == 2 && stanzaCorrenteId != null) {
+	    				mostraDialogParametroManuale(stanzaCorrenteId);
+	    				mostraDettagliStanza(stanzaCorrenteId, stanzaCorrenteNome);
+	    			}
+	    		}
+	    	});
 	    }
 
 	    private void caricaStanzeInTabella() {
@@ -79,6 +97,7 @@ public class StanzeController {
 	    		}
 	    	} else if (scelta == 2) {  //IMPOSTA PARAMETRO MANUALE
 	    		mostraDialogParametroManuale(id);
+	    		mostraDettagliStanza(id, nome);
 	    	}
 	    }
 	    
@@ -145,18 +164,53 @@ public class StanzeController {
 	    }
 
 	    public void mostraDettagliStanza(String id, String nome) {
+	    	// De-registra l'observer dalla stanza precedente
+	    	if (stanzaOsservata != null) {
+	    		stanzaOsservata.removeObserver(this);
+	    	}
+
+	    	this.stanzaCorrenteId = id;
+	    	this.stanzaCorrenteNome = nome;
 	    	Stanza stanza = gestoreStanze.cercaStanzaPerId(id);
 	    	if (stanza != null) {
+	    		// Registra come observer per aggiornamenti automatici
+	    		stanza.addObserver(this);
+	    		this.stanzaOsservata = stanza;
+
 	    		Map<String, Double> parametri = stanza.getParametri();
-	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri);
+	    		Map<String, Double> parametriTarget = stanza.getParametriTarget();
+	    		elencoPanel.getDettaglioPanel().mostraParametri(nome, parametri, parametriTarget);
 	    	} else {
+	    		this.stanzaOsservata = null;
 	    		elencoPanel.getDettaglioPanel().pulisci();
 	    	}
 	    }
 
+	    @Override
+	    public void update(Observable o, Object arg) {
+	    	// Chiamato quando la Stanza osservata cambia parametri
+	    	if (stanzaCorrenteId != null && stanzaCorrenteNome != null) {
+	    		SwingUtilities.invokeLater(() -> {
+	    			mostraDettagliStanza(stanzaCorrenteId, stanzaCorrenteNome);
+	    		});
+	    	}
+	    }
+
 	    private void mostraDialogParametroManuale(String stanzaId) {
-	    	// ComboBox parametro
-	    	JComboBox<DispositivoParameter> comboParametro = new JComboBox<>(DispositivoParameter.values());
+	    	// Filtra solo i parametri per cui esiste un attuatore attivo nella stanza
+	    	JComboBox<DispositivoParameter> comboParametro = new JComboBox<>();
+	    	for (DispositivoParameter param : DispositivoParameter.values()) {
+	    		if (parametroManager.getDispositivoIdoneo(stanzaId, param) != null) {
+	    			comboParametro.addItem(param);
+	    		}
+	    	}
+
+	    	if (comboParametro.getItemCount() == 0) {
+	    		JOptionPane.showMessageDialog(null,
+	    			"Nessun attuatore attivo presente in questa stanza.\nAggiungi un attuatore prima di impostare parametri.",
+	    			"Errore", JOptionPane.ERROR_MESSAGE);
+	    		return;
+	    	}
 
 	    	// Pannello valore con CardLayout (stesso pattern di ScenarioFormPanel)
 	    	CardLayout valorePanelLayout = new CardLayout();
@@ -229,7 +283,19 @@ public class StanzeController {
 	    				return;
 	    			}
 	    			try {
-	    				Double.parseDouble(txt);
+	    				double val = Double.parseDouble(txt);
+	    				if (paramScelto.getMin() != null && val < paramScelto.getMin()) {
+	    					JOptionPane.showMessageDialog(null,
+	    						"Valore sotto il minimo consentito (" + paramScelto.getMin() + " " + paramScelto.getUnit() + ")",
+	    						"Errore", JOptionPane.ERROR_MESSAGE);
+	    					return;
+	    				}
+	    				if (paramScelto.getMax() != null && val > paramScelto.getMax()) {
+	    					JOptionPane.showMessageDialog(null,
+	    						"Valore sopra il massimo consentito (" + paramScelto.getMax() + " " + paramScelto.getUnit() + ")",
+	    						"Errore", JOptionPane.ERROR_MESSAGE);
+	    					return;
+	    				}
 	    			} catch (NumberFormatException e) {
 	    				JOptionPane.showMessageDialog(null, "Valore numerico non valido", "Errore", JOptionPane.ERROR_MESSAGE);
 	    				return;

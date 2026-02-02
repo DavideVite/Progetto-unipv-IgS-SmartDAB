@@ -1,18 +1,26 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
+import java.awt.Frame;
+import java.awt.Window;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
+import it.unipv.posfw.smartdab.core.service.DispositivoLoader;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoFormPanel;
 import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class DispositivoController implements
         DispositivoPanel.DispositivoPanelListener,
@@ -23,16 +31,17 @@ public class DispositivoController implements
     private DispositivoFormPanel formPanel;
     private GestoreStanze gestoreStanze;
     private DispositiviManager dispositiviManager;
+    private DispositivoLoader dispositivoLoader;
 
-    // Dati in memoria (simulazione, in attesa di DAO completo)
-//    private Map<String, DispositivoPOJO> dispositivi;
+    private Map<String, String> mapNomeToId = new HashMap<>();
     private String filtroStanzaCorrente = "Tutte";
 
-    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze, DispositiviManager dispositiviManager) {
+    public DispositivoController(MainPanel mainPanel, GestoreStanze gestoreStanze,
+                                 DispositiviManager dispositiviManager, DispositivoLoader dispositivoLoader) {
         this.mainPanel = mainPanel;
         this.gestoreStanze = gestoreStanze;
-//        this.dispositivi = new HashMap<>();
-        this.dispositiviManager = dispositiviManager; 
+        this.dispositiviManager = dispositiviManager;
+        this.dispositivoLoader = dispositivoLoader;
 
         inizializzaViste();
         aggiornaVista();
@@ -54,22 +63,32 @@ public class DispositivoController implements
 
     private void aggiornaListaStanze() {
         List<String> nomiStanze = new ArrayList<>();
+        mapNomeToId.clear();
         Set<Stanza> stanze = gestoreStanze.visualizzaStanze();
         if (stanze != null) {
             for (Stanza s : stanze) {
                 nomiStanze.add(s.getNome());
+                mapNomeToId.put(s.getNome(), s.getId());
             }
         }
+        // Aggiorna la mappa ID -> Nome per visualizzazione nomi nelle tabelle
+        Map<String, String> mapIdToNome = new HashMap<>();
+        for (Map.Entry<String, String> entry : mapNomeToId.entrySet()) {
+            mapIdToNome.put(entry.getValue(), entry.getKey());
+        }
+        dispositivoPanel.aggiornaMappaStanze(mapIdToNome);
+
         dispositivoPanel.aggiornaListaStanze(nomiStanze);
         formPanel.aggiornaListaStanze(nomiStanze);
     }
 
     private void aggiornaListaDispositivi() {
         List<DispositivoPOJO> listaFiltrata = new ArrayList<>();
+        String filtroId = mapNomeToId.get(filtroStanzaCorrente);
 
         for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
-            if (filtroStanzaCorrente != null && filtroStanzaCorrente.equals("Tutte") ||
-                d.getStanza().equals(filtroStanzaCorrente)) {
+            if (filtroStanzaCorrente == null || filtroStanzaCorrente.equals("Tutte") ||
+                d.getStanza().equals(filtroId)) {
                 listaFiltrata.add(d);
             }
         }
@@ -115,25 +134,20 @@ public class DispositivoController implements
         aggiornaListaDispositivi();
     }
 
-    @Override
-    public void onStanzaSelezionata(String stanza) {
-        List<DispositivoPOJO> listaStanza = new ArrayList<>();
-        for (DispositivoPOJO d : dispositiviManager.getDispositivi()) {
-            if (d.getStanza().equals(stanza)) {
-                listaStanza.add(d);
-            }
-        }
-        dispositivoPanel.aggiornaListaPerStanza(listaStanza);
-    }
-
     // Implementazione DispositivoFormListener
     @Override
     public void onSalva(DispositivoPOJO dispositivo) {
+        // Il form usa il nome della stanza, ma il DB vuole l'ID
+        String stanzaId = mapNomeToId.get(dispositivo.getStanza());
+        if (stanzaId != null) {
+            dispositivo.setStanza(stanzaId);
+        }
+
         if (formPanel.isModifica()) {
             dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo aggiornato");
         } else {
-            if (dispositiviManager.getDispositivoById(filtroStanzaCorrente) != null) {
+            if (dispositiviManager.getDispositivoById(dispositivo.getId()) != null) {
                 JOptionPane.showMessageDialog(formPanel,
                     "ID già esistente", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -141,6 +155,21 @@ public class DispositivoController implements
             dispositiviManager.aggiungiDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo creato");
         }
+
+        // Crea l'oggetto dominio e collegalo a Stanza + EventBus
+        dispositivoLoader.caricaSingolo(dispositivo);
+
+        // Inizializza il parametro nella stanza se non esiste ancora
+        String idStanza = dispositivo.getStanza();
+        Stanza stanza = gestoreStanze.cercaStanzaPerId(idStanza);
+        if (stanza != null) {
+            DispositivoParameter param = dispositivo.getParametro();
+            if (stanza.getParametri().get(param.name()) == null) {
+                double valoreIniziale = param.getMin() != null ? param.getMin() : 0.0;
+                stanza.updateParameter(param.name(), valoreIniziale);
+            }
+        }
+
         chiudiFormDialog();
         aggiornaListaDispositivi();
     }

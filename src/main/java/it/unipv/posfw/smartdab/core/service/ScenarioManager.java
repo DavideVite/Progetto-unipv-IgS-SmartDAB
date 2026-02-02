@@ -1,10 +1,16 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.service.strategy.ImmediateActivationStrategy;
+import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
@@ -29,10 +35,27 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
  * 2. Testabilita: possibilita di iniettare mock DAO nei test
  * 3. Coerenza: stesso pattern di GestoreStanze
  */
-public class ScenarioManager {
+public class ScenarioManager implements Observable {
 
 	private Map<String, Scenario> scenari;
 	private final ScenarioDAO scenarioDAO;
+	private final List<Observer> observers = new ArrayList<>();
+	private ScenarioActivationStrategy activationStrategy = new ImmediateActivationStrategy();
+
+	public void setActivationStrategy(ScenarioActivationStrategy strategy) {
+		this.activationStrategy = strategy;
+	}
+
+	@Override
+	public void addObserver(Observer observer) { observers.add(observer); }
+
+	@Override
+	public void removeObserver(Observer observer) { observers.remove(observer); }
+
+	@Override
+	public void notifyObservers(Object args) {
+		for (Observer o : observers) o.update(this, args);
+	}
 
 	/**
 	 * Costruttore con Dependency Injection.
@@ -58,8 +81,8 @@ public class ScenarioManager {
 	}
 
 	/**
-	 * Crea gli scenari predefiniti (Notte, Giorno, Assenza) se non esistono già.
-	 * Ogni scenario viene configurato per tutte le stanze presenti nel database.
+	 * Crea gli scenari predefiniti (Notte, Giorno, Assenza) se non esistono,
+	 * oppure li aggiorna aggiungendo le configurazioni per stanze nuove.
 	 */
 	private void inizializzaScenariPredefiniti() {
 		try {
@@ -71,9 +94,9 @@ public class ScenarioManager {
 				return;
 			}
 
-			creaScenarioNotte(stanze);
-			creaScenarioGiorno(stanze);
-			creaScenarioAssenza(stanze);
+			creaOAggiornaScenarioNotte(stanze);
+			creaOAggiornaScenarioGiorno(stanze);
+			creaOAggiornaScenarioAssenza(stanze);
 
 		} catch (Exception e) {
 			System.err.println("Errore durante l'inizializzazione degli scenari predefiniti: " + e.getMessage());
@@ -81,38 +104,77 @@ public class ScenarioManager {
 		}
 	}
 
-	private void creaScenarioNotte(Set<Stanza> stanze) {
-		if (esisteScenario("Notte")) return;
-		Scenario s = creaScenario("Notte", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 18.0));
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 50.0));
+	/**
+	 * Verifica se una stanza ha gia' almeno una configurazione nello scenario.
+	 */
+	private boolean stanzaGiaConfigurata(Scenario scenario, String stanzaId) {
+		for (StanzaConfig config : scenario.getConfigurazioni()) {
+			if (config.getStanzaId().equals(stanzaId)) {
+				return true;
+			}
 		}
-		System.out.println("Scenario predefinito 'Notte' creato con " + s.getConfigurazioni().size() + " configurazioni");
+		return false;
 	}
 
-	private void creaScenarioGiorno(Set<Stanza> stanze) {
-		if (esisteScenario("Giorno")) return;
-		Scenario s = creaScenario("Giorno", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 21.0));
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 500.0));
+	private void creaOAggiornaScenarioNotte(Set<Stanza> stanze) {
+		Scenario s;
+		if (!esisteScenario("Notte")) {
+			s = creaScenario("Notte", EnumScenarioType.PREDEFINITO);
+		} else {
+			s = getScenario("Notte");
 		}
-		System.out.println("Scenario predefinito 'Giorno' creato con " + s.getConfigurazioni().size() + " configurazioni");
+		int aggiunte = 0;
+		for (Stanza stanza : stanze) {
+			if (!stanzaGiaConfigurata(s, stanza.getId())) {
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 18.0));
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
+				aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 50.0));
+				aggiunte++;
+			}
+		}
+		System.out.println("Scenario 'Notte': " + s.getConfigurazioni().size() + " configurazioni"
+				+ (aggiunte > 0 ? " (" + aggiunte + " stanze aggiunte)" : ""));
 	}
 
-	private void creaScenarioAssenza(Set<Stanza> stanze) {
-		if (esisteScenario("Assenza")) return;
-		Scenario s = creaScenario("Assenza", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 16.0));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 0.0));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_PRESENZA, true));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_MOVIMENTO, true));
+	private void creaOAggiornaScenarioGiorno(Set<Stanza> stanze) {
+		Scenario s;
+		if (!esisteScenario("Giorno")) {
+			s = creaScenario("Giorno", EnumScenarioType.PREDEFINITO);
+		} else {
+			s = getScenario("Giorno");
 		}
-		System.out.println("Scenario predefinito 'Assenza' creato con " + s.getConfigurazioni().size() + " configurazioni");
+		int aggiunte = 0;
+		for (Stanza stanza : stanze) {
+			if (!stanzaGiaConfigurata(s, stanza.getId())) {
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 21.0));
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
+				aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 500.0));
+				aggiunte++;
+			}
+		}
+		System.out.println("Scenario 'Giorno': " + s.getConfigurazioni().size() + " configurazioni"
+				+ (aggiunte > 0 ? " (" + aggiunte + " stanze aggiunte)" : ""));
+	}
+
+	private void creaOAggiornaScenarioAssenza(Set<Stanza> stanze) {
+		Scenario s;
+		if (!esisteScenario("Assenza")) {
+			s = creaScenario("Assenza", EnumScenarioType.PREDEFINITO);
+		} else {
+			s = getScenario("Assenza");
+		}
+		int aggiunte = 0;
+		for (Stanza stanza : stanze) {
+			if (!stanzaGiaConfigurata(s, stanza.getId())) {
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 16.0));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 0.0));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_PRESENZA, true));
+				aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_MOVIMENTO, true));
+				aggiunte++;
+			}
+		}
+		System.out.println("Scenario 'Assenza': " + s.getConfigurazioni().size() + " configurazioni"
+				+ (aggiunte > 0 ? " (" + aggiunte + " stanze aggiunte)" : ""));
 	}
 
 	/**
@@ -149,6 +211,7 @@ public class ScenarioManager {
 			// Persistenza nel database
 			scenarioDAO.insertScenario(scenario);
 
+			notifyObservers("SCENARIO_CREATO");
 			return scenario;
 		}
 
@@ -165,6 +228,7 @@ public class ScenarioManager {
 		// Persistenza nel database
 		scenarioDAO.insertScenario(scenario);
 
+		notifyObservers("SCENARIO_CREATO");
 		return scenario;
 	}
 
@@ -191,6 +255,7 @@ public class ScenarioManager {
 		// Rimuovi dalla mappa in memoria
 		scenari.remove(nomeScenario);
 
+		notifyObservers("SCENARIO_ELIMINATO");
 		return eliminatoDalDb;
 	}
 
@@ -221,15 +286,11 @@ public class ScenarioManager {
 		// Persiste lo stato di attivazione nel database
 		scenarioDAO.updateScenario(scenario);
 
-		// Esegui le configurazioni
-		boolean tuttiSuccesso = true;
-		for (StanzaConfig config : scenario.getConfigurazioni()) {
-			if (!parametroManager.applicaStanzaConfig(config)) {
-				tuttiSuccesso = false;
-				// Continua comunque con le altre configurazioni
-			}
-		}
-		return tuttiSuccesso;
+		// Delega l'esecuzione delle configurazioni alla strategy
+		boolean result = activationStrategy.attiva(scenario, parametroManager);
+
+		notifyObservers("SCENARIO_ATTIVATO");
+		return result;
 	}
 
 
@@ -241,6 +302,7 @@ public class ScenarioManager {
 			// Persiste lo stato di disattivazione nel database
 			scenarioDAO.updateScenario(scenario);
 
+			notifyObservers("SCENARIO_DISATTIVATO");
 			return true;
 		}
 		return false;

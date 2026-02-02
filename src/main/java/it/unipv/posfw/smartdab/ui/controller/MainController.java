@@ -2,6 +2,7 @@ package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
+import it.unipv.posfw.smartdab.core.service.DispositivoLoader;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
@@ -22,7 +23,7 @@ public class MainController {
     private ScenarioManager scenarioManager;
     private ParametroManager parametroManager;
     private DispositiviManager dispositiviManager;
-    private DispositiviManager dispositivoManager;
+    private DispositivoLoader dispositivoLoader;
 
     // Sub-controllers
     private StanzeController stanzeController;
@@ -40,8 +41,13 @@ public class MainController {
         gestoreStanze = new GestoreStanze(casa);
         scenarioManager = new ScenarioManager();
         dispositiviManager = new DispositiviManager();
-        parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance(dispositiviManager));
-        dispositivoManager = new DispositiviManager();
+
+        EventBus eventBus = EventBus.getInstance(dispositiviManager);
+        parametroManager = new ParametroManager(gestoreStanze, eventBus);
+
+        // Carica i dispositivi POJO come oggetti dominio, collegandoli a Stanze e EventBus
+        dispositivoLoader = new DispositivoLoader(gestoreStanze, eventBus);
+        dispositivoLoader.caricaTutti(dispositiviManager.getDispositivi());
     }
 
     private void inizializzaView() {
@@ -78,7 +84,8 @@ public class MainController {
         dispositivoController = new DispositivoController(
             mainPanel,
             gestoreStanze,
-            dispositivoManager
+            dispositiviManager,
+            dispositivoLoader
         );
 
         // Listener per cambio tab

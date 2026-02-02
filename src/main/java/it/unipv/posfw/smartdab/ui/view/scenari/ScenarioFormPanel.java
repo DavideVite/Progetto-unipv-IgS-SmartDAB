@@ -358,10 +358,17 @@ public class ScenarioFormPanel extends JPanel {
         configurazioniTemp.clear();
         modelloConfig.setRowCount(0);
 
+        // Costruisci mappa inversa ID -> Nome per visualizzazione
+        Map<String, String> mappaIdToNome = new HashMap<>();
+        for (Map.Entry<String, String> entry : mappaStanzaNomeToId.entrySet()) {
+            mappaIdToNome.put(entry.getValue(), entry.getKey());
+        }
+
         for (StanzaConfig config : scenario.getConfigurazioni()) {
             configurazioniTemp.add(config);
+            String stanzaDisplay = mappaIdToNome.getOrDefault(config.getStanzaId(), config.getStanzaId());
             modelloConfig.addRow(new Object[]{
-                config.getStanzaId(),
+                stanzaDisplay,
                 config.getTipo_parametro().toString(),
                 config.getParametro().getDisplayString()
             });
