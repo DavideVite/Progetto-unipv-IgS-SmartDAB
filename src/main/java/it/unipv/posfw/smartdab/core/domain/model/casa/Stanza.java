@@ -156,7 +156,8 @@ public class Stanza implements Observable, Observer, RoomPort {
      @Override
 	 public void notifyObservers(Object args) {
          for (Observer o : observers) {
-        		 o.update(this, args);
+//        		 o.update(this, args);
+        	 o.update(this, parametri.get(args.toString()));
         	 }
          }
 

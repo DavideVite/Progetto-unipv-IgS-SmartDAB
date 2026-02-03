@@ -174,4 +174,32 @@ public class CommunicationDAOImpl implements CommunicationDAO {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean deleteCommunicationByDispositivoId(String id) {
+		Connection connection = null;
+		PreparedStatement s = null;
+
+		try {
+			connection = DatabaseConnection.getConnection();
+
+			if (connection != null) {
+
+				s = connection.prepareStatement("DELETE FROM Communication WHERE dispositivo = ?");
+				s.setString(1, id);
+				int rowsAffected = s.executeUpdate();
+				return rowsAffected > 0;
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (s != null) s.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
 }
