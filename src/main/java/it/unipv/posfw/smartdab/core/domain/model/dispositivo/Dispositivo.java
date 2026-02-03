@@ -50,6 +50,11 @@ public abstract class Dispositivo implements DevicePort {
 		active = !active;
 	}
 	
+	@Override
+	public String toString() {
+		return topic.getId();
+	}
+
 	// Il dispositivo fa qualcosa, ma dipende dalla specializzazione
 	public abstract int action(Object args);
 }
