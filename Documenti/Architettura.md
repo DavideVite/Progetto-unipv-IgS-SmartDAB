@@ -25,6 +25,26 @@ Ma, la porzione dell’EventBus è pub/sub.
 Motivazione della scelta:
 L'adozione di un'architettura a layer permette la Separazione delle Responsabilità (Separation of Concerns). Questo facilita la manutenibilità: una modifica alla logica di salvataggio nel database (DAL) non impatta il codice dell'interfaccia grafica. Inoltre, rende il sistema più testabile, permettendo di verificare la logica di business isolandola dalla UI e dal DB.
 
+ ```
+┌─────────────────────────────────────┐
+│           UI LAYER                  │
+│   View (Swing) ←→ Controller        │
+└──────────────┬──────────────────────┘
+               │ chiama direttamente
+               ▼
+┌─────────────────────────────────────┐
+│         SERVICE LAYER               │
+│  GestoreStanze, ScenarioManager     │
+│  ParametroManager, DispositiviManager│
+└──────────────┬──────────────────────┘
+               │ istanzia direttamente
+               ▼
+┌─────────────────────────────────────┐
+│      DATA ACCESS LAYER              │
+│   StanzaDAOImpl, DispositivoDAOImpl │
+│   DatabaseConnection (Singleton)    │
+└─────────────────────────────────────┘
+ ```
 
 ## 2.2 Il Presentation Layer è attraverso MVC.
 
