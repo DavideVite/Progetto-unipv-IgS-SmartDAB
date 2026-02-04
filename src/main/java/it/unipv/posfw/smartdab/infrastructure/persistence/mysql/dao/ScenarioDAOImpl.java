@@ -17,7 +17,7 @@ import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
-public class ScenarioDAOImpl implements ScenarioDAO {
+public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException {
 
 	private StanzaConfigDAOImpl configDAO;
 
@@ -81,6 +81,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 		} finally {
 			try {
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -118,6 +119,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 		} finally {
 			try {
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -148,6 +150,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 		} finally {
 			try {
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -178,12 +181,22 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				}
 			}
 
+		TODO: riformulare con try with resources
+		try (Connection conn = Databaseconnection.getConnection();
+			 PreparedStatement pstmt = conn.prepareStatemnet(SELECT_BY_ID)) {
+
+			 }
+
+
+
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -219,6 +232,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -254,6 +268,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (stmt != null) stmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -290,6 +305,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -326,6 +342,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -358,6 +375,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -389,6 +407,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			try {
 				if (rs != null) rs.close();
 				if (stmt != null) stmt.close();
+				if (conn != null) conn.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

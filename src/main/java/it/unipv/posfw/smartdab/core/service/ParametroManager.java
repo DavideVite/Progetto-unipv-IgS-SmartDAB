@@ -38,7 +38,7 @@ public class ParametroManager {
                 }
 
                 // 3. Deve supportare il parametro richiesto
-                if (attuatore.getTopic() != null && attuatore.getTopic().getParameter() == tipoParametro) {
+                if (attuatore.getTopic() != null && attuatore.getTopic().getParameter() != null && attuatore.getTopic().getParameter() == tipoParametro) {
                     return attuatore;
                 }
             } catch (ClassCastException e) {
@@ -51,7 +51,7 @@ public class ParametroManager {
 
     // Caso d'uso 1: Impostazione manuale
     public boolean impostaParametro(String stanzaId, DispositivoParameter tipoParametro, IParametroValue valore) {
-        if (!valore.isValid()) return false;
+        if (valore != null || !valore.isValid()) return false;
 
         Stanza stanza = gestoreStanze.cercaStanzaPerId(stanzaId);
         if (stanza == null) return false;

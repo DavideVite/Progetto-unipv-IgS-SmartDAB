@@ -200,14 +200,19 @@ public class ScenarioManager implements Observable {
 
 
 	public boolean eliminaScenario(String nomeScenario) {
-		Scenario scenario = scenari.get(nomeScenario);
-		if (scenario == null) {
+		try {
+			Scenario scenario = scenari.get(nomeScenario);
+			if (scenario == null) {
 			return false;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Errore durante l'eliminazione dello scenario: " + e.getMessage(), e);
 		}
+
 
 		// Gli scenari predefiniti non possono essere eliminati
 		if (scenario.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
-			throw new IllegalArgumentException("Lo scenario predefinito '" + nomeScenario + "' non può essere eliminato");
+			throw new ScenarioNonModificabileException("Lo scenario predefinito '" + nomeScenario + "' non può essere eliminato");
 		}
 
 		// Elimina dal database (elimina anche le StanzaConfig associate)
