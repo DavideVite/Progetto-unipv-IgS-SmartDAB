@@ -16,6 +16,7 @@ import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
+import it.unipv.posfw.smartdab.core.service.ParametroValidator;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
@@ -239,36 +240,30 @@ public class StanzeController {
 	    	DispositivoParameter paramScelto = (DispositivoParameter) comboParametro.getSelectedItem();
 	    	if (paramScelto == null) return;
 
-	    	IParametroValue valore;
+	    	// Ottieni il valore in base al tipo
+	    	String valoreStr;
 	    	switch (paramScelto.getType()) {
 	    		case NUMERIC:
-	    			String txt = txtNumerico.getText().trim();
-	    			if (txt.isEmpty()) {
-	    				JOptionPane.showMessageDialog(null, "Inserisci un valore numerico", "Errore", JOptionPane.ERROR_MESSAGE);
-	    				return;
-	    			}
-	    			try {
-	    				Double.parseDouble(txt);
-	    			} catch (NumberFormatException e) {
-	    				JOptionPane.showMessageDialog(null, "Valore numerico non valido", "Errore", JOptionPane.ERROR_MESSAGE);
-	    				return;
-	    			}
-	    			valore = ParametroValueFactory.create(paramScelto, txt);
+	    			valoreStr = txtNumerico.getText().trim();
 	    			break;
 	    		case BOOLEAN:
-	    			valore = ParametroValueFactory.create(paramScelto, chkBooleano.isSelected());
+	    			valoreStr = String.valueOf(chkBooleano.isSelected());
 	    			break;
 	    		case ENUM:
-	    			String valEnum = (String) comboEnum.getSelectedItem();
-	    			if (valEnum == null) {
-	    				JOptionPane.showMessageDialog(null, "Seleziona un valore", "Errore", JOptionPane.ERROR_MESSAGE);
-	    				return;
-	    			}
-	    			valore = ParametroValueFactory.create(paramScelto, valEnum);
+	    			valoreStr = (String) comboEnum.getSelectedItem();
 	    			break;
 	    		default:
 	    			return;
 	    	}
+
+	    	// Validazione centralizzata tramite ParametroValidator (risolve SRP punto 5.3)
+	    	ParametroValidator.ValidazioneResult validazione = ParametroValidator.valida(paramScelto, valoreStr);
+	    	if (!validazione.isValido()) {
+	    		JOptionPane.showMessageDialog(null, validazione.getMessaggio(), "Errore", JOptionPane.ERROR_MESSAGE);
+	    		return;
+	    	}
+
+	    	IParametroValue valore = ParametroValueFactory.create(paramScelto, valoreStr);
 
 	    	// Invoca il core
 	    	boolean successo = parametroManager.impostaParametro(stanzaId, paramScelto, valore);

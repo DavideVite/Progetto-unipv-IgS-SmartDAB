@@ -28,22 +28,19 @@ public class ParametroManager {
         if (dispositivi == null) return null;
 
         for (Dispositivo d : dispositivi) {
-            // 1. Verifica se è un attuatore tramite cast
-            try {
-                AttuatoreFacade attuatore = (AttuatoreFacade) d;
-
-                // 2. Deve essere attivo
-                if (!attuatore.isActive()) {
-                    continue;
-                }
-
-                // 3. Deve supportare il parametro richiesto
-                if (attuatore.getTopic() != null && attuatore.getTopic().getParameter() != null && attuatore.getTopic().getParameter() == tipoParametro) {
-                    return attuatore;
-                }
-            } catch (ClassCastException e) {
-                // Non è un attuatore, passa al prossimo dispositivo
+            // Verifica se e' un attuatore tramite instanceof (risolve LSP punto 4.1)
+            if (!(d instanceof AttuatoreFacade attuatore)) {
                 continue;
+            }
+
+            // Deve essere attivo
+            if (!attuatore.isActive()) {
+                continue;
+            }
+
+            // Usa supportaParametro (risolve Demeter punto 3.3)
+            if (attuatore.supportaParametro(tipoParametro)) {
+                return attuatore;
             }
         }
         return null;
@@ -51,7 +48,7 @@ public class ParametroManager {
 
     // Caso d'uso 1: Impostazione manuale
     public boolean impostaParametro(String stanzaId, DispositivoParameter tipoParametro, IParametroValue valore) {
-        if (valore != null || !valore.isValid()) return false;
+        if (valore == null || !valore.isValid()) return false;
 
         Stanza stanza = gestoreStanze.cercaStanzaPerId(stanzaId);
         if (stanza == null) return false;

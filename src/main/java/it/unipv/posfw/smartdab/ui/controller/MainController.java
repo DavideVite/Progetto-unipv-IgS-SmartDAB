@@ -5,7 +5,10 @@ import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
+import it.unipv.posfw.smartdab.core.service.ScenariPredefinitInitializer;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 import it.unipv.posfw.smartdab.ui.view.MainFrame;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
@@ -22,7 +25,6 @@ public class MainController {
     private ScenarioManager scenarioManager;
     private ParametroManager parametroManager;
     private DispositiviManager dispositiviManager;
-    private DispositiviManager dispositivoManager;
 
     // Sub-controllers
     private StanzeController stanzeController;
@@ -35,13 +37,21 @@ public class MainController {
         inizializzaController();
     }
 
+    
     private void inizializzaModel() {
         casa = new Casa();
         gestoreStanze = new GestoreStanze(casa);
-        scenarioManager = new ScenarioManager();
+
+        // DI: inietto ScenarioDAOImpl nel costruttore di ScenarioManager
+        scenarioManager = new ScenarioManager(new ScenarioDAOImpl());
+
+        // Inizializzazione scenari predefiniti da file di configurazione (SRP: separato da ScenarioManager)
+        StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();
+        ScenariPredefinitInitializer scenariInit = new ScenariPredefinitInitializer(scenarioManager);
+        scenariInit.inizializza(stanzaDAO.readAllStanze());
+
         dispositiviManager = new DispositiviManager();
         parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance(dispositiviManager));
-        dispositivoManager = new DispositiviManager();
     }
 
     private void inizializzaView() {
@@ -78,7 +88,7 @@ public class MainController {
         dispositivoController = new DispositivoController(
             mainPanel,
             gestoreStanze,
-            dispositivoManager
+            dispositiviManager
         );
 
         // Listener per cambio tab

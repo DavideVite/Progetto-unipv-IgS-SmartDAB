@@ -15,14 +15,10 @@ import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
-import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
-import it.unipv.posfw.smartdab.factory.StanzaConfigFactory;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
+import it.unipv.posfw.smartdab.core.domain.exception.ScenarioNonModificabileException;
 
 /**
  * Servizio per la gestione degli scenari.
@@ -59,17 +55,8 @@ public class ScenarioManager implements Observable {
 	}
 
 	/**
-	 * Costruttore con Dependency Injection.
-	 * Usa l'implementazione di default ScenarioDAOImpl.
-	 * Carica automaticamente gli scenari dal database all'avvio.
-	 */
-	public ScenarioManager() {
-		this(new ScenarioDAOImpl());
-	}
-
-	/**
-	 * Costruttore con Dependency Injection esplicita del DAO.
-	 * Permette di iniettare mock DAO per i test.
+	 * Costruttore con Dependency Injection esplicita.
+	 * Le dipendenze vengono iniettate dal MainController (Composition Root).
 	 * Carica automaticamente gli scenari dal database all'avvio.
 	 *
 	 * @param scenarioDAO Il DAO per la persistenza degli scenari
@@ -78,65 +65,6 @@ public class ScenarioManager implements Observable {
 		this.scenarioDAO = scenarioDAO;
 		this.scenari = new HashMap<>();
 		caricaDalDatabase();
-		inizializzaScenariPredefiniti();
-	}
-
-	/**
-	 * Crea gli scenari predefiniti (Notte, Giorno, Assenza) se non esistono già.
-	 * Ogni scenario viene configurato per tutte le stanze presenti nel database.
-	 */
-	private void inizializzaScenariPredefiniti() {
-		try {
-			StanzaDAO stanzaDAO = new StanzaDAOImpl();
-			Set<Stanza> stanze = stanzaDAO.readAllStanze();
-
-			if (stanze.isEmpty()) {
-				System.out.println("Nessuna stanza trovata: scenari predefiniti non creati");
-				return;
-			}
-
-			creaScenarioNotte(stanze);
-			creaScenarioGiorno(stanze);
-			creaScenarioAssenza(stanze);
-
-		} catch (Exception e) {
-			System.err.println("Errore durante l'inizializzazione degli scenari predefiniti: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	private void creaScenarioNotte(Set<Stanza> stanze) {
-		if (esisteScenario("Notte")) return;
-		Scenario s = creaScenario("Notte", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 18.0));
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
-			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 50.0));
-		}
-		System.out.println("Scenario predefinito 'Notte' creato con " + s.getConfigurazioni().size() + " configurazioni");
-	}
-
-	private void creaScenarioGiorno(Set<Stanza> stanze) {
-		if (esisteScenario("Giorno")) return;
-		Scenario s = creaScenario("Giorno", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 21.0));
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
-			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 500.0));
-		}
-		System.out.println("Scenario predefinito 'Giorno' creato con " + s.getConfigurazioni().size() + " configurazioni");
-	}
-
-	private void creaScenarioAssenza(Set<Stanza> stanze) {
-		if (esisteScenario("Assenza")) return;
-		Scenario s = creaScenario("Assenza", EnumScenarioType.PREDEFINITO);
-		for (Stanza stanza : stanze) {
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 16.0));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 0.0));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_PRESENZA, true));
-			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_MOVIMENTO, true));
-		}
-		System.out.println("Scenario predefinito 'Assenza' creato con " + s.getConfigurazioni().size() + " configurazioni");
 	}
 
 	/**
@@ -201,15 +129,10 @@ public class ScenarioManager implements Observable {
 
 
 	public boolean eliminaScenario(String nomeScenario) {
-		try {
-			Scenario scenario = scenari.get(nomeScenario);
-			if (scenario == null) {
+		Scenario scenario = scenari.get(nomeScenario);
+		if (scenario == null) {
 			return false;
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Errore durante l'eliminazione dello scenario: " + e.getMessage(), e);
 		}
-
 
 		// Gli scenari predefiniti non possono essere eliminati
 		if (scenario.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
