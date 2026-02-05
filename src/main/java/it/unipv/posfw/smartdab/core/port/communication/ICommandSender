@@ -1,0 +1,9 @@
+
+// TODO: forse posso semplificare l'interfaccia rimuovendo DispositivoParameter 
+// un dipositivo gestisce solo un parametro, quindi potrei passare solo Dispositivo e IParametroValue
+
+//Ho deciso di fare questa interfaccia in quanto ParametroManager è un elemento del dominio 
+// dipendeva da un dettaglio dell'infrastruttura (ICommandSender) e questo rompeva il principio di separazione 
+public interface ICommandSender {
+    boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore);
+}

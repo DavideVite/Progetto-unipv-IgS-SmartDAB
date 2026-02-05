@@ -1,5 +1,7 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
 
+import java.util.Objects;
+
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
@@ -14,6 +16,9 @@ public class StanzaConfig {
 		this.valore = valore;
 		this.tipo_parametro = tipo_parametro;
 	}
+
+	
+
 
 	public String getStanzaId() {
 		return stanzaId;
@@ -32,4 +37,22 @@ public class StanzaConfig {
 		return "StanzaConfig [stanzaId=" + stanzaId + ", valore=" + valore + ", tipo_parametro="
 				+ tipo_parametro + "]";
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.stanzaId, this.tipo_parametro);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final StanzaConfig other = (StanzaConfig) obj;
+        return Objects.equals(this.stanzaId, other.stanzaId)
+            && this.tipo_parametro == other.tipo_parametro;
+    }
 }

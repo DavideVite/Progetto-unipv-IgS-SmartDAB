@@ -11,11 +11,13 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenarioFormPanel;
+import it.unipv.posfw.smartdab.core.service.exception.ScenarioNonModificabileException;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,8 +132,17 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     "Eliminare lo scenario '" + scenario.getNome() + "'?",
                     "Conferma", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    scenarioManager.eliminaScenario(scenario.getNome());
-                    panel.getDetailPanel().pulisci();
+                    try {
+                        scenarioManager.eliminaScenario(scenario.getNome());
+                    } catch (ScenarioNonModificabileException ex) {
+                        JOptionPane.showMessageDialog(panel,
+                            ex.getMessage(),
+                            "Errore", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }   
+
+                    // scenarioManager.eliminaScenario(scenario.getNome());
+                    // panel.getDetailPanel().pulisci();
                 }
             }
         });
@@ -140,6 +151,7 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
     public void aggiornaTabella() {
         scenariList.clear();
         scenariList.addAll(scenarioManager.getTuttiScenari());
+        Collections.sort(scenariList);
 
         panel.getTableModel().setRowCount(0);
         for (Scenario s : scenariList) {
@@ -274,7 +286,13 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
 
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(formPanel, ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(formPanel,
+                "Errore durante il salvataggio dello scenario: " + e.getMessage(),
+                "Errore", JOptionPane.ERROR_MESSAGE);
         }
+
+
     }
 
     /**

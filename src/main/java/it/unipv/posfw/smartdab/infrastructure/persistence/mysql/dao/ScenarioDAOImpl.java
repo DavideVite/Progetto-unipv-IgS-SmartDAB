@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,7 +18,7 @@ import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
 
-public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException {
+public class ScenarioDAOImpl implements ScenarioDAO {
 
 	private StanzaConfigDAOImpl configDAO;
 
@@ -69,7 +70,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 				pstmt.executeUpdate();
 
 				// Salva le configurazioni associate
-				for (StanzaConfig config : scenario.getConfigurazioni()) {
+				for (StanzaConfig config : scenario ) {
 					configDAO.insertConfig(conn, id, config);
 				}
 
@@ -107,7 +108,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 
 				// Aggiorna le configurazioni: cancella le vecchie e inserisce le nuove
 				configDAO.deleteByScenario(conn, scenario.getId());
-				for (StanzaConfig config : scenario.getConfigurazioni()) {
+				for (StanzaConfig config : scenario) {
 					configDAO.insertConfig(conn, scenario.getId(), config);
 				}
 
@@ -176,22 +177,22 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					// Carica le configurazioni
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, id);
-					scenario.setConfigurazioni(configs);
+					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
 					return Optional.of(scenario);
 				}
 			}
 
-		TODO: riformulare con try with resources
-		try (Connection conn = Databaseconnection.getConnection();
-			 PreparedStatement pstmt = conn.prepareStatemnet(SELECT_BY_ID)) {
+		// TODO: riformulare con try with resources
+		// try (Connection conn = Databaseconnection.getConnection();
+		// 	 PreparedStatement pstmt = conn.prepareStatemnet(SELECT_BY_ID)) {
 
-			 }
+		// 	 }
 
 
 
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la lettura dello scenario", e);
 		} finally {
 			try {
 				if (rs != null) rs.close();
@@ -221,7 +222,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 				if (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(configs);
+					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
 					return Optional.of(scenario);
 				}
 			}
@@ -257,7 +258,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(configs);
+					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
 					scenari.add(scenario);
 				}
 			}
@@ -294,7 +295,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(configs);
+					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
 					scenari.add(scenario);
 				}
 			}
@@ -331,7 +332,7 @@ public class ScenarioDAOImpl implements ScenarioDAO, throws PersistenzaException
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(configs);
+					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
 					scenari.add(scenario);
 				}
 			}

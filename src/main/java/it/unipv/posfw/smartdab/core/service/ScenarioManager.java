@@ -3,6 +3,7 @@ package it.unipv.posfw.smartdab.core.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -337,15 +338,15 @@ public class ScenarioManager implements Observable {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return false;
 
-		List<StanzaConfig> configurazioni = scenario.getConfigurazioni();
-		for (StanzaConfig config : configurazioni) {
+		// Uso di Iterator per rimozione sicura durante l'iterazione
+		Iterator<StanzaConfig> iterator = scenario.iterator();
+		while (iterator.hasNext()) {
+			StanzaConfig config = iterator.next();
 			if (config.getStanzaId().equals(stanzaId) && config.getTipo_parametro() == tipoParametro) {
-				boolean removed = scenario.rimuoviConfigurazione(config);
-				if (removed) {
-					// Persiste la modifica nel database
-					scenarioDAO.updateScenario(scenario);
-				}
-				return removed;
+				iterator.remove();
+				// Persiste la modifica nel database
+				scenarioDAO.updateScenario(scenario);
+				return true;
 			}
 		}
 		return false;
@@ -354,7 +355,7 @@ public class ScenarioManager implements Observable {
 	/**
 	 * Ritorna la lista delle configurazioni di uno scenario.
 	 */
-	public List<StanzaConfig> getConfigurazioniScenario(String nomeScenario) {
+	public Set<StanzaConfig> getConfigurazioniScenario(String nomeScenario) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return null;
 		return scenario.getConfigurazioni();

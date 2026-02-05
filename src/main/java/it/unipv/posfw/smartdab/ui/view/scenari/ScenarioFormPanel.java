@@ -358,7 +358,7 @@ public class ScenarioFormPanel extends JPanel {
         configurazioniTemp.clear();
         modelloConfig.setRowCount(0);
 
-        for (StanzaConfig config : scenario.getConfigurazioni()) {
+        for (StanzaConfig config : scenario) {
             configurazioniTemp.add(config);
             modelloConfig.addRow(new Object[]{
                 config.getStanzaId(),

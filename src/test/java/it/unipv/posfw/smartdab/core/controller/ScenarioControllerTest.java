@@ -78,7 +78,7 @@ public class ScenarioControllerTest {
 
 		assertNotNull(scenario);
 		assertEquals("ScenarioTest", scenario.getNome());
-		assertTrue(scenario.getConfigurazioni().isEmpty());
+		assertTrue(scenario.isEmpty());
 		assertFalse(scenario.isActive());
 	}
 

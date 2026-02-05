@@ -13,7 +13,7 @@ public class ImmediateActivationStrategy implements ScenarioActivationStrategy {
 	@Override
 	public boolean attiva(Scenario scenario, ParametroManager parametroManager) {
 		boolean tuttiSuccesso = true;
-		for (StanzaConfig config : scenario.getConfigurazioni()) {
+		for (StanzaConfig config : scenario) {
 			if (!parametroManager.applicaStanzaConfig(config)) {
 				tuttiSuccesso = false;
 			}
