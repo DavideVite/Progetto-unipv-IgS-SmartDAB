@@ -96,9 +96,12 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
                 int row = e.getFirstRow();
                 if (row >= 0 && row < scenariList.size()) {
-                    Boolean attivo = (Boolean) panel.getTableModel().getValueAt(row, 0);
+                    // Leggo direttamente lo stato dallo Scenario (fonte di verità)
+                    // invece di fidarmi del valore della cella che potrebbe non essere Boolean
                     Scenario scenario = scenariList.get(row);
-                    if (attivo) {
+                    boolean attivoCorrente = scenario.isActive();
+                    // L'utente ha cliccato la checkbox, quindi vuole invertire lo stato
+                    if (!attivoCorrente) {
                         scenarioManager.attivaScenario(scenario.getNome(), parametroManager);
                     } else {
                         scenarioManager.disattivaScenario(scenario.getNome());

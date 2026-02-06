@@ -158,7 +158,7 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 
 	 @Override
 	 public String toString() {
-		return "Scenario [nome=" + nome + ", " + "\nconfigurazioni=" + configurazioni + "]";
+		return "Scenario [nome=" + nome + ", id=" + id + ", tipo_scenario=" + tipo_scenario + ", isActive=" + isActive + ", data_creazione=" + data_creazione + ", data_ultima_modifica=" + data_ultima_modifica + "\nconfigurazioni=" + configurazioni + "]";
 	 }
 
 

@@ -422,12 +422,25 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 	private Scenario creaScenarioDaResultSet(ResultSet rs) throws SQLException {
 		String id = rs.getString("id");
 		String nome = rs.getString("nome");
-		EnumScenarioType tipo = EnumScenarioType.valueOf(rs.getString("tipo"));
+		EnumScenarioType tipo = parseScenarioType(rs.getString("tipo"));
 		boolean attivo = rs.getBoolean("attivo");
 		LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 		LocalDateTime updatedAt = rs.getTimestamp("updated_at").toLocalDateTime();
 
 		return new Scenario(id, nome, tipo, attivo, createdAt, updatedAt);
+	}
+
+	/**
+	 * Converte una stringa nel corrispondente EnumScenarioType.
+	 * Se il valore non è valido, ritorna PERSONALIZZATO come fallback.
+	 */
+	private EnumScenarioType parseScenarioType(String tipoStr) {
+		try {
+			return EnumScenarioType.valueOf(tipoStr);
+		} catch (IllegalArgumentException e) {
+			System.err.println("Tipo scenario non valido nel DB: " + tipoStr + ". Default a PERSONALIZZATO.");
+			return EnumScenarioType.PERSONALIZZATO;
+		}
 	}
 
 }
