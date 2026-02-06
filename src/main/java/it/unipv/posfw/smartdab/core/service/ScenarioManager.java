@@ -1,5 +1,7 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.service.strategy.ImmediateActivationStrategy;
 import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
+import it.unipv.posfw.smartdab.core.service.ScenarioImporter.ScenarioImportException;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
@@ -282,5 +285,130 @@ public class ScenarioManager implements Observable {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return null;
 		return scenario.getConfigurazioni();
+	}
+
+	// ===== EXPORT / IMPORT SCENARI =====
+
+	/**
+	 * Esporta uno scenario su file.
+	 * Utilizza ScenarioExporter con pattern Decorator (PrintWriter -> BufferedWriter -> FileWriter).
+	 *
+	 * @param nomeScenario Nome dello scenario da esportare
+	 * @param file File di destinazione
+	 * @return true se l'export è riuscito, false se lo scenario non esiste
+	 * @throws IOException Se si verifica un errore durante la scrittura
+	 */
+	public boolean esportaScenario(String nomeScenario, File file) throws IOException {
+		Scenario scenario = scenari.get(nomeScenario);
+		if (scenario == null) {
+			return false;
+		}
+
+		ScenarioExporter exporter = new ScenarioExporter();
+		exporter.esportaScenario(scenario, file);
+		return true;
+	}
+
+	/**
+	 * Importa uno scenario da file e lo aggiunge al sistema.
+	 * Utilizza ScenarioImporter con pattern Decorator (BufferedReader -> FileReader)
+	 * e StringTokenizer per il parsing.
+	 *
+	 * Se uno scenario con lo stesso nome esiste già, viene generata un'eccezione.
+	 *
+	 * @param file File da cui importare
+	 * @return Lo scenario importato
+	 * @throws IOException Se si verifica un errore durante la lettura
+	 * @throws ScenarioImportException Se il formato del file non è valido
+	 * @throws IllegalArgumentException Se uno scenario con lo stesso nome esiste già
+	 */
+	public Scenario importaScenario(File file) throws IOException, ScenarioImportException {
+		ScenarioImporter importer = new ScenarioImporter();
+		Scenario scenario = importer.importaScenario(file);
+
+		// Verifica che non esista già uno scenario con lo stesso nome
+		if (esisteScenario(scenario.getNome())) {
+			throw new IllegalArgumentException(
+				"Scenario con nome '" + scenario.getNome() + "' esiste già. " +
+				"Eliminare lo scenario esistente prima di importare.");
+		}
+
+		// Aggiungi alla mappa in memoria
+		scenari.put(scenario.getNome(), scenario);
+
+		// Persisti nel database
+		scenarioDAO.insertScenario(scenario);
+
+		notifyObservers("SCENARIO_IMPORTATO");
+		return scenario;
+	}
+
+	/**
+	 * Importa uno scenario da file, sovrascrivendo quello esistente se presente.
+	 *
+	 * @param file File da cui importare
+	 * @param sovrascrivi Se true, sovrascrive lo scenario esistente
+	 * @return Lo scenario importato
+	 * @throws IOException Se si verifica un errore durante la lettura
+	 * @throws ScenarioImportException Se il formato del file non è valido
+	 */
+	public Scenario importaScenario(File file, boolean sovrascrivi)
+			throws IOException, ScenarioImportException {
+
+		ScenarioImporter importer = new ScenarioImporter();
+		Scenario scenario = importer.importaScenario(file);
+
+		// Se esiste già e sovrascrivi è true, elimina quello esistente
+		if (esisteScenario(scenario.getNome())) {
+			if (sovrascrivi) {
+				Scenario esistente = scenari.get(scenario.getNome());
+				// Non permettere sovrascrittura di scenari predefiniti
+				if (esistente.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
+					throw new IllegalArgumentException(
+						"Non è possibile sovrascrivere lo scenario predefinito '" + scenario.getNome() + "'");
+				}
+				// Elimina quello esistente
+				scenarioDAO.deleteScenario(esistente.getId());
+				scenari.remove(scenario.getNome());
+			} else {
+				throw new IllegalArgumentException(
+					"Scenario con nome '" + scenario.getNome() + "' esiste già.");
+			}
+		}
+
+		// Aggiungi alla mappa in memoria
+		scenari.put(scenario.getNome(), scenario);
+
+		// Persisti nel database
+		scenarioDAO.insertScenario(scenario);
+
+		notifyObservers("SCENARIO_IMPORTATO");
+		return scenario;
+	}
+
+	/**
+	 * Genera un nome file suggerito per l'export di uno scenario.
+	 *
+	 * @param nomeScenario Nome dello scenario
+	 * @return Nome file suggerito o null se lo scenario non esiste
+	 */
+	public String suggerisciNomeFileExport(String nomeScenario) {
+		Scenario scenario = scenari.get(nomeScenario);
+		if (scenario == null) {
+			return null;
+		}
+		ScenarioExporter exporter = new ScenarioExporter();
+		return exporter.suggerisciNomeFile(scenario);
+	}
+
+	/**
+	 * Verifica se un file ha il formato corretto per l'importazione.
+	 *
+	 * @param file File da verificare
+	 * @return true se il formato sembra valido
+	 */
+	public boolean verificaFormatoFileImport(File file) {
+		ScenarioImporter importer = new ScenarioImporter();
+		return importer.verificaFormatoFile(file);
 	}
 }
