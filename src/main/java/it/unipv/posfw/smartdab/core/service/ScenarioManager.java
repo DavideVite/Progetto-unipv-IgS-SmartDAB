@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -210,13 +211,19 @@ public class ScenarioManager implements Observable {
 
 	// Getters
 
+	/**
+	 * Restituisce una vista non modificabile di tutti gli scenari.
+	 */
 	public Collection<Scenario> getTuttiScenari() {
-		return scenari.values();
+		return Collections.unmodifiableCollection(scenari.values());
 	}
 
-
+	/**
+	 * Restituisce una vista non modificabile della mappa degli scenari.
+	 * Il chiamante non puo' modificare la mappa direttamente.
+	 */
 	public Map<String, Scenario> getScenari() {
-		return scenari;
+		return Collections.unmodifiableMap(scenari);
 	}
 
 

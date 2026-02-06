@@ -1,13 +1,19 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
+import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.core.service.ScenariPredefinitInitializer;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
+import it.unipv.posfw.smartdab.infrastructure.messaging.adapter.CommandSenderAdapter;
+import it.unipv.posfw.smartdab.infrastructure.persistence.adapter.ScenarioRepositoryAdapter;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 import it.unipv.posfw.smartdab.ui.view.MainFrame;
 import it.unipv.posfw.smartdab.ui.view.MainPanel;
@@ -38,20 +44,39 @@ public class MainController {
     }
 
     
+    /**
+     * COMPOSITION ROOT: Qui vengono create tutte le dipendenze e iniettate nei servizi.
+     *
+     * Flusso delle dipendenze (Architettura Esagonale):
+     * 1. DAOs (infrastructure) - accesso dati puro
+     * 2. Adapters (infrastructure) - implementano Output Ports del core
+     * 3. Services (core) - ricevono Output Ports, non implementazioni concrete
+     */
     private void inizializzaModel() {
         casa = new Casa();
         gestoreStanze = new GestoreStanze(casa);
 
-        // DI: inietto ScenarioDAOImpl nel costruttore di ScenarioManager
-        scenarioManager = new ScenarioManager(new ScenarioDAOImpl());
+        // ===== LAYER INFRASTRUCTURE: DAOs =====
+        ScenarioDAO scenarioDAO = new ScenarioDAOImpl();
+        StanzaDAO stanzaDAO = new StanzaDAOImpl();
 
-        // Inizializzazione scenari predefiniti da file di configurazione (SRP: separato da ScenarioManager)
-        StanzaDAOImpl stanzaDAO = new StanzaDAOImpl();
+        // ===== LAYER INFRASTRUCTURE: Adapters (Output Port implementations) =====
+        IScenarioRepository scenarioRepository = new ScenarioRepositoryAdapter(scenarioDAO);
+
+        // ===== LAYER CORE: Services =====
+        scenarioManager = new ScenarioManager(scenarioRepository);
+
+        // Inizializzazione scenari predefiniti (SRP: separato da ScenarioManager)
         ScenariPredefinitInitializer scenariInit = new ScenariPredefinitInitializer(scenarioManager);
         scenariInit.inizializza(stanzaDAO.readAllStanze());
 
+        // DispositiviManager e EventBus
         dispositiviManager = new DispositiviManager();
-        parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance(dispositiviManager));
+        EventBus eventBus = EventBus.getInstance(dispositiviManager);
+
+        // CommandSender Adapter per ParametroManager
+        ICommandSender commandSender = new CommandSenderAdapter(eventBus);
+        parametroManager = new ParametroManager(gestoreStanze, commandSender);
     }
 
     private void inizializzaView() {

@@ -37,10 +37,26 @@ public class CommandSenderAdapter implements ICommandSender {
         this.eventBusClient = eventBusClient;
     }
 
+    /**
+     * Invia un comando a un dispositivo per impostare un parametro.
+     *
+     * @param dispositivo Il dispositivo target (non null)
+     * @param tipo Il tipo di parametro da impostare (non null)
+     * @param valore Il valore da impostare (non null)
+     * @return true se il comando e' stato ricevuto con ACK
+     * @throws IllegalArgumentException se uno dei parametri e' null
+     */
     @Override
     public boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore) {
-        if (dispositivo == null || tipo == null || valore == null) {
-            return false;
+        // Fail-fast con messaggi espliciti
+        if (dispositivo == null) {
+            throw new IllegalArgumentException("Dispositivo non puo' essere null");
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("Tipo parametro non puo' essere null");
+        }
+        if (valore == null) {
+            throw new IllegalArgumentException("Valore parametro non puo' essere null");
         }
 
         // Usa toNumericValue() invece di instanceof + switch.

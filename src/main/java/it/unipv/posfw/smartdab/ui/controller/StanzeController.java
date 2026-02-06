@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
+import it.unipv.posfw.smartdab.core.domain.exception.ParametroNonValidoException;
+import it.unipv.posfw.smartdab.core.domain.exception.StanzaNonTrovataException;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
@@ -265,13 +267,17 @@ public class StanzeController {
 
 	    	IParametroValue valore = ParametroValueFactory.create(paramScelto, valoreStr);
 
-	    	// Invoca il core
-	    	boolean successo = parametroManager.impostaParametro(stanzaId, paramScelto, valore);
-	    	if (successo) {
+	    	// Invoca il core con gestione eccezioni
+	    	try {
+	    		parametroManager.impostaParametro(stanzaId, paramScelto, valore);
 	    		JOptionPane.showMessageDialog(null, "Parametro impostato correttamente");
-	    	} else {
+	    	} catch (StanzaNonTrovataException e) {
 	    		JOptionPane.showMessageDialog(null,
-	    				"Impossibile impostare il parametro.\nVerifica che la stanza abbia un attuatore attivo per questo parametro.",
+	    				"Stanza non trovata: " + e.getStanzaId(),
+	    				"Errore", JOptionPane.ERROR_MESSAGE);
+	    	} catch (ParametroNonValidoException e) {
+	    		JOptionPane.showMessageDialog(null,
+	    				e.getMessage(),
 	    				"Errore", JOptionPane.ERROR_MESSAGE);
 	    	}
 	    }

@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
+import it.unipv.posfw.smartdab.core.domain.exception.PersistenzaException;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
@@ -78,14 +79,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante l'inserimento dello scenario: " + scenario.getNome(), e);
 		} finally {
-			try {
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(null, pstmt, conn);
 		}
 	}
 
@@ -116,14 +112,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante l'aggiornamento dello scenario: " + scenario.getNome(), e);
 		} finally {
-			try {
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(null, pstmt, conn);
 		}
 	}
 
@@ -147,14 +138,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante l'eliminazione dello scenario con ID: " + id, e);
 		} finally {
-			try {
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(null, pstmt, conn);
 		}
 		return false;
 	}
@@ -182,25 +168,10 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				}
 			}
 
-		// TODO: riformulare con try with resources
-		// try (Connection conn = Databaseconnection.getConnection();
-		// 	 PreparedStatement pstmt = conn.prepareStatemnet(SELECT_BY_ID)) {
-
-		// 	 }
-
-
-
-
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura dello scenario", e);
+			throw new PersistenzaException("Errore durante la lettura dello scenario con ID: " + id, e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, pstmt, conn);
 		}
 		return Optional.empty();
 	}
@@ -228,15 +199,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la lettura dello scenario con nome: " + nome, e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, pstmt, conn);
 		}
 		return Optional.empty();
 	}
@@ -264,15 +229,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la lettura di tutti gli scenari", e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (stmt != null) stmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, stmt, conn);
 		}
 		return scenari;
 	}
@@ -301,15 +260,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la lettura degli scenari di tipo: " + tipo.name(), e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, pstmt, conn);
 		}
 		return scenari;
 	}
@@ -338,15 +291,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la lettura degli scenari attivi: " + active, e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, pstmt, conn);
 		}
 		return scenari;
 	}
@@ -371,15 +318,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante la verifica esistenza scenario: " + nome, e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, pstmt, conn);
 		}
 		return false;
 	}
@@ -403,15 +344,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new PersistenzaException("Errore durante il conteggio degli scenari", e);
 		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (stmt != null) stmt.close();
-				if (conn != null) conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			chiudiRisorse(rs, stmt, conn);
 		}
 		return 0;
 	}
@@ -443,4 +378,25 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 		}
 	}
 
+	/**
+	 * Metodo helper per chiudere le risorse JDBC in modo sicuro.
+	 * Evita duplicazione di codice nei blocchi finally.
+	 */
+	private void chiudiRisorse(ResultSet rs, Statement stmt, Connection conn) {
+		try {
+			if (rs != null) rs.close();
+		} catch (SQLException e) {
+			System.err.println("Errore chiusura ResultSet: " + e.getMessage());
+		}
+		try {
+			if (stmt != null) stmt.close();
+		} catch (SQLException e) {
+			System.err.println("Errore chiusura Statement: " + e.getMessage());
+		}
+		try {
+			if (conn != null) conn.close();
+		} catch (SQLException e) {
+			System.err.println("Errore chiusura Connection: " + e.getMessage());
+		}
+	}
 }

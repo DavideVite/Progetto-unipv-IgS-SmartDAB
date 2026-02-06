@@ -118,7 +118,19 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 		 return id;
 	 }
 
+	 /**
+	  * Imposta l'ID dello scenario.
+	  * ATTENZIONE: Questo metodo e' destinato SOLO all'uso da parte del layer di persistenza
+	  * (ScenarioDAOImpl) per assegnare l'ID generato dal database.
+	  * Non deve essere chiamato dal codice applicativo.
+	  *
+	  * @param id L'ID generato dal database
+	  * @throws IllegalStateException se l'ID e' gia' stato impostato (immutabilita')
+	  */
 	 public void setId(String id) {
+		 if (this.id != null && !this.id.isEmpty()) {
+			 throw new IllegalStateException("L'ID dello scenario e' gia' stato impostato e non puo' essere modificato");
+		 }
 		 this.id = id;
 	 }
 
