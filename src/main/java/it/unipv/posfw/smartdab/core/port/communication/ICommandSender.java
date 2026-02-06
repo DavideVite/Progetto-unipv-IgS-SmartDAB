@@ -7,8 +7,6 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 /**
  * Output Port per l'invio di comandi ai dispositivi.
  *
- * PERCHE' QUESTA INTERFACCIA E' NEL CORE:
- *
  * 1. RIMUOVE "SETPOINT" HARDCODED DA ParametroManager:
  *    - Prima: ParametroManager conteneva Request.createRequest(..., "SETPOINT", ...)
  *    - Dopo: ParametroManager chiama solo inviaComando(), l'implementazione decide il formato

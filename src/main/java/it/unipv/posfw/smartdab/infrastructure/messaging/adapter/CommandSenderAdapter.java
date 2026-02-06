@@ -4,7 +4,6 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
 import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
@@ -44,14 +43,12 @@ public class CommandSenderAdapter implements ICommandSender {
             return false;
         }
 
-        // Estrai il valore numerico dal parametro (logica specifica del protocollo)
-        double valoreNumerico = estraiValoreNumerico(tipo, valore);
-
-        // Crea la Request nel formato richiesto dal protocollo
+        // Usa toNumericValue() invece di instanceof + switch.
+        // La conversione e' delegata all'oggetto stesso (polimorfismo).
         Request request = Request.createRequest(
             dispositivo.getTopic(),
             COMMAND_TYPE,
-            valoreNumerico
+            valore.toNumericValue()
         );
 
         // Flusso EventBus: setRequest -> sendRequest
@@ -59,28 +56,5 @@ public class CommandSenderAdapter implements ICommandSender {
         Message result = eventBusClient.sendRequest(request);
 
         return result == Message.ACK;
-    }
-
-    /**
-     * Estrae il valore numerico da un IParametroValue.
-     * Questa logica e' specifica del protocollo: la Request richiede un double.
-     *
-     * @param tipo Il tipo di parametro
-     * @param valore Il valore da convertire
-     * @return Il valore come double
-     */
-    private double estraiValoreNumerico(DispositivoParameter tipo, IParametroValue valore) {
-        if (valore instanceof ParametroValue pv) {
-            switch (tipo.getType()) {
-                case NUMERIC:
-                    return pv.getAsDouble();
-                case BOOLEAN:
-                    return pv.getAsBoolean() ? 1.0 : 0.0;
-                case ENUM:
-                    // Restituisce l'indice del valore nell'enum
-                    return tipo.getAllowedValues().indexOf(pv.getAsString());
-            }
-        }
-        return 0.0;
     }
 }

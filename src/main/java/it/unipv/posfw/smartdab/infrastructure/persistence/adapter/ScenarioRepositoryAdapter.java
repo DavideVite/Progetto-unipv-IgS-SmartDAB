@@ -13,7 +13,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
 /**
  * Adapter che implementa l'Output Port IScenarioRepository.
  *
- * RUOLO NELL'ARCHITETTURA ESAGONALE:
  * - Traduce le chiamate dal dominio (IScenarioRepository) al DAO (ScenarioDAO)
  * - Il pattern DAO resta intatto e indipendente
  * - Aggiunge validazione multilivello prima della persistenza
@@ -38,7 +37,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
  *    - Evita stati inconsistenti nel database
  */
 public class ScenarioRepositoryAdapter implements IScenarioRepository {
-
     private final ScenarioDAO scenarioDAO;
 
     public ScenarioRepositoryAdapter(ScenarioDAO scenarioDAO) {

@@ -18,9 +18,9 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 	private String id;
 	private String nome;
 	private Set<StanzaConfig> configurazioni;
-	private EnumScenarioType tipo_scenario;
+	private final EnumScenarioType tipo_scenario;
 	private boolean isActive;
-	private LocalDateTime data_creazione;
+	private final LocalDateTime data_creazione;
 	private	LocalDateTime data_ultima_modifica;
 
 

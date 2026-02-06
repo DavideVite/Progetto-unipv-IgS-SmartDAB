@@ -7,9 +7,9 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 
 public class StanzaConfig {
 
-	private String stanzaId;
-	private IParametroValue valore;
-	private DispositivoParameter tipo_parametro;
+	private final String stanzaId;
+	private final IParametroValue valore;
+	private final DispositivoParameter tipo_parametro;
 
 	public StanzaConfig(String stanzaId, IParametroValue valore, DispositivoParameter tipo_parametro) {
 		this.stanzaId = stanzaId;
