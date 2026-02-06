@@ -4,22 +4,34 @@ import java.util.List;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
-import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
-import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
+import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
 
+/**
+ * Servizio per la gestione dei parametri.
+ *
+ * REFACTORING: Inversione delle Dipendenze (DIP)
+ * - Prima: Dipendeva da IEventBusClient e Request (infrastructure)
+ *          Conteneva "SETPOINT" hardcoded
+ * - Dopo: Dipende da ICommandSender (core.port) - Output Port
+ *
+ * Vantaggi:
+ * 1. Il core non conosce piu' il protocollo di comunicazione
+ * 2. "SETPOINT" e il formato Request sono in CommandSenderAdapter
+ * 3. Possiamo cambiare protocollo senza modificare questo service
+ * 4. Architettura Esagonale: dipendenze corrette (Infrastructure -> Core)
+ */
 public class ParametroManager {
     private final GestoreStanze gestoreStanze;
-    private final IEventBusClient eventBusClient;
+    private final ICommandSender commandSender;
 
-    public ParametroManager(GestoreStanze gestoreStanze, IEventBusClient eventBusClient) {
+    public ParametroManager(GestoreStanze gestoreStanze, ICommandSender commandSender) {
         this.gestoreStanze = gestoreStanze;
-        this.eventBusClient = eventBusClient;
+        this.commandSender = commandSender;
     }
 
     // Trova primo attuatore idoneo nella stanza che supporta il parametro richiesto
@@ -53,10 +65,11 @@ public class ParametroManager {
         Stanza stanza = gestoreStanze.cercaStanzaPerId(stanzaId);
         if (stanza == null) return false;
 
-        // Tenta invio via EventBus se esiste un dispositivo di dominio
+        // Tenta invio via CommandSender se esiste un dispositivo di dominio
         Dispositivo dispositivo = getDispositivoIdoneo(stanzaId, tipoParametro);
         if (dispositivo != null) {
-            inviaComando(dispositivo, tipoParametro, valore);
+            // Delega all'Output Port - il core non conosce il protocollo
+            commandSender.inviaComando(dispositivo, tipoParametro, valore);
         }
 
         // Aggiorna sempre il target della stanza direttamente
@@ -66,6 +79,11 @@ public class ParametroManager {
         return true;
     }
 
+    /**
+     * Estrae il valore numerico per aggiornare il target della stanza.
+     * Nota: questa logica resta qui perche' serve per Stanza.updateTarget(),
+     * non per il protocollo di comunicazione.
+     */
     private double estraiValoreNumerico(DispositivoParameter tipo, IParametroValue valore) {
         if (valore instanceof ParametroValue pv) {
             switch (tipo.getType()) {
@@ -87,16 +105,5 @@ public class ParametroManager {
             config.getTipo_parametro(),
             config.getParametro()
         );
-    }
-
-    // Invio all'EventBus tramite IEventBusClient
-    private boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore) {
-        Request request = Request.createRequest(dispositivo.getTopic(), "SETPOINT", valore);
-
-        // Flusso: setRequest -> sendRequest
-        eventBusClient.setRequest(request);
-        Message result = eventBusClient.sendRequest(request);
-
-        return result == Message.ACK;
     }
 }
