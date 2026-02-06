@@ -20,7 +20,7 @@ import it.unipv.posfw.smartdab.core.port.room.RoomPort;
  * Questo permette di usare Stanza come parametro in Topic.createTopic().
  */
 public class Stanza implements Observable, Observer, RoomPort {
-     private static int counter = 0;  //TODO verificare se torna a zero
+     private static int counter = 0;
 	 private String id;
 	 private String nome;
 	 private double mq;

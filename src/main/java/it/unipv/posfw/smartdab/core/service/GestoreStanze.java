@@ -171,9 +171,9 @@ public class GestoreStanze {
         return null;
     }
 
-    public boolean eliminaStanza(String nomeStanza) {
-    	if(casa.esisteStanza(nomeStanza)) {
-    		Stanza s = casa.cercaStanza(nomeStanza);
+    public boolean eliminaStanza(String idStanza) throws Exception {
+    		Stanza s = casa.cercaStanzaPerId(idStanza);
+    		if(s!=null) {
     		if(s.isEmpty()) {
     			casa.rimuoviStanza(s);
 

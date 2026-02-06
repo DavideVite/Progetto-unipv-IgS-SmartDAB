@@ -143,7 +143,7 @@ public class StanzaDAOImpl implements StanzaDAO{
 	}
 
 	@Override
-	public void deleteStanza(Stanza s) {
+	public void deleteStanza(Stanza s) throws Exception {
 		Connection conn = null;
 		PreparedStatement pstmt = null; 	
 		
@@ -168,7 +168,7 @@ public class StanzaDAOImpl implements StanzaDAO{
             }
 		}
 	} catch (SQLException e) {
-		e.printStackTrace();		
+		throw new Exception("Errore database: " + e.getMessage());		
 	} finally {
 		//chiudiamo lo statement
 		try {
