@@ -59,10 +59,6 @@ public class DispositivoPOJO {
 		created_at = LocalDateTime.now();
 	}
 	
-	public DispositivoPOJO() {
-		
-	}
-	
 	public String getId() {
 		return id;
 	}
