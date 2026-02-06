@@ -6,6 +6,7 @@ import it.unipv.posfw.smartdab.core.domain.exception.ParametroNonValidoException
 import it.unipv.posfw.smartdab.core.domain.exception.StanzaNonTrovataException;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
 

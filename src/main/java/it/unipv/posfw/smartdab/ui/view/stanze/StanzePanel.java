@@ -31,7 +31,12 @@ public class StanzePanel extends JPanel {
 
 		String[] colonne = {"id", "nome", "mq"};
 
-		modello = new DefaultTableModel(colonne, 0);
+		modello = new DefaultTableModel(colonne, 0) {
+		    @Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false; // Tutte le celle diventano non editabili col click
+		    }
+		};
 		tabella = new JTable(modello);
 
 		tabella.setRowHeight(30);

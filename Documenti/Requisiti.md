@@ -83,7 +83,9 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 
 **RFU6:** L'utente può attivare uno scenario esistente (personalizzato o predefinito).
 
-**RFU7:** Al primo avvio del sistema, l'utente deve inserire la password fornita dal produttore per poter accedere alla configurazione. Dopo il primo avviamento l'utente deve scegliere un PIN che gli permette completo accesso al sistema. In assenza di PIN, gli utenti non possono gestire creazione ed eliminazione stanze, creare nuovi scenari e gestire procedure di configurazione/eliminazione dei singoli dispositivi.
+**RFU7:** Al primo avvio del sistema, l'utente deve autenticarsi inserire la password fornita dal produttore per poter accedere alla configurazione. Dopo il primo avviamento l'utente deve scegliere un PIN di 5 cifre che gli permette completo accesso al sistema e che sarà salvato per accessi futuri. 
+Agli Avvii successivi il sistema richiede solo l'inserimento del PIN precedentemente impostato.
+In assenza di PIN, gli utenti non accedono al sistema. 
 
 **RFU8:** L'utente può creare degli scenari che si attivano automaticamente (chiamati regole) in base a condizioni ambientali o eventi (es. soglia di temperatura, movimento, orario specifico).
 

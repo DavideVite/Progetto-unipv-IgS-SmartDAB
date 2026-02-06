@@ -48,10 +48,12 @@ public class StandardCommunicator implements ICommunicator {
 		Request request = Request.createRequest(dispositivo.getTopic(), Message.UPDATE + "." + Message.PARAMETER, args);
 		
 		if(request != null) {
+
 			Iterator<DispositiviObserver> iter = observers.iterator();
 
 			while(iter.hasNext()) {
 				iter.next().update(request);
+				
 			}
 		}
 		

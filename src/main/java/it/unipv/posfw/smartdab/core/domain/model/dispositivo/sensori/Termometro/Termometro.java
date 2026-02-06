@@ -22,8 +22,9 @@ public class Termometro extends SensoreFacade {
 		try {
 			
 			// Applico un rumore gaussiano sul errore% del valore reale
-			double noise = (Math.random() * noise_sensitivity - noise_sensitivity / 2) * error * (double) args;
-			temp = Math.floor(((double) args + noise) * 10) / 10;
+//			double noise = (Math.random() * noise_sensitivity - noise_sensitivity / 2) * error * (double) args;
+//			temp = Math.floor(((double) args + noise) * 10) / 10;
+			temp = (double) args;
 			
 			publishMeasure();
 			

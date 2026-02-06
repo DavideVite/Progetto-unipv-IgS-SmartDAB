@@ -25,9 +25,10 @@ public class GestoreMalfunzionamenti{
     //La strategia da usare se un parametro non è presente nel file di configurazione
 	private MalfunzionamentoStrategy strategiaDefault;
 	
-	public GestoreMalfunzionamenti(MalfunzionamentoStrategy strategiaDefault) {
+	public GestoreMalfunzionamenti(MalfunzionamentoStrategy strategiaDefault, IEventBusMalfunzionamenti eventBus) {
 		this.strategiaDefault = strategiaDefault;
 		this.dispositivoDao = new DispositivoDAOImpl();
+		this.eventBus = eventBus;
 		caricaDispositiviDalDB();
 		caricaConfigurazione(); // Metodo per leggere il file .properties
 	}

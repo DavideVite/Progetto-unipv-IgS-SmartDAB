@@ -1,6 +1,7 @@
 package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.domain.model.dispositivo.DispositiviBootstrap;
 import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
 import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
@@ -72,7 +73,10 @@ public class MainController {
 
         // DispositiviManager e EventBus
         dispositiviManager = new DispositiviManager();
-        EventBus eventBus = EventBus.getInstance(dispositiviManager);
+        // EventBus eventBus = EventBus.getInstance(dispositiviManager);
+                DispositiviBootstrap dboot = new DispositiviBootstrap(dispositivoManager, EventBus.getInstance(dispositivoManager));
+        dboot.removeAllDispositivi();
+        dboot.initDispositiviDb(casa.getStanze().iterator().next());
 
         // CommandSender Adapter per ParametroManager
         ICommandSender commandSender = new CommandSenderAdapter(eventBus);

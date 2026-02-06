@@ -42,8 +42,8 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 	// Parte di attuazione
 	@Override
 	public void switchDispositivo() {
-		this.switchDispositivo();
-		this.getCommunicator().notifyObservers(this.isActive());
+		super.switchDispositivo();
+		super.getCommunicator().notifyObservers(this.isActive());
 		illuminazione = intensita * (this.isActive() ? 1 : 0);
 		applyVariation(illuminazione);
 	}
@@ -64,9 +64,6 @@ public class Lampada_ON_OFF extends AttuatoreFacade {
 		
 		return 1;
 	}
-
-	// FIX: Rimosso metodo applyVariation() duplicato (era definito due volte identico)
-	// Il metodo era presente sia alle righe 54-66 che 71-83, causando errore di compilazione
 
 	@Override
 	public int action(Object args) {

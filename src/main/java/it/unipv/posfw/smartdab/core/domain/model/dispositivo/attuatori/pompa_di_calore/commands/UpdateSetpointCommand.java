@@ -3,6 +3,7 @@ package it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.pompa_di
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
+import it.unipv.posfw.smartdab.core.port.device.AttuatorePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 public class UpdateSetpointCommand implements ICommand {
@@ -13,7 +14,7 @@ public class UpdateSetpointCommand implements ICommand {
 			if((double)request.getVal() <= DispositivoParameter.TEMPERATURA.getMax() &&
 			   (double)request.getVal() >= DispositivoParameter.TEMPERATURA.getMin()) {
 				
-				dispositivo.action((double)request.getVal());
+				((AttuatorePort) dispositivo).changeSetpoint((double)request.getVal());
 			}
 			
 			else System.out.println("Il valore inserito è potenzialmente pericoloso");

@@ -39,6 +39,7 @@ import it.unipv.posfw.smartdab.core.domain.exception.ScenarioNonModificabileExce
  *    (Infrastructure -> Core, mai viceversa)
  */
 public class ScenarioManager implements Observable {
+public class ScenarioManager implements Observable {
 
 	private Map<String, Scenario> scenari;
 	private final IScenarioRepository scenarioRepository;

@@ -38,6 +38,7 @@ public class ObservableParameter implements Observable {
 		try {
 			AttuatoreFacade attuatore = (AttuatoreFacade)args;
 			
+			
 			if(attuatore.getTopic().getParameter().equals(parameterName)) {
 				Iterator<Observer> roomsIterator = rooms.iterator();
 				RoomPort room;
@@ -79,4 +80,11 @@ public class ObservableParameter implements Observable {
 	public void setRooms(List<Observer> rooms) {
 		this.rooms = rooms;
 	}
+
+	@Override
+	public String toString() {
+		return parameterName.toString();
+	}
+	
+	
 }
