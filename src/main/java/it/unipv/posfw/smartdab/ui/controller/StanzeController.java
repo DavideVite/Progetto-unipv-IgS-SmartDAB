@@ -80,23 +80,31 @@ public class StanzeController {
 	    	if(scelta == 0) { //MODIFICA
 	    		formPanel.preparaPerModifica(nome, mq);
 	    		layout.show(container, "FORM_STANZA");
+	    	
 	    	} else if (scelta == 1) {  //ELIMINA
 	    		int riga = elencoPanel.getTabella().getSelectedRow();
 	    		int conferma = JOptionPane.showConfirmDialog(null,  "Sei sicuro di voler eliminare " + nome + "?", "Conferma", JOptionPane.YES_NO_OPTION);
 	    		if (conferma == JOptionPane.YES_OPTION) {
-	    			boolean successo = gestoreStanze.eliminaStanza(nome);
+	    		  try {
+	    			boolean successo = gestoreStanze.eliminaStanza(id);
 	    			if(successo) {
 	    				elencoPanel.rimuoviRigaTabella(riga);
 	    				JOptionPane.showMessageDialog(null,  "Stanza eliminata");
 	    			} else {
-	    				JOptionPane.showMessageDialog(null, "Errore: impossibile eliminare la stanza (contiene dispositivi?)", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				JOptionPane.showMessageDialog(null, "Errore: impossibile eliminare la stanza (contiene dispositivi)", "Errore", JOptionPane.ERROR_MESSAGE);
 	    			}
+	    		} catch (Exception e) {
+	   		      JOptionPane.showMessageDialog(null,"Impossibile eliminare la stanza: è utilizzata in uno o più scenari.\n" +
+	    	                "Rimuovi la stanza dagli scenari prima di procedere.", 
+	    	                "Errore di Integrità", JOptionPane.ERROR_MESSAGE);
 	    		}
+	    	  }
 	    	} else if (scelta == 2) {  //IMPOSTA PARAMETRO MANUALE
 	    		mostraDialogParametroManuale(id);
 	    		mostraDettagliStanza(id, nome);
 	    	}
-	    }
+        }
+	  
 	    
 	    public void salvaStanza() {
 	    	String id = formPanel.getId();
