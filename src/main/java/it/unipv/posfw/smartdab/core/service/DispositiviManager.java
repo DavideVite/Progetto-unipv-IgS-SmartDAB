@@ -108,6 +108,22 @@ public class DispositiviManager {
     	}
     } 
     
+    // Per i test
+    public void clearDispositivi() {
+		dispositivi.clear();
+	}
+    
+    // Metodo per il DB
+	public boolean deleteDispositivo(String id) {
+    	if(dao.existsById(id)) {
+    		dao.deleteDispositivo(id);
+    		return true;
+    	} else {
+    		System.out.println("Errore: il dispositivo non esiste");
+    		return false;
+    	}
+    } 
+    
     public DispositivoPOJO getDispositivoById(String id) {
     	Iterator<DispositivoPOJO> iter = dispositivi.iterator();
     	DispositivoPOJO d;
