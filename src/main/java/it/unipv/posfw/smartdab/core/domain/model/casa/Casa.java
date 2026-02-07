@@ -33,6 +33,15 @@ public class Casa {
      	  }
      	  return null; 
 	 	  }
+	   
+	   public Stanza cercaStanzaPerId(String idStanza) {
+		   for(Stanza s: stanze) {
+			   if(s.getId().equalsIgnoreCase(idStanza)) {
+				   return s;
+				   }
+			   }
+		   return null;
+	   }
 
 	  public void nuovaStanza(Stanza s) {
            this.stanze.add(s);

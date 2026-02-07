@@ -42,7 +42,6 @@ public class MainController {
         dispositivoManager = new DispositiviManager();
         parametroManager = new ParametroManager(gestoreStanze, EventBus.getInstance(dispositivoManager));
         
-        
         DispositiviBootstrap dboot = new DispositiviBootstrap(dispositivoManager, EventBus.getInstance(dispositivoManager));
         dboot.removeAllDispositivi();
         dboot.initDispositiviDb(casa.getStanze().iterator().next());
@@ -61,7 +60,6 @@ public class MainController {
         stanzeController = new StanzeController(
             mainPanel.getStanzeContainer(),
             mainPanel.getStanzeLayout(),
-            gestoreStanze,
             parametroManager
         );
 

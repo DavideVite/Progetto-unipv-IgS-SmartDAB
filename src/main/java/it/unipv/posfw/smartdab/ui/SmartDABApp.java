@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 import it.unipv.posfw.smartdab.core.service.PersistenzaManager;
 import it.unipv.posfw.smartdab.ui.controller.AutenticazioneController;
 import it.unipv.posfw.smartdab.ui.controller.MainController;
@@ -15,7 +17,7 @@ public class SmartDABApp {
    public static void main(String[] args) {
     	  
     	// prova per eliminare il pin e far partire tutto dall'inserimento password
-    	   /* try {
+    	   /*try {
     	        java.util.prefs.Preferences.userNodeForPackage(PersistenzaManager.class).clear();
     	        System.out.println("PIN eliminato");
     	    } catch (Exception e) {
@@ -24,7 +26,10 @@ public class SmartDABApp {
     	   
     	   SwingUtilities.invokeLater(() -> {
         	
-        	
+            //prepariamo l'hub all'avvio, passiamo la password del produttore per sbloccare la creazione dei gestori
+            Hub.getInstance("prod123");
+            System.out.println("Sistema inizializzato");
+        	   
         	String pinSalvato = PersistenzaManager.caricaPin();
 
        	//finestra di login

@@ -17,7 +17,7 @@ import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 	            JPanel container = new JPanel(layout);
 
 	            // Il Controller (senza servizi per il test)
-	            StanzeController controller = new StanzeController(container, layout, null, null);
+	            StanzeController controller = new StanzeController(container, layout, null);
 
 	            StanzePanel elenco = new StanzePanel(controller);
 	            StanzeFormPanel form = new StanzeFormPanel(controller);

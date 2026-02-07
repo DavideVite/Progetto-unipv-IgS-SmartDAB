@@ -9,10 +9,12 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBus_dispositiviAdder;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
-public class EventBus implements DispositiviObserver, IEventBusClient {
+public class EventBus implements DispositiviObserver, IEventBusClient, IEventBus_dispositiviAdder, IEventBusMalfunzionamenti {
 	private ArrayList<Dispositivo> dispositivi = new ArrayList<>();
 	private DispositiviManager dispositiviManager;
 	private static EventBus instance = null;
@@ -46,6 +48,17 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		return false;
 	}
 	
+	
+	// Per i test
+	public void clearDispositivi() {
+		try {
+			dispositivi.clear();
+			dispositiviManager.clearDispositivi();
+		} catch(NullPointerException e) {
+			
+		}
+	}
+
 	public Dispositivo searchDispositivoByName(String name) {
 		Iterator<Dispositivo> iter = dispositivi.iterator();
 		Dispositivo d;
@@ -75,12 +88,11 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		while(iter.hasNext()) {
 			d = iter.next();
 			
+			
 			// Confronto le caratteristiche dei dispositivi con quelle ricercate e verifico che
 			// non siano disabilitati o in conflitto
-			
 			if(request.getTopic().getParameter().equals(d.getTopic().getParameter()) &&
-			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) && 
-			   request.getTopic().getId().equals(d.getTopic().getId()) &&
+			   request.getTopic().getRoom().equals(d.getTopic().getRoom()) &&
 			   
 			   !(d.getState().toString().equals(DispositivoStates.DISABLED.toString()) ||
 				 d.getState().toString().equals(DispositivoStates.CONFLICT.toString())	 )
@@ -102,7 +114,7 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 	}
 	
 	public Message sendRequest(Request request) {
-		return searchDispositivoByName(request.getTopic().toString()
+		return searchDispositivoByName(request.getTopic().getId()
 				).getCommunicator().processRequest(request);
 	}
 	
@@ -133,14 +145,18 @@ public class EventBus implements DispositiviObserver, IEventBusClient {
 		
 		// Verifico se il messaggio arrivato è pertinente alla funzionalità di un sensore
 		if(type.equals(Message.UPDATE + "." + Message.PARAMETER)) {
-			setRequest(request);
-
+			
 			// Prendi tutti gli iscritti al topic e itera
 			Iterator<Dispositivo> iterSubs = getSubscribers().iterator();
 			Dispositivo d;
+			
 
 			while(iterSubs.hasNext()) {
 				d = iterSubs.next();
+				
+				
+				request.setRequest(d.getTopic(), Message.ACT.toString(), request.getVal());
+				setRequest(request);
 				
 				// Manda richiesta
 				for(int i = 0; i < 10; i++) {

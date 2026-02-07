@@ -10,14 +10,13 @@ import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
-import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.strategy.MalfunzionamentoStrategy;
 
 public class GestoreMalfunzionamenti{
 	
 	private Map<String, Integer> tentativiFalliti = new HashMap<>();
-	private DispositivoDAO dispositivoDao;
-	private IEventBusMalfunzionamenti eventBus;
+	private final DispositivoDAO dispositivoDao;
+	private final IEventBusMalfunzionamenti eventBus;
     
     //Associa il tipo di parametro alla sua strategia specifica presente nel file
 	private Map<DispositivoParameter, MalfunzionamentoStrategy> mappeStrategie = new HashMap<>();
@@ -25,9 +24,10 @@ public class GestoreMalfunzionamenti{
     //La strategia da usare se un parametro non è presente nel file di configurazione
 	private MalfunzionamentoStrategy strategiaDefault;
 	
-	public GestoreMalfunzionamenti(MalfunzionamentoStrategy strategiaDefault) {
+	public GestoreMalfunzionamenti(MalfunzionamentoStrategy strategiaDefault, DispositivoDAO dispositivoDao, IEventBusMalfunzionamenti eventBus) {
 		this.strategiaDefault = strategiaDefault;
-		this.dispositivoDao = new DispositivoDAOImpl();
+		this.dispositivoDao = dispositivoDao;
+		this.eventBus = eventBus;
 		caricaDispositiviDalDB();
 		caricaConfigurazione(); // Metodo per leggere il file .properties
 	}
@@ -81,7 +81,7 @@ public class GestoreMalfunzionamenti{
 			MalfunzionamentoStrategy strategyDaUsare = mappeStrategie.getOrDefault(pojo.getParametro(), strategiaDefault);
 			
 			//uso la strategia
-			if(strategyDaUsare.deveDisabilitare(null, value, conteggio)) {
+			if(strategyDaUsare.deveDisabilitare(pojo, value, conteggio)) {
 			eventBus.disableDispositivo(pojo);
 			
 			}

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -102,7 +103,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			else return false;
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("Errore nell'inserimento del dispositivo nel DB");	
 		} finally {
 			try {
 				if (s != null) s.close();
@@ -123,6 +124,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			if (connection != null) {
 				s = connection.prepareStatement("UPDATE Dispositivo SET attivo = ? WHERE id = ?");
 				s.setBoolean(1, d.isAttivo());
+				s.setString(2, d.getId());
 
 				s.executeUpdate();
 
@@ -152,7 +154,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 
 			if (connection != null) {
 				s = connection.prepareStatement("UPDATE Dispositivo SET stato = ? WHERE id = ?");
-				s.setString(2, DispositivoStates.DISABLED.toString());
+				s.setString(1, DispositivoStates.DISABLED.toString());
 				s.setString(2, id);
 
 				s.executeUpdate();

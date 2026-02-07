@@ -12,7 +12,9 @@ import it.unipv.posfw.smartdab.ui.view.dispositivi.DispositivoPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DispositivoController implements
@@ -139,7 +141,7 @@ public class DispositivoController implements
         }
 
         if (formPanel.isModifica()) {
-            dispositiviManager.aggiungiDispositivo(dispositivo);
+            dispositiviManager.aggiornaDispositivo(dispositivo);
             JOptionPane.showMessageDialog(formPanel, "Dispositivo aggiornato");
         } else {
             if (dispositiviManager.getDispositivoById(dispositivo.getId()) != null) {
@@ -174,7 +176,7 @@ public class DispositivoController implements
 
     private void mostraFormDialog() {
         Window window = SwingUtilities.getWindowAncestor(dispositivoPanel);
-        if (window instanceof Frame) {
+        if (window instanceof Frame) {	// DA RIMUOVERE
             formDialog = new JDialog((Frame) window, "Dispositivo", true);
         } else {
             formDialog = new JDialog((Frame) null, "Dispositivo", true);

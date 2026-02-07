@@ -19,6 +19,7 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 
 public class StanzeController {
 	    private StanzePanel elencoPanel;
@@ -31,10 +32,9 @@ public class StanzeController {
 	    private String stanzaCorrenteId;
 	    private String stanzaCorrenteNome;
 
-	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze, ParametroManager parametroManager) {
+	    public StanzeController(JPanel container, CardLayout layout, ParametroManager parametroManager) {
 	    	this.container = container;
 	    	this.layout = layout;
-	    	this.gestoreStanze = gestoreStanze;
 	    	this.parametroManager = parametroManager;
 	    }
 	    
@@ -56,6 +56,13 @@ public class StanzeController {
 	    }
 
 	    private void caricaStanzeInTabella() {
+	    	//non nel costruttore per essere sicuri che l'utente abbia già sbloccato il sistema
+	    	this.gestoreStanze = Hub.getInstance().getGestoreStanze();
+	    	
+	    	if (gestoreStanze == null) {
+	    		return;
+	    	}
+	    	
 	    	for (Stanza s : gestoreStanze.visualizzaStanze()) {
 	    		elencoPanel.aggiungiRigaTabella(s.getId(), s.getNome(), s.getMq());
 	    	}
@@ -80,23 +87,31 @@ public class StanzeController {
 	    	if(scelta == 0) { //MODIFICA
 	    		formPanel.preparaPerModifica(nome, mq);
 	    		layout.show(container, "FORM_STANZA");
+	    	
 	    	} else if (scelta == 1) {  //ELIMINA
 	    		int riga = elencoPanel.getTabella().getSelectedRow();
 	    		int conferma = JOptionPane.showConfirmDialog(null,  "Sei sicuro di voler eliminare " + nome + "?", "Conferma", JOptionPane.YES_NO_OPTION);
 	    		if (conferma == JOptionPane.YES_OPTION) {
-	    			boolean successo = gestoreStanze.eliminaStanza(nome);
+	    		  try {
+	    			boolean successo = gestoreStanze.eliminaStanza(id);
 	    			if(successo) {
 	    				elencoPanel.rimuoviRigaTabella(riga);
 	    				JOptionPane.showMessageDialog(null,  "Stanza eliminata");
 	    			} else {
-	    				JOptionPane.showMessageDialog(null, "Errore: impossibile eliminare la stanza (contiene dispositivi?)", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				JOptionPane.showMessageDialog(null, "Errore: impossibile eliminare la stanza (contiene dispositivi)", "Errore", JOptionPane.ERROR_MESSAGE);
 	    			}
+	    		} catch (Exception e) {
+	   		      JOptionPane.showMessageDialog(null,"Impossibile eliminare la stanza: è utilizzata in uno o più scenari.\n" +
+	    	                "Rimuovi la stanza dagli scenari prima di procedere.", 
+	    	                "Errore di Integrità", JOptionPane.ERROR_MESSAGE);
 	    		}
+	    	  }
 	    	} else if (scelta == 2) {  //IMPOSTA PARAMETRO MANUALE
 	    		mostraDialogParametroManuale(id);
 	    		mostraDettagliStanza(id, nome);
 	    	}
-	    }
+        }
+	  
 	    
 	    public void salvaStanza() {
 	    	String id = formPanel.getId();

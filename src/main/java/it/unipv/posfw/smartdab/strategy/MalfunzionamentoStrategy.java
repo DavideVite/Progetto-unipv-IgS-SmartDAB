@@ -1,9 +1,9 @@
 package it.unipv.posfw.smartdab.strategy;
 
-import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
 
 public interface MalfunzionamentoStrategy {
 	
-	boolean deveDisabilitare(Dispositivo d, Object value, int conteggioErrori);
+	boolean deveDisabilitare(DispositivoPOJO d, Object value, int conteggioErrori);
 
 }

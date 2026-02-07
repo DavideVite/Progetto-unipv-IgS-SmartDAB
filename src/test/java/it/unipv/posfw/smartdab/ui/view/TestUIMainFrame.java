@@ -26,7 +26,7 @@ public class TestUIMainFrame {
             JPanel stanzeContainer = new JPanel(cardLayout);
 
             // Crea il controller per StanzePanel (senza servizi per il test)
-            StanzeController stanzeController = new StanzeController(stanzeContainer, cardLayout, null, null);
+            StanzeController stanzeController = new StanzeController(stanzeContainer, cardLayout, null);
 
             // Crea i pannelli
             StanzePanel stanzePanel = new StanzePanel(stanzeController);
