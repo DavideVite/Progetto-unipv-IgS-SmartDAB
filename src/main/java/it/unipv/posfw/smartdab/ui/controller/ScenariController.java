@@ -26,13 +26,18 @@ import java.util.Set;
 /**
  * Controller per la gestione degli Scenari.
  *
+ * PATTERN MVC + OBSERVER:
+ * - Implementa Observer per ricevere notifiche da ScenarioManager
+ * - Quando il Model cambia, il Controller aggiorna automaticamente la View
+ * - Registrazione: scenarioManager.addObserver(this) nel costruttore
+ *
  * INTEGRAZIONE ScenarioFormPanel:
  * - Aggiunto GestoreStanze per ottenere la lista delle stanze disponibili
  * - Aggiunto ScenarioFormPanel per creazione/modifica scenari completi con configurazioni
  * - Il bottone "Nuovo" ora apre il form completo invece di un semplice input dialog
  * - Implementato ScenarioFormListener per gestire salvataggio e annullamento
  */
-public class ScenariController implements ScenarioFormPanel.ScenarioFormListener {
+public class ScenariController implements ScenarioFormPanel.ScenarioFormListener, Observer {
 
     private ScenariPanel panel;
     private ScenarioManager scenarioManager;
@@ -64,15 +69,28 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
         this.formPanel = new ScenarioFormPanel();
         this.formPanel.setListener(this);
 
+        // OBSERVER PATTERN: registra questo controller come observer del model
+        // Quando ScenarioManager notifica cambiamenti, update() viene chiamato automaticamente
+        this.scenarioManager.addObserver(this);
+
         addListeners();
         aggiornaTabella();
     }
 
     // ==================== Observer Pattern ====================
 
+    /**
+     * Callback chiamata automaticamente quando ScenarioManager notifica un cambiamento.
+     * Aggiorna la tabella degli scenari nella View.
+     *
+     * SwingUtilities.invokeLater() garantisce che l'aggiornamento della UI avvenga
+     * nel thread EDT (Event Dispatch Thread) di Swing. Anche se attualmente il sistema
+     * non usa thread separati, e' buona pratica per evitare problemi futuri se
+     * le notifiche dovessero arrivare da thread diversi (es. timer, rete, ecc.).
+     */
     @Override
     public void update(Observable o, Object arg) {
-        aggiornaTabella();
+        SwingUtilities.invokeLater(() -> aggiornaTabella());
     }
 
     private void addListeners() {
@@ -131,7 +149,8 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     "Conferma", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     scenarioManager.eliminaScenario(scenario.getNome());
-                    aggiornaTabella();
+                    // NOTA: aggiornaTabella() non serve piu' qui, viene chiamato
+                    // automaticamente via Observer quando ScenarioManager notifica
                     panel.getDetailPanel().pulisci();
                 }
             }
@@ -278,7 +297,8 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             }
 
             chiudiFormDialog();
-            aggiornaTabella();
+            // NOTA: aggiornaTabella() non serve piu' qui, viene chiamato
+            // automaticamente via Observer quando ScenarioManager notifica
 
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(formPanel, ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);

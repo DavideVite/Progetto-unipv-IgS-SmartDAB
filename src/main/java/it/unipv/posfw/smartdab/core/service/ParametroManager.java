@@ -1,14 +1,21 @@
 package it.unipv.posfw.smartdab.core.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.exception.ParametroNonValidoException;
 import it.unipv.posfw.smartdab.core.domain.exception.StanzaNonTrovataException;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
-import it.unipv.posfw.smartdab.core.domain.model.parametro.ParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
+import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
+import it.unipv.posfw.smartdab.core.service.strategy.ActuationStrategy;
+import it.unipv.posfw.smartdab.core.service.strategy.ActuationStrategy.ActuationResult;
+import it.unipv.posfw.smartdab.core.service.strategy.DirectMatchStrategy;
 
 /**
  * Servizio per la gestione dei parametri.
@@ -23,14 +30,65 @@ import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
  * - Dopo: Usa Stanza.getAttuatori() e IParametroValue.toNumericValue()
  *         La responsabilita' del filtraggio e' nell'entita' che possiede i dati,
  *         la conversione e' delegata all'oggetto stesso (polimorfismo).
+ *
+ * REFACTORING: Strategy Pattern per distribuzione comandi
+ * - La logica di selezione degli attuatori e' delegata a ActuationStrategy
+ * - Strategie disponibili: DirectMatch, Broadcast, LoadBalancing, EcoEfficiency
+ * - Cambio strategia a runtime via setActuationStrategy()
+ *
+ * PATTERN OBSERVER:
+ * - Implementa Observable per notificare quando un parametro viene impostato
+ * - I controller possono registrarsi come observer per reagire ai cambiamenti
  */
-public class ParametroManager {
+public class ParametroManager implements Observable {
     private final GestoreStanze gestoreStanze;
     private final ICommandSender commandSender;
+    private ActuationStrategy actuationStrategy;
+    private final List<Observer> observers = new ArrayList<>();
 
     public ParametroManager(GestoreStanze gestoreStanze, ICommandSender commandSender) {
         this.gestoreStanze = gestoreStanze;
         this.commandSender = commandSender;
+        this.actuationStrategy = new DirectMatchStrategy(); // Default
+    }
+
+    // ==================== Observable Pattern ====================
+
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Object args) {
+        for (Observer o : observers) {
+            o.update(this, args);
+        }
+    }
+
+    /**
+     * Imposta la strategia di distribuzione dei comandi.
+     * Permette di cambiare comportamento a runtime.
+     *
+     * @param strategy La nuova strategia da utilizzare
+     */
+    public void setActuationStrategy(ActuationStrategy strategy) {
+        if (strategy == null) {
+            throw new IllegalArgumentException("La strategia non puo' essere null");
+        }
+        this.actuationStrategy = strategy;
+    }
+
+    /**
+     * Restituisce la strategia corrente.
+     */
+    public ActuationStrategy getActuationStrategy() {
+        return actuationStrategy;
     }
 
     /**
@@ -59,8 +117,7 @@ public class ParametroManager {
 
     /**
      * Imposta un parametro su una stanza.
-     * Se esiste un attuatore idoneo, invia il comando via EventBus.
-     * Aggiorna sempre il target della stanza.
+     * Usa ActuationStrategy per determinare quali attuatori riceveranno il comando.
      *
      * @param stanzaId ID della stanza
      * @param tipoParametro Tipo di parametro da impostare
@@ -82,16 +139,32 @@ public class ParametroManager {
             throw new StanzaNonTrovataException(stanzaId);
         }
 
-        // Tenta invio via CommandSender se esiste un attuatore idoneo
-        AttuatoreFacade attuatore = findAttuatoreIdoneoInStanza(stanza, tipoParametro);
-        if (attuatore != null) {
-            // Delega all'Output Port - il core non conosce il protocollo
-            commandSender.inviaComando(attuatore, tipoParametro, valore);
+        // Raccogli tutti gli attuatori candidati che supportano il parametro
+        List<AttuatoreFacade> attuatoriCandidati = new ArrayList<>();
+        for (AttuatoreFacade attuatore : stanza.getAttuatori()) {
+            if (attuatore.supportaParametro(tipoParametro)) {
+                attuatoriCandidati.add(attuatore);
+            }
         }
 
-        // Aggiorna sempre il target della stanza.
-        // Usa toNumericValue() invece di instanceof + switch (polimorfismo).
-        stanza.updateTarget(tipoParametro.name(), valore.toNumericValue());
+        // Delega alla strategia la selezione e distribuzione
+        List<ActuationResult> risultati = actuationStrategy.distribuisci(
+            attuatoriCandidati, tipoParametro, valore
+        );
+
+        // Invia comandi a tutti gli attuatori selezionati dalla strategia
+        for (ActuationResult risultato : risultati) {
+            // L'aggiornamento del target nella stanza avviene tramite il flusso Observer:
+            // Attuatore.action() -> ObservableParameter.notifyObservers() -> Stanza.update()
+            commandSender.inviaComando(
+                risultato.getAttuatore(),
+                tipoParametro,
+                risultato.getValore()
+            );
+        }
+
+        // Notifica gli observer che un parametro e' stato impostato
+        notifyObservers("PARAMETRO_IMPOSTATO");
     }
 
     /**
@@ -109,16 +182,4 @@ public class ParametroManager {
         );
     }
 
-    /**
-     * Trova un attuatore idoneo all'interno di una stanza gia' recuperata.
-     * Metodo privato per evitare doppia ricerca della stanza.
-     */
-    private AttuatoreFacade findAttuatoreIdoneoInStanza(Stanza stanza, DispositivoParameter tipoParametro) {
-        for (AttuatoreFacade attuatore : stanza.getAttuatori()) {
-            if (attuatore.isActive() && attuatore.supportaParametro(tipoParametro)) {
-                return attuatore;
-            }
-        }
-        return null;
-    }
 }

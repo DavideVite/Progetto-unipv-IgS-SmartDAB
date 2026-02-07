@@ -52,6 +52,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
+				// TRANSACTION: disabilita auto-commit
+				conn.setAutoCommit(false);
+
 				pstmt = conn.prepareStatement(INSERT);
 
 				// Genera un ID se non presente
@@ -75,12 +78,30 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 					configDAO.insertConfig(conn, id, config);
 				}
 
+				// TRANSACTION: commit se tutto ok
+				conn.commit();
 				System.out.println("Scenario salvato con successo: " + scenario.getNome());
 			}
 
 		} catch (SQLException e) {
+			// TRANSACTION: rollback in caso di errore
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException rollbackEx) {
+					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
+				}
+			}
 			throw new PersistenzaException("Errore durante l'inserimento dello scenario: " + scenario.getNome(), e);
 		} finally {
+			// Ripristina auto-commit prima di chiudere
+			if (conn != null) {
+				try {
+					conn.setAutoCommit(true);
+				} catch (SQLException e) {
+					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
+				}
+			}
 			chiudiRisorse(null, pstmt, conn);
 		}
 	}
@@ -94,6 +115,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
+				// TRANSACTION: disabilita auto-commit
+				conn.setAutoCommit(false);
+
 				pstmt = conn.prepareStatement(UPDATE);
 				pstmt.setString(1, scenario.getTipo_scenario().name());
 				pstmt.setBoolean(2, scenario.isActive());
@@ -108,12 +132,30 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 					configDAO.insertConfig(conn, scenario.getId(), config);
 				}
 
+				// TRANSACTION: commit se tutto ok
+				conn.commit();
 				System.out.println("Scenario aggiornato con successo: " + scenario.getNome());
 			}
 
 		} catch (SQLException e) {
+			// TRANSACTION: rollback in caso di errore
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException rollbackEx) {
+					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
+				}
+			}
 			throw new PersistenzaException("Errore durante l'aggiornamento dello scenario: " + scenario.getNome(), e);
 		} finally {
+			// Ripristina auto-commit prima di chiudere
+			if (conn != null) {
+				try {
+					conn.setAutoCommit(true);
+				} catch (SQLException e) {
+					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
+				}
+			}
 			chiudiRisorse(null, pstmt, conn);
 		}
 	}
@@ -127,6 +169,9 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
+				// TRANSACTION: disabilita auto-commit
+				conn.setAutoCommit(false);
+
 				// Prima elimina le configurazioni associate
 				configDAO.deleteByScenario(conn, id);
 
@@ -134,12 +179,31 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				pstmt = conn.prepareStatement(DELETE);
 				pstmt.setString(1, id);
 				int rowsAffected = pstmt.executeUpdate();
+
+				// TRANSACTION: commit se tutto ok
+				conn.commit();
 				return rowsAffected > 0;
 			}
 
 		} catch (SQLException e) {
+			// TRANSACTION: rollback in caso di errore
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException rollbackEx) {
+					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
+				}
+			}
 			throw new PersistenzaException("Errore durante l'eliminazione dello scenario con ID: " + id, e);
 		} finally {
+			// Ripristina auto-commit prima di chiudere
+			if (conn != null) {
+				try {
+					conn.setAutoCommit(true);
+				} catch (SQLException e) {
+					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
+				}
+			}
 			chiudiRisorse(null, pstmt, conn);
 		}
 		return false;

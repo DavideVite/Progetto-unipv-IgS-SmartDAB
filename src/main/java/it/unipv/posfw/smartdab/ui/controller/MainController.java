@@ -73,8 +73,8 @@ public class MainController {
 
         // DispositiviManager e EventBus
         dispositiviManager = new DispositiviManager();
-        // EventBus eventBus = EventBus.getInstance(dispositiviManager);
-                DispositiviBootstrap dboot = new DispositiviBootstrap(dispositivoManager, EventBus.getInstance(dispositivoManager));
+        EventBus eventBus = EventBus.getInstance(dispositiviManager);
+        DispositiviBootstrap dboot = new DispositiviBootstrap(dispositiviManager, eventBus);
         dboot.removeAllDispositivi();
         dboot.initDispositiviDb(casa.getStanze().iterator().next());
 
