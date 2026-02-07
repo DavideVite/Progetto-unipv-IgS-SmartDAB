@@ -31,7 +31,6 @@ public class DispositiviBootstrap {
 	public void removeAllDispositivi() {
 		for(DispositivoPOJO d: dm.getDispositivi())
 			dm.deleteDispositivo(d.getId());
-		dm.caricaDalDatabase();
 	}
 	
 	public void initDispositiviDb(Stanza s) {

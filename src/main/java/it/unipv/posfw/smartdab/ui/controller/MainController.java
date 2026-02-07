@@ -96,7 +96,6 @@ public class MainController {
         stanzeController = new StanzeController(
             mainPanel.getStanzeContainer(),
             mainPanel.getStanzeLayout(),
-            gestoreStanze,
             parametroManager
         );
 
