@@ -6,6 +6,7 @@ import it.unipv.posfw.smartdab.core.domain.enums.ParameterType;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
+import it.unipv.posfw.smartdab.core.service.ParametroValidator;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 
 import javax.swing.*;
@@ -241,43 +242,28 @@ public class ScenarioFormPanel extends JPanel {
             return;
         }
 
-        // Ottieni il valore
+        // Ottieni il valore in base al tipo
         String valoreStr;
         ParameterType tipo = param.getType();
         switch (tipo) {
             case NUMERIC:
                 valoreStr = txtValoreNumerico.getText().trim();
-                if (valoreStr.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Inserisci un valore numerico", "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                try {
-                    double val = Double.parseDouble(valoreStr);
-                    if (param.getMin() != null && val < param.getMin()) {
-                        JOptionPane.showMessageDialog(this, "Valore sotto il minimo consentito (" + param.getMin() + " " + param.getUnit() + ")", "Errore", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    if (param.getMax() != null && val > param.getMax()) {
-                        JOptionPane.showMessageDialog(this, "Valore sopra il massimo consentito (" + param.getMax() + " " + param.getUnit() + ")", "Errore", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(this, "Valore numerico non valido", "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 break;
             case BOOLEAN:
                 valoreStr = String.valueOf(chkValoreBooleano.isSelected());
                 break;
             case ENUM:
                 valoreStr = (String) comboValoreEnum.getSelectedItem();
-                if (valoreStr == null) {
-                    JOptionPane.showMessageDialog(this, "Seleziona un valore", "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 break;
             default:
                 valoreStr = "";
+        }
+
+        // Validazione centralizzata tramite ParametroValidator (risolve SRP punto 5.3)
+        ParametroValidator.ValidazioneResult risultato = ParametroValidator.valida(param, valoreStr);
+        if (!risultato.isValido()) {
+            JOptionPane.showMessageDialog(this, risultato.getMessaggio(), "Errore", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // Crea la configurazione con l'ID della stanza (per il DB)
@@ -358,7 +344,7 @@ public class ScenarioFormPanel extends JPanel {
         configurazioniTemp.clear();
         modelloConfig.setRowCount(0);
 
-        for (StanzaConfig config : scenario.getConfigurazioni()) {
+        for (StanzaConfig config : scenario) {
             configurazioniTemp.add(config);
             modelloConfig.addRow(new Object[]{
                 config.getStanzaId(),
