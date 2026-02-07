@@ -124,6 +124,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			if (connection != null) {
 				s = connection.prepareStatement("UPDATE Dispositivo SET attivo = ? WHERE id = ?");
 				s.setBoolean(1, d.isAttivo());
+				s.setString(2, d.getId());
 
 				s.executeUpdate();
 
@@ -153,7 +154,7 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 
 			if (connection != null) {
 				s = connection.prepareStatement("UPDATE Dispositivo SET stato = ? WHERE id = ?");
-				s.setString(2, DispositivoStates.DISABLED.toString());
+				s.setString(1, DispositivoStates.DISABLED.toString());
 				s.setString(2, id);
 
 				s.executeUpdate();

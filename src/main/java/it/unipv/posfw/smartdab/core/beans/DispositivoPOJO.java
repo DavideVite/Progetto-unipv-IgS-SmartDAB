@@ -47,11 +47,13 @@ public class DispositivoPOJO {
 		try {
 			d = (AttuatoreFacade)d;
 			this.tipo = "ATTUATORE";
-		} catch(ClassCastException e) {
-			d = (SensoreFacade)d;
-			this.tipo = "SENSORE";
-		} finally {
-			this.tipo = "NESSUNO";
+		} catch(ClassCastException e1) {
+			try {
+				d = (SensoreFacade)d;
+				this.tipo = "SENSORE";
+			} catch(ClassCastException e2) {
+				this.tipo = "NESSUNO";
+			}
 		}
 		
 		this.stato = d.getState();
