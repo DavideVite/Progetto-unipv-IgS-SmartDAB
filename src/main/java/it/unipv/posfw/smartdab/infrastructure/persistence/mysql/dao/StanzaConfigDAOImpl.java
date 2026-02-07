@@ -40,7 +40,7 @@ public class StanzaConfigDAOImpl implements StanzaConfigDAO {
 		} finally {
 			try {
 				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
+				// Non chiudere conn: e' passata dall'esterno
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -76,7 +76,7 @@ public class StanzaConfigDAOImpl implements StanzaConfigDAO {
 			try {
 				if (rs != null) rs.close();
 				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
+				// Non chiudere conn: e' passata dall'esterno
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -99,7 +99,7 @@ public class StanzaConfigDAOImpl implements StanzaConfigDAO {
 		} finally {
 			try {
 				if (pstmt != null) pstmt.close();
-				if (conn != null) conn.close();
+				// Non chiudere conn: e' passata dall'esterno
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

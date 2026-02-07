@@ -152,7 +152,7 @@ public class ScenarioRepositoryAdapter implements IScenarioRepository {
 
         // Riutilizza ParametroValidator per validare il valore
         // Questo garantisce coerenza con la validazione UI
-        String valoreStr = config.getParametro().getAsString();
+        String valoreStr = config.getParametro().getRawValue();
         ParametroValidator.ValidazioneResult result =
             ParametroValidator.valida(config.getTipo_parametro(), valoreStr);
 
