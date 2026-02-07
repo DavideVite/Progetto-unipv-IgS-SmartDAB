@@ -8,6 +8,13 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
+import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
+import it.unipv.posfw.smartdab.core.service.DispositiviManager;
+import it.unipv.posfw.smartdab.core.service.GestoreMalfunzionamenti;
+import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
+import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 
 	public class Hub {
 		
@@ -15,6 +22,7 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 		
 		private Autenticazione autenticazione;
 	    private GestoreStanze gestoreStanze;
+	    private GestoreMalfunzionamenti gestoreMalfunzionamenti;
 	    
 	    private boolean sistemaSbloccato = false;
 	    
@@ -24,6 +32,9 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
            // recupero dati (accensione)
           	StanzaDAO stanzaDao = new StanzaDAOImpl();
           	MisuraDAO misuraDao = new MisuraDAOImpl();
+          	DispositivoDAO dispositivoDao = new DispositivoDAOImpl();
+          	DispositiviManager dispManager = new DispositiviManager();
+          	IEventBusMalfunzionamenti eventBus = EventBus.getInstance(dispManager);
           	
 	    	Set<Stanza> stanzeRecuperate = stanzaDao.readAllStanze(); 
 	        Casa casa = new Casa();    		
@@ -34,7 +45,7 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
             }
 	       
 	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao, misuraDao);
-
+	       this.gestoreMalfunzionamenti = new GestoreMalfunzionamenti(new StrategiaStandard(), dispositivoDao, eventBus);
 	    }  
 	    
 	    //metodo per sbloccare il sistema all'accensione
@@ -72,10 +83,16 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 	    	return autenticazione;
 	    }
 	    
-	    // Aggiungo un metodo che mette in contatto l'event bus con l'HUB
-	    public void receiveCommunication() {
-	    	
+	    public GestoreMalfunzionamenti getGestoreMalfunzionamenti() {
+	    	if (sistemaSbloccato) {
+	    	return gestoreMalfunzionamenti;
+	    	}
+	    	else {
+	    		System.out.println("Sistema bloccato, inserire il PIN");
+	    		return null;
+	    	}
 	    }
+	
 	} 
 
 

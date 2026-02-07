@@ -19,6 +19,7 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 
 public class StanzeController {
 	    private StanzePanel elencoPanel;
@@ -31,10 +32,9 @@ public class StanzeController {
 	    private String stanzaCorrenteId;
 	    private String stanzaCorrenteNome;
 
-	    public StanzeController(JPanel container, CardLayout layout, GestoreStanze gestoreStanze, ParametroManager parametroManager) {
+	    public StanzeController(JPanel container, CardLayout layout, ParametroManager parametroManager) {
 	    	this.container = container;
 	    	this.layout = layout;
-	    	this.gestoreStanze = gestoreStanze;
 	    	this.parametroManager = parametroManager;
 	    }
 	    
@@ -56,6 +56,13 @@ public class StanzeController {
 	    }
 
 	    private void caricaStanzeInTabella() {
+	    	//non nel costruttore per essere sicuri che l'utente abbia già sbloccato il sistema
+	    	this.gestoreStanze = Hub.getInstance().getGestoreStanze();
+	    	
+	    	if (gestoreStanze == null) {
+	    		return;
+	    	}
+	    	
 	    	for (Stanza s : gestoreStanze.visualizzaStanze()) {
 	    		elencoPanel.aggiungiRigaTabella(s.getId(), s.getNome(), s.getMq());
 	    	}
