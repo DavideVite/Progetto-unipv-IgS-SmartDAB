@@ -106,7 +106,7 @@ public class GestoreStanze {
     }
 
     public List<Dispositivo> getDispositiviPerStanza(String stanzaId) {
-    	Stanza s = cercaStanzaPerId(stanzaId);
+    	Stanza s = casa.cercaStanzaPerId(stanzaId);
 
     	if(s != null) {
     		return s.getDispositivi();
@@ -166,15 +166,6 @@ public class GestoreStanze {
     		return true;
     	 }
     	 return false;
-    }
-
-    public Stanza cercaStanzaPerId(String id) {
-        for (Stanza s : casa.getStanze()) {
-            if (s.getId().equals(id)) {
-                return s;
-            }
-        }
-        return null;
     }
 
     public boolean eliminaStanza(String idStanza) throws Exception {

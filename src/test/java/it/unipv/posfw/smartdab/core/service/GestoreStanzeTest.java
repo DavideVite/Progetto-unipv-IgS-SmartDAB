@@ -50,7 +50,7 @@ public class GestoreStanzeTest {
 	}
 
 	@Test
-	public void testEliminaStanzaNonVuota() {
+	public void testEliminaStanzaNonVuota() throws Exception {
 		Stanza cucina = new Stanza("S03", "Cucina", 20.0, LocalDateTime.now());
 		casa.nuovaStanza(cucina);
 
@@ -63,7 +63,7 @@ public class GestoreStanzeTest {
 		// Creo la lampada con la signature corretta: (Topic, Lampada_Communicator, ObservableParameter, int)
 	    cucina.getDispositivi().add(new Lampada_ON_OFF(topic, communicator, obsParam, 3000));
 
-	    boolean eliminata = gestore.eliminaStanza("Cucina");
+	    boolean eliminata = gestore.eliminaStanza("L01");
 
 	    assertFalse(eliminata, "La stanza non dovrebbe essere eliminata se ha dispositivi");
 	    assertTrue(casa.esisteStanza("Cucina"), "La stanza dovrebbe essere ancora presente");

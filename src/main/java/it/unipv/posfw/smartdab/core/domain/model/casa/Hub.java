@@ -1,9 +1,8 @@
 package it.unipv.posfw.smartdab.core.domain.model.casa;
 
-import java.util.Set;
-
 import it.unipv.posfw.smartdab.core.domain.model.utente.Autenticazione;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
+import it.unipv.posfw.smartdab.factory.EventBusFactory;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
@@ -11,7 +10,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreMalfunzionamenti;
-import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
@@ -34,16 +32,10 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
           	MisuraDAO misuraDao = new MisuraDAOImpl();
           	DispositivoDAO dispositivoDao = new DispositivoDAOImpl();
           	DispositiviManager dispManager = new DispositiviManager();
-          	IEventBusMalfunzionamenti eventBus = EventBus.getInstance(dispManager);
+          	IEventBusMalfunzionamenti eventBus = EventBusFactory.getEventBus(dispManager);
           	
-	    	Set<Stanza> stanzeRecuperate = stanzaDao.readAllStanze(); 
 	        Casa casa = new Casa();    		
 	        
-            for (Stanza s : stanzeRecuperate) {
-            	casa.nuovaStanza(s);
-            
-            }
-	       
 	       this.gestoreStanze = new GestoreStanze(casa, stanzaDao, misuraDao);
 	       this.gestoreMalfunzionamenti = new GestoreMalfunzionamenti(new StrategiaStandard(), dispositivoDao, eventBus);
 	    }  
