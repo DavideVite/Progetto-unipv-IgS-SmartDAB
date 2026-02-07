@@ -126,6 +126,12 @@ public class GestoreStanze {
         }
 
         Stanza nuovaStanza = new Stanza(nomeStanza, mqStanza);
+        
+        if(mqStanza <= 0) {
+            System.err.println("Errore: I metri quadri devono essere maggiori di 0");
+            return null; // Ritorna null perché la creazione non è valida
+        }
+        
         casa.nuovaStanza(nuovaStanza);
 
         stanzaDAO.insertStanza(nuovaStanza);

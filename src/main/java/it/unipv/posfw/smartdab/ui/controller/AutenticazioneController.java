@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import it.unipv.posfw.smartdab.core.service.PersistenzaManager;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Hub;
 
 public class AutenticazioneController {
 	
@@ -35,6 +36,10 @@ public class AutenticazioneController {
 		// \\d{5} d è un digit (cifra numerica da 0 a 9), 5 è il quantificatore
 		if(pin != null && pin.matches("\\d{5}") ) {
 			PersistenzaManager.salvaPin(pin);
+			
+			//sblocchiamo l'hub
+			Hub.getInstance().accedi(pin);
+			
 			if(azioneSuccesso != null) {
 				azioneSuccesso.run(); //chiude login e apre main frame
 			}
@@ -46,6 +51,10 @@ public class AutenticazioneController {
 	public void verificaPinEsistente(String pinInserito) {
 	    String pinSalvato = PersistenzaManager.caricaPin();
 	    if(pinInserito.equals(pinSalvato)) {
+	    	
+	    	//sblocchiamo l'hub
+	    	Hub.getInstance().accedi(pinInserito);
+	    	
 	        if(azioneSuccesso != null) azioneSuccesso.run();
 	    } else {
 	        JOptionPane.showMessageDialog(container, "PIN errato!");
