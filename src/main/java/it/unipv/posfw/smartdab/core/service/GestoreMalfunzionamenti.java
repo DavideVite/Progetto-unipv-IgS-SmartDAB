@@ -51,11 +51,11 @@ public class GestoreMalfunzionamenti{
              // Recupera il nome della classe (es: "it.unipv...StrategiaCritica")
              String className = prop.getProperty(key);
              
-             //Trasforma la stringa in un oggetto reale. 
+             //Trasforma la stringa in un oggetto reale. REFLECTION
              //Class.forName trova la classe, getDeclaredConstructor().newInstance() crea l'istanza
              MalfunzionamentoStrategy s = (MalfunzionamentoStrategy) Class.forName(className).getDeclaredConstructor().newInstance();    
              
-             // Converte la stringa della chiave nel valore corrispondente dell'Enum DispositivoParameter
+             //Associa il parametro alla strategia appena creata
              mappeStrategie.put(DispositivoParameter.valueOf(key), s);
             }
 			} else {
@@ -82,6 +82,7 @@ public class GestoreMalfunzionamenti{
 			
 			//uso la strategia
 			if(strategyDaUsare.deveDisabilitare(pojo, value, conteggio)) {
+			//notifica l'event bus 
 			eventBus.disableDispositivo(pojo);
 			
 			}

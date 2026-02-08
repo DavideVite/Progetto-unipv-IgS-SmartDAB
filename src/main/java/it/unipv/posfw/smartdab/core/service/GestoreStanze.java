@@ -106,7 +106,7 @@ public class GestoreStanze {
     }
 
     public List<Dispositivo> getDispositiviPerStanza(String stanzaId) {
-    	Stanza s = casa.cercaStanzaPerId(stanzaId);
+    	Stanza s = cercaStanzaPerId(stanzaId);
 
     	if(s != null) {
     		return s.getDispositivi();
@@ -126,12 +126,6 @@ public class GestoreStanze {
         }
 
         Stanza nuovaStanza = new Stanza(nomeStanza, mqStanza);
-        
-        if(mqStanza <= 0) {
-            System.err.println("Errore: I metri quadri devono essere maggiori di 0");
-            return null; // Ritorna null perché la creazione non è valida
-        }
-        
         casa.nuovaStanza(nuovaStanza);
 
         stanzaDAO.insertStanza(nuovaStanza);
@@ -168,8 +162,12 @@ public class GestoreStanze {
     	 return false;
     }
 
+    public Stanza cercaStanzaPerId(String id) {
+    	return casa.cercaStanzaPerId(id);
+    }
+
     public boolean eliminaStanza(String idStanza) throws Exception {
-    		Stanza s = casa.cercaStanzaPerId(idStanza);
+    		Stanza s = cercaStanzaPerId(idStanza);
     		if(s!=null) {
     		if(s.isEmpty()) {
     			casa.rimuoviStanza(s);

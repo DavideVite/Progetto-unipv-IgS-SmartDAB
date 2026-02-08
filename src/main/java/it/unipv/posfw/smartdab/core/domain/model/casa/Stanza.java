@@ -57,16 +57,13 @@ public class Stanza implements Observable, Observer, RoomPort {
 		            counter = idNumerico;
 		        }
 		    } catch (Exception e) {
-		    	
+		    	System.err.println("Errore nel counter della Stanza ");
+		    	e.printStackTrace();
 		    }
 		}
 	 
 	 public LocalDateTime getCreatedAt() { 
 		 return createdAt;
-	 }
-	 
-	 public static void setCounter(int value) {
-		 counter = value;
 	 }
  
 	 public String getId() {
@@ -156,7 +153,6 @@ public class Stanza implements Observable, Observer, RoomPort {
      @Override
 	 public void notifyObservers(Object args) {
          for (Observer o : observers) {
-//        		 o.update(this, args);
         	 o.update(this, parametri.get(args.toString()));
         	 }
          }
@@ -164,7 +160,8 @@ public class Stanza implements Observable, Observer, RoomPort {
      @Override
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
-
+        
+        //recupero l'Enum che identifica il parametro
 		DispositivoParameter paramEnum = obsParam.getParameterName();
 		String nomeStr = paramEnum.name();
 		double valore = obsParam.getValue();
