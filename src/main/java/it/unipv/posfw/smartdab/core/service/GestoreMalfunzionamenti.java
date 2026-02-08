@@ -1,8 +1,8 @@
 package it.unipv.posfw.smartdab.core.service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -33,7 +33,7 @@ public class GestoreMalfunzionamenti{
 	}
 	
 	private void caricaDispositiviDalDB() {
-		List<DispositivoPOJO> lista = dispositivoDao.selectN(100);
+		ArrayList<DispositivoPOJO> lista = dispositivoDao.selectN(100);
 		for(DispositivoPOJO p: lista) {
 			//uso l'ID come chiave
 			tentativiFalliti.put(p.getId(), 0);

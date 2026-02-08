@@ -1,15 +1,17 @@
 package it.unipv.posfw.smartdab.core.domain.model.casa;
 
-import java.util.List;
+import java.util.ArrayList;
 
+import it.unipv.posfw.smartdab.core.beans.CommunicationPOJO;
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
-import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
 import it.unipv.posfw.smartdab.core.domain.model.utente.Autenticazione;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 import it.unipv.posfw.smartdab.core.service.GestoreMalfunzionamenti;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.factory.EventBusFactory;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.CommunicationDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.CommunicationDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.DispositivoDAOImpl;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
@@ -26,7 +28,8 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	    private GestoreStanze gestoreStanze;
 	    private GestoreMalfunzionamenti gestoreMalfunzionamenti;
         private MisuraDAO misuraDao;
-      	private DispositivoDAO dispositivoDao;	    
+      	private DispositivoDAO dispositivoDao;	
+      	private CommunicationDAO communicationDao;
 	    private boolean sistemaSbloccato = false;
 	    
 	    private Hub(String passwordProduttore) {
@@ -36,6 +39,7 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
           	StanzaDAO stanzaDao = new StanzaDAOImpl();
           	this.misuraDao = new MisuraDAOImpl();
           	this.dispositivoDao = new DispositivoDAOImpl();
+          	this.communicationDao = new CommunicationDAOImpl();
 
           	DispositiviManager dispManager = new DispositiviManager();
           	IEventBusMalfunzionamenti eventBus = EventBusFactory.getEventBus(dispManager);
@@ -107,33 +111,36 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	    }
 	    
 	    public void verificaStatoDispositivi() {
-	    	List<MisuraPOJO> ultimeMisure = misuraDao.readUltimeMisurePerStanza();
-	    	
-	    	// Recupero tutti i dispositivi da monitorare
-	        List<DispositivoPOJO> tuttiIDispositivi = dispositivoDao.selectN(100);
+	    	//Legge le ultime comunicazioni
+	        ArrayList<CommunicationPOJO> ultimeCom = communicationDao.selectN(100); 
+	        
+	        ArrayList<DispositivoPOJO> tuttiIDispositivi = dispositivoDao.selectN(100);
 
 	        for (DispositivoPOJO d : tuttiIDispositivi) {
-	            // 2. Verifica se c'è una comunicazione recente per questo dispositivo
-	            MisuraPOJO misura = trovaMisuraPerDispositivo(ultimeMisure, d);
+	        	// Cerchiamo l'ultima comunicazione per questo dispositivo
+	            CommunicationPOJO com = trovaComunicazionePerDispositivo(ultimeCom, d.getId());
+	           
 	            
-	            // Se misura è null, il GestoreMalfunzionamenti incrementerà il fallimento
-	            gestoreMalfunzionamenti.controllaConnessione(d, misura);
-	        }
-	    }
-	    
-	    
-	     //Metodo di utilità interno per filtrare la lista in memoria.
-	    private MisuraPOJO trovaMisuraPerDispositivo(List<MisuraPOJO> misure, DispositivoPOJO d) {
-	    	for (MisuraPOJO m : misure) {
-	            //Controllo 1: La stanza deve coincidere
-	            //Controllo 2: Il tipo di misura deve coincidere con il parametro del dispositivo
-	            if (m.getIdStanza().equals(d.getStanza()) && 
-	                m.getTipo().equals(d.getParametro().name())) {
-	                return m;
+	            //Se non c'è comunicazione (null) OPPURE se l'esito è "FAILED", 
+	            //passiamo null al gestore per segnalare il problema
+	            Object valoreDaControllare = null;
+	            if (com != null && !"FAILED".equals(com.getEsito())) {
+	                valoreDaControllare = com.getValue();
 	            }
+	            
+	            gestoreMalfunzionamenti.controllaConnessione(d, valoreDaControllare);
 	        }
-	        return null; // Non ha comunicato recentemente
 	    }
+	        
+	        private CommunicationPOJO trovaComunicazionePerDispositivo(ArrayList<CommunicationPOJO> lista, String idDisp) {
+	        	for(CommunicationPOJO c : lista) {
+	        		//confronto id del dispositivo salvato nella comunicazione con quello del dispositivo che stiamo controllando
+	        		if(c.getDispositivo().equals(idDisp)) {
+	        			return c; //comunicazione più recente
+	        		}
+	        	}
+	        	return null;
+	        }
 	}
 
 
