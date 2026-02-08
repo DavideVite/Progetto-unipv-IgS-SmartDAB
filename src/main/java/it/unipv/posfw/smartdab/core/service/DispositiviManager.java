@@ -53,22 +53,54 @@ public class DispositiviManager {
     
     public DispositivoPOJO aggiungiDispositivo(DispositivoPOJO d) {
 
-    	DispositivoPOJO d1 = d;
+        if(dispositivi.contains(d)) {
+            return null;
+        }
 
-    	if(dispositivi.contains(d1) || dao.existsById(d.getId())) {
-    		return null;
-    	}
+    	dispositivi.add(d);
 
-    	dispositivi.add(d1);
+    	dao.insertDispositivo(d);
+    	return d;
+    }
+    
+    public DispositivoPOJO aggiornaDispositivo(DispositivoPOJO d) {
 
-    	dao.insertDispositivo(d1);
-    	return d1;
+        if(getDispositivoById(d.getId()) != null) {
+        	System.out.println(dispositivi.get(dispositivi.indexOf(getDispositivoById(d.getId()))));
+            dispositivi.set(dispositivi.indexOf(getDispositivoById(d.getId())), d);
+            System.out.println(dispositivi.get(dispositivi.indexOf(getDispositivoById(d.getId()))));
+            dao.updateDispositivo(d);
+            return null;
+        }
+
+    	dispositivi.add(d);
+
+    	dao.insertDispositivo(d);
+    	return d;
     }
     
     // Metodo per rilevazione dei malfunzionamenti
     public boolean disableDispositivo(String id) {
     	if(dao.existsById(id)) {
     		dao.disableDispositivo(id);
+    		getDispositivoById(id).setStato(DispositivoStates.DISABLED);
+    		System.out.println(getDispositivoById(id).getStato());
+    		return true;
+    	} else {
+    		System.out.println("Errore: il dispositivo non esiste");
+    		return false;
+    	}
+    } 
+    
+    // Per i test
+    public void clearDispositivi() {
+		dispositivi.clear();
+	}
+    
+    // Metodo per il DB
+	public boolean deleteDispositivo(String id) {
+    	if(dao.existsById(id)) {
+    		dao.deleteDispositivo(id);
     		return true;
     	} else {
     		System.out.println("Errore: il dispositivo non esiste");

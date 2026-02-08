@@ -20,8 +20,23 @@ public final class ParametroValue implements IParametroValue {
         this.tipoParametro = Objects.requireNonNull(tipoParametro, "tipoParametro non può essere null");
     }
 
+    @Override
     public String getRawValue() {
         return rawValue;
+    }
+
+    /**
+     * Converte il valore in double secondo il tipo di parametro.
+     * La logica e' incapsulata qui invece che nei chiamanti,
+     * rispettando il principio "Tell, Don't Ask".
+     */
+    @Override
+    public double toNumericValue() {
+        return switch (tipoParametro.getType()) {
+            case NUMERIC -> getAsDouble();
+            case BOOLEAN -> getAsBoolean() ? 1.0 : 0.0;
+            case ENUM -> tipoParametro.getAllowedValues().indexOf(getAsString());
+        };
     }
 
     @Override
