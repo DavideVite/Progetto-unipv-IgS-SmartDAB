@@ -62,8 +62,15 @@ public class GestoreStanzeTest {
 
 		// Creo la lampada con la signature corretta: (Topic, Lampada_Communicator, ObservableParameter, int)
 	    cucina.getDispositivi().add(new Lampada_ON_OFF(topic, communicator, obsParam, 3000));
-
-	    boolean eliminata = gestore.eliminaStanza("L01");
+	    
+	    // eliminaStanza() presenta un'eccezione che deve essere gestita qui
+	    boolean eliminata = true;
+	    
+		try {
+			eliminata = gestore.eliminaStanza("Cucina");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	    assertFalse(eliminata, "La stanza non dovrebbe essere eliminata se ha dispositivi");
 	    assertTrue(casa.esisteStanza("Cucina"), "La stanza dovrebbe essere ancora presente");

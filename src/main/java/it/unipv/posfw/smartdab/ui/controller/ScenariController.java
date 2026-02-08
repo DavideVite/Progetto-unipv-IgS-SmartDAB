@@ -11,11 +11,13 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenarioFormPanel;
+import it.unipv.posfw.smartdab.core.service.exception.ScenarioNonModificabileException;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,11 @@ import java.util.Set;
 
 /**
  * Controller per la gestione degli Scenari.
+ *
+ * PATTERN MVC + OBSERVER:
+ * - Implementa Observer per ricevere notifiche da ScenarioManager
+ * - Quando il Model cambia, il Controller aggiorna automaticamente la View
+ * - Registrazione: scenarioManager.addObserver(this) nel costruttore
  *
  * INTEGRAZIONE ScenarioFormPanel:
  * - Aggiunto GestoreStanze per ottenere la lista delle stanze disponibili
@@ -62,8 +69,9 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
         this.formPanel = new ScenarioFormPanel();
         this.formPanel.setListener(this);
 
-        // Registra il controller come Observer dello ScenarioManager
-        scenarioManager.addObserver(this);
+        // OBSERVER PATTERN: registra questo controller come observer del model
+        // Quando ScenarioManager notifica cambiamenti, update() viene chiamato automaticamente
+        this.scenarioManager.addObserver(this);
 
         addListeners();
         aggiornaTabella();
@@ -71,9 +79,18 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
 
     // ==================== Observer Pattern ====================
 
+    /**
+     * Callback chiamata automaticamente quando ScenarioManager notifica un cambiamento.
+     * Aggiorna la tabella degli scenari nella View.
+     *
+     * SwingUtilities.invokeLater() garantisce che l'aggiornamento della UI avvenga
+     * nel thread EDT (Event Dispatch Thread) di Swing. Anche se attualmente il sistema
+     * non usa thread separati, e' buona pratica per evitare problemi futuri se
+     * le notifiche dovessero arrivare da thread diversi (es. timer, rete, ecc.).
+     */
     @Override
     public void update(Observable o, Object arg) {
-        aggiornaTabella();
+        SwingUtilities.invokeLater(() -> aggiornaTabella());
     }
 
     private void addListeners() {
@@ -101,12 +118,13 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     } else {
                         scenarioManager.disattivaScenario(scenario.getNome());
                     }
+                    aggiornaDettaglio(row);
                 }
             }
         });
 
-        // Bottone Nuovo - apre ScenarioFormPanel per creare scenari con configurazioni
-        panel.getBtnNuovo().addActionListener(e -> mostraFormNuovoScenario());
+//         // Bottone Nuovo - apre ScenarioFormPanel per creare scenari con configurazioni
+//         panel.getBtnNuovo().addActionListener(e -> mostraFormNuovoScenario());
 
         // Bottone Modifica - apre ScenarioFormPanel per modificare scenario selezionato
         panel.getBtnModifica().addActionListener(e -> {
@@ -131,6 +149,8 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     "Conferma", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     scenarioManager.eliminaScenario(scenario.getNome());
+                    // NOTA: aggiornaTabella() non serve piu' qui, viene chiamato
+                    // automaticamente via Observer quando ScenarioManager notifica
                     panel.getDetailPanel().pulisci();
                 }
             }
@@ -148,6 +168,12 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                 s.getNome(),
                 s.getTipo_scenario().toString()
             });
+        }
+    }
+
+    private void aggiornaDettaglio(int row) {
+        if (row >= 0 && row < scenariList.size()) {
+            panel.getDetailPanel().mostraScenario(scenariList.get(row));
         }
     }
 
@@ -271,6 +297,8 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             }
 
             chiudiFormDialog();
+            // NOTA: aggiornaTabella() non serve piu' qui, viene chiamato
+            // automaticamente via Observer quando ScenarioManager notifica
 
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(formPanel, ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);

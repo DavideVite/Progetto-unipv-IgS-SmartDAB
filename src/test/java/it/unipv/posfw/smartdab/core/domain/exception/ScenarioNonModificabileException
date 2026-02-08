@@ -1,0 +1,5 @@
+public class ScenarioNonModificabileException extends RuntimeException {
+    public ScenarioNonModificabileException(String message) {
+        super(message);
+    }
+}
