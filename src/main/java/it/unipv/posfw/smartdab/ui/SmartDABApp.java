@@ -17,7 +17,7 @@ public class SmartDABApp {
    public static void main(String[] args) {
     	  
     	// prova per eliminare il pin e far partire tutto dall'inserimento password
-    	   /*try {
+    	   /* try {
     	        java.util.prefs.Preferences.userNodeForPackage(PersistenzaManager.class).clear();
     	        System.out.println("PIN eliminato");
     	    } catch (Exception e) {

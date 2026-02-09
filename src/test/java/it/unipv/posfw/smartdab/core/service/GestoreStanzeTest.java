@@ -50,7 +50,7 @@ public class GestoreStanzeTest {
 	}
 
 	@Test
-	public void testEliminaStanzaNonVuota() {
+	public void testEliminaStanzaNonVuota() throws Exception {
 		Stanza cucina = new Stanza("S03", "Cucina", 20.0, LocalDateTime.now());
 		casa.nuovaStanza(cucina);
 

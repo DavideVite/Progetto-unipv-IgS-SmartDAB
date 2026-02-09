@@ -111,7 +111,7 @@ public class MisuraDAOImpl implements MisuraDAO {
 
 	
 	@Override
-	public List<MisuraPOJO> readUltimeMisurePerStanza() {
+	public List<MisuraPOJO> readUltimeMisurePerStanza() {  //restituisce l'ultima misura di ogni stanza per ogni tipo
 		Connection conn = null;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
