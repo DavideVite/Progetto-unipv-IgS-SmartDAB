@@ -226,6 +226,7 @@ public class ScenarioFormPanel extends JPanel {
         }
     }
 
+    //METODO PRINCIPALE: AGGIUNTA CONFIGURAZIONE
     private void aggiungiConfigurazione() {
         String stanzaNome = (String) comboStanza.getSelectedItem();
         DispositivoParameter param = (DispositivoParameter) comboParametro.getSelectedItem();
