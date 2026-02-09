@@ -123,8 +123,8 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
             }
         });
 
-//         // Bottone Nuovo - apre ScenarioFormPanel per creare scenari con configurazioni
-//         panel.getBtnNuovo().addActionListener(e -> mostraFormNuovoScenario());
+      // Bottone Nuovo - apre ScenarioFormPanel per creare scenari con configurazioni
+       panel.getBtnNuovo().addActionListener(e-> mostraFormNuovoScenario());
 
         // Bottone Modifica - apre ScenarioFormPanel per modificare scenario selezionato
         panel.getBtnModifica().addActionListener(e -> {
@@ -213,6 +213,7 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
     /**
      * Aggiorna la lista delle stanze disponibili nel form.
      * Passa una mappa nome -> ID per permettere il corretto salvataggio nel DB.
+     * Visualizza stanza RESTITUISCE le stanze. 
      */
     private void aggiornaListaStanzeForm() {
         Map<String, String> stanzeMap = new HashMap<>();
@@ -232,11 +233,7 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
      */
     private void mostraFormDialog(String titolo) {
         Window window = SwingUtilities.getWindowAncestor(panel);
-        if (window instanceof Frame) {
-            formDialog = new JDialog((Frame) window, titolo, true);
-        } else {
-            formDialog = new JDialog((Frame) null, titolo, true);
-        }
+        formDialog = new JDialog(window, titolo, Dialog.ModalityType.APPLICATION_MODAL);    
         formDialog.setContentPane(formPanel);
         formDialog.pack();
         formDialog.setMinimumSize(new Dimension(600, 500));
