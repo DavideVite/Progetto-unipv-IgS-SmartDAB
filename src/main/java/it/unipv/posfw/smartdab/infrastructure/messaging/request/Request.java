@@ -6,6 +6,12 @@ import java.util.List;
 import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
+/**
+ * Classe che definisce la struttura di una richiesta
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class Request {
 	private Topic topic;
 	private String type;
@@ -16,6 +22,11 @@ public class Request {
 		this.type = type;
 		this.val = val;
 	}
+	
+	
+	/**
+	 * Questo metodo fa sì che una richiesta possa essere istanziata solo se i parametri inseriti sono validi
+	 */
 	
 	public static Request createRequest(Topic topic, String type, Object val) throws IllegalArgumentException {
 		if(verifyArguments(topic, type, val)) {

@@ -8,6 +8,14 @@ import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 
+/**
+ * Questa classe è un contenitore di informazioni di un dispositivo del sistema SmartDAB
+ * @see DispositivoParameter
+ * @see DispositivoStates
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class DispositivoPOJO {
 	private String id;
 	private String stanza;

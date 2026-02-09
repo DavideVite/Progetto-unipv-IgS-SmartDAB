@@ -9,6 +9,12 @@ import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 import it.unipv.posfw.smartdab.infrastructure.messaging.DispositiviObserver;
 
+/**
+ * Implementazione di un comunicatore standard di esempio per semplici dispositivi
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class StandardCommunicator implements ICommunicator {
 
 	private DevicePort dispositivo;

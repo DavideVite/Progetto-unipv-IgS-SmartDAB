@@ -6,6 +6,17 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
 import it.unipv.posfw.smartdab.core.port.device.AttuatorePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
+/**
+ * Implementazione di un dispositivo di tipo attuatore con logica proporzionale
+ * @see Dispositivo
+ * @see AttuatoreFacade
+ * @see AttuatorePort
+ * @see PompaDiCalore_Communicator
+ * @see ObservableParameter
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class PompaDiCalore extends AttuatoreFacade implements AttuatorePort {
 
 	private double stored_temp;
@@ -20,10 +31,15 @@ public class PompaDiCalore extends AttuatoreFacade implements AttuatorePort {
 		super(topic, c, o);
 		c.setDispositivo(this);
 	}
+	/**
+	 * La variazione applicata dalla pompa di calore è gestita con logica proporzionale
+	 * Vout = (Setpoint - Actual_state) * k 
+	 */
 	
 	@Override
 	public int applyVariation(Object state) {
 		try {
+			System.out.println(state.toString() + " QUA");
 			if(((double) state <= setpoint + 3 && (double) state >= setpoint - 3)) return 1;
 			double error = setpoint - ((double) state);
 			stored_temp = Math.floor(((double) state + k * error) * 10) / 10;
@@ -40,11 +56,18 @@ public class PompaDiCalore extends AttuatoreFacade implements AttuatorePort {
 		}
 	}
 
+	/**
+	 * L'azione della pompa di calore consiste solo nell'applicare la variazione
+	 */
+	
 	@Override
 	public int action(Object state) {
 		return applyVariation(state);
 	}
-
+	
+	/**
+	 * Consente di impostare l'obiettivo di temperatura della pompa di calore
+	 */
 	public void changeSetpoint(double setpoint) {
 		this.setpoint = setpoint;
 	}

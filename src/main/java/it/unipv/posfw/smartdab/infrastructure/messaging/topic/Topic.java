@@ -3,16 +3,17 @@ package it.unipv.posfw.smartdab.infrastructure.messaging.topic;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
-// Questa classe definisce un nuovo abstract type topic semi-strutturato
-
-// Ogni controllo necessario per l'istanza è gestito qui
+/**
+ * Questa classe definisce la struttura di un topic (home/room/id/parameter)
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
 
 public class Topic {
 	private String home;
 	private String room;
 	private String id;
 	private DispositivoParameter parameter;
-	public final int length = 4; // Numero di Layers
 	public final String TOPIC_FORMAT = "%s/%s/%s/%s";
 	
 	// Costruttore chiuso per garantire la costruzione di topic regolari
@@ -23,7 +24,9 @@ public class Topic {
 		this.parameter = parameter;
 	}
 	
-	// Usare questo metodo per istanziare il topic
+	/**
+	 * Questo metodo consente di istanziare un topic solo se i parametri inseriti sono validi
+	 */
 	public static Topic createTopic(String id, RoomPort room, DispositivoParameter parameter) throws IllegalArgumentException {
 		if(verifyArguments(room, parameter) && checkId(id)) {
 			return new Topic(id, room, parameter);

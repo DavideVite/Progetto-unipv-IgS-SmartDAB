@@ -2,6 +2,13 @@ package it.unipv.posfw.smartdab.core.domain.enums;
 
 import java.util.List;
 
+/**
+ * Questa classe è una enum che contiene tutti i parametri di un dispositivo accettabili nel contesto
+ * SmartDAB, specificando inoltre massimo, minimo, unità di misura e metodi di inizializzazione
+ * @author Alessandro Ingenito & Davide Vitello
+ * @version 1.1
+ */
+
 public enum DispositivoParameter {
 
     // === NUMERICI (min, max, unit) ===

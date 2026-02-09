@@ -4,15 +4,19 @@ import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
 /**
- * Interfaccia per il pattern Command.
- * Rappresenta un comando eseguibile su un dispositivo.
+ * Questa classe è un'interfaccia che ogni comando associato ai dispositivi deve implementare
+ * @see DevicePort
+ * @see Request
+ * @author Alessandro Ingenito
+ * @version 1.0
  */
-public interface ICommand {
 
+public interface ICommand {
+	
 	/**
-	 * Esegue il comando sul dispositivo specificato.
-	 * @param dispositivo il dispositivo target
-	 * @param request la richiesta contenente i parametri del comando
+	 * @param dispositivo dispositivo sul quale il comando deve agire
+	 * @param request richiesta che ha portato all'individuazione del comando
 	 */
-	void execute(DevicePort dispositivo, Request request);
+	
+	public void execute(DevicePort dispositivo, Request request);
 }
