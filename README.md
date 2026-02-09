@@ -38,9 +38,6 @@ SmartDAB è un sistema software Java per la gestione di una **smart home**. Perm
 - MySQL
 
 ### Setup Database
-```bash
-mysql -u root -p < database/SQL_script_finale.sql
-```
 
 Configurare le credenziali in `src/main/resources/db.properties`:
 ```properties
@@ -49,37 +46,17 @@ db.user=your_user
 db.password=your_password
 ```
 
-### Compilazione
-```bash
-mvn clean install
-```
-
-### Esecuzione
-```bash
-mvn exec:java -Dexec.mainClass="it.unipv.posfw.smartdab.Main"
-```
-
-Oppure da IDE, eseguire `MainController.mostraApplicazione()`:
-```java
-SwingUtilities.invokeLater(() -> {
-    MainController controller = new MainController();
-    controller.mostraApplicazione();
-});
-```
-
----
 
 ## Architettura
 
-Il progetto segue un'**architettura esagonale** (Ports & Adapters) con pattern **MVC** per l'UI.
+Il progetto segue un'archietettura ibrida: client/server per la gestione dei dispositivi e a strati per il resto del sistema, con pattern **MVC** per l'UI.
 
 ```
 src/main/java/it/unipv/posfw/smartdab/
 ├── core/           # Dominio e servizi
 │   ├── domain/     # Entità (Casa, Stanza, Dispositivo, Scenario)
 │   ├── service/    # Logica di business
-│   └── port/       # Interfacce per comunicazione esterna
-├── adapter/        # Facade per sensori e attuatori
+│
 ├── infrastructure/ # Persistenza (DAO) e messaging (EventBus)
 ├── factory/        # Factory per creazione oggetti
 └── ui/             # Interfaccia Swing (View + Controller)
@@ -88,7 +65,6 @@ src/main/java/it/unipv/posfw/smartdab/
 ### Pattern principali
 - **MVC** - Separazione UI/logica
 - **Observer** - Notifica cambiamenti parametri
-- **Publisher/Subscriber** - Comunicazione dispositivi via EventBus
 - **Factory** - Creazione dispositivi da POJO
 - **Command** - Azioni sui dispositivi
 
@@ -96,21 +72,22 @@ src/main/java/it/unipv/posfw/smartdab/
 
 ## Funzionalità principali
 
-| Funzionalità | Stato |
-|:-------------|:------|
-| CRUD Stanze | ✅ |
-| CRUD Dispositivi | ✅ |
-| EventBus (pub/sub) | ✅ |
-| Impostazione parametri manuali | ✅ |
-| CRUD Scenari | ✅ |
-| Attivazione/disattivazione scenari | ✅ |
-| Scenari predefiniti (Notte, Giorno, Assenza) | ✅ |
-| Interfaccia grafica Swing | ✅ |
+| Funzionalità |
+|:-------------|
+| CRUD Stanze |
+| CRUD Dispositivi | 
+| EventBus (pub/sub) | 
+| Impostazione parametri manuali |
+| CRUD Scenari | 
+| Attivazione/disattivazione scenari | 
+| Scenari predefiniti (Notte, Giorno, Assenza) |
+| Interfaccia grafica Swing |
 
 ---
 
-## Autori
+## Team
 
+- Beatrice Bertone
 - Alessandro Geremia Ingenito
 - Davide Vitello
-- Beatrice Bertone
+
