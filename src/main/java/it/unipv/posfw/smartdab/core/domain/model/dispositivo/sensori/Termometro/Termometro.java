@@ -5,6 +5,12 @@ import it.unipv.posfw.smartdab.core.port.communication.StandardCommunicator;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 
+/**
+ * Implementazione di un semplice sensore di temperatura
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class Termometro extends SensoreFacade {
 
 	private double temp;
@@ -17,14 +23,18 @@ public class Termometro extends SensoreFacade {
 		c.setDispositivo(this);
 	}
 	
+	/**
+	 * La misura del termometro introduce in questo caso un errore gaussiano 
+	 * di circa il 5% dello stato attuale
+	 */
+	
 	@Override
 	public void update(Observable o, Object args) {
 		try {
 			
 			// Applico un rumore gaussiano sul errore% del valore reale
-//			double noise = (Math.random() * noise_sensitivity - noise_sensitivity / 2) * error * (double) args;
-//			temp = Math.floor(((double) args + noise) * 10) / 10;
-			temp = (double) args;
+			double noise = (Math.random() * noise_sensitivity - noise_sensitivity / 2) * error * (double) args;
+			temp = Math.floor(((double) args + noise) * 10) / 10;
 			
 			publishMeasure();
 			

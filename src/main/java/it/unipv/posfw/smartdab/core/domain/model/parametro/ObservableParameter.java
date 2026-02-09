@@ -10,6 +10,15 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 
+/**
+ * Classe che rappresenta un parametro osservato dalle stanze e modificato dagli attuatori incaricati
+ * @see Observable
+ * @see Stanza
+ * @see DispositivoParameter
+ * @author Alessandro Ingenito
+ * @version 1.1
+ */
+
 public class ObservableParameter implements Observable {
 	
 	private List<Observer> rooms = new ArrayList<>();
@@ -30,6 +39,9 @@ public class ObservableParameter implements Observable {
 		rooms.remove(observer);
 	}
 
+	/**
+	 * Modifica il parametro della stanza in cui è presente l'attuatore che chiama il metodo
+	 */
 	@Override
 	public void notifyObservers(Object args) {
 		

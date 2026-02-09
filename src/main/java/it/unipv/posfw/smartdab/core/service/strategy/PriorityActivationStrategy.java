@@ -15,10 +15,6 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
  */
 public class PriorityActivationStrategy implements ScenarioActivationStrategy {
 
-	/**
-	 * Applica le configurazioni in ordine di priorita'.
-	 * Le eccezioni vengono catturate e loggate, ma non interrompono l'esecuzione.
-	 */
 	@Override
 	public boolean attiva(Scenario scenario, ParametroManager parametroManager) {
 		List<StanzaConfig> sorted = scenario.getConfigurazioni().stream()
@@ -27,11 +23,7 @@ public class PriorityActivationStrategy implements ScenarioActivationStrategy {
 
 		boolean tuttiSuccesso = true;
 		for (StanzaConfig config : sorted) {
-			try {
-				parametroManager.applicaStanzaConfig(config);
-			} catch (RuntimeException e) {
-				System.err.println("Errore applicazione config stanza " + config.getStanzaId()
-					+ ": " + e.getMessage());
+			if (!parametroManager.applicaStanzaConfig(config)) {
 				tuttiSuccesso = false;
 			}
 		}

@@ -12,13 +12,10 @@ import javax.swing.*;
 import java.util.Map;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.exception.ParametroNonValidoException;
-import it.unipv.posfw.smartdab.core.domain.exception.StanzaNonTrovataException;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
 import it.unipv.posfw.smartdab.core.service.ParametroManager;
-import it.unipv.posfw.smartdab.core.service.ParametroValidator;
 import it.unipv.posfw.smartdab.factory.ParametroValueFactory;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzeFormPanel;
 import it.unipv.posfw.smartdab.ui.view.stanze.StanzePanel;
@@ -257,42 +254,44 @@ public class StanzeController {
 	    	DispositivoParameter paramScelto = (DispositivoParameter) comboParametro.getSelectedItem();
 	    	if (paramScelto == null) return;
 
-	    	// Ottieni il valore in base al tipo
-	    	String valoreStr;
+	    	IParametroValue valore;
 	    	switch (paramScelto.getType()) {
 	    		case NUMERIC:
-	    			valoreStr = txtNumerico.getText().trim();
+	    			String txt = txtNumerico.getText().trim();
+	    			if (txt.isEmpty()) {
+	    				JOptionPane.showMessageDialog(null, "Inserisci un valore numerico", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				return;
+	    			}
+	    			try {
+	    				Double.parseDouble(txt);
+	    			} catch (NumberFormatException e) {
+	    				JOptionPane.showMessageDialog(null, "Valore numerico non valido", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				return;
+	    			}
+	    			valore = ParametroValueFactory.create(paramScelto, txt);
 	    			break;
 	    		case BOOLEAN:
-	    			valoreStr = String.valueOf(chkBooleano.isSelected());
+	    			valore = ParametroValueFactory.create(paramScelto, chkBooleano.isSelected());
 	    			break;
 	    		case ENUM:
-	    			valoreStr = (String) comboEnum.getSelectedItem();
+	    			String valEnum = (String) comboEnum.getSelectedItem();
+	    			if (valEnum == null) {
+	    				JOptionPane.showMessageDialog(null, "Seleziona un valore", "Errore", JOptionPane.ERROR_MESSAGE);
+	    				return;
+	    			}
+	    			valore = ParametroValueFactory.create(paramScelto, valEnum);
 	    			break;
 	    		default:
 	    			return;
 	    	}
 
-	    	// Validazione centralizzata tramite ParametroValidator (risolve SRP punto 5.3)
-	    	ParametroValidator.ValidazioneResult validazione = ParametroValidator.valida(paramScelto, valoreStr);
-	    	if (!validazione.isValido()) {
-	    		JOptionPane.showMessageDialog(null, validazione.getMessaggio(), "Errore", JOptionPane.ERROR_MESSAGE);
-	    		return;
-	    	}
-
-	    	IParametroValue valore = ParametroValueFactory.create(paramScelto, valoreStr);
-
-	    	// Invoca il core con gestione eccezioni
-	    	try {
-	    		parametroManager.impostaParametro(stanzaId, paramScelto, valore);
+	    	// Invoca il core
+	    	boolean successo = parametroManager.impostaParametro(stanzaId, paramScelto, valore);
+	    	if (successo) {
 	    		JOptionPane.showMessageDialog(null, "Parametro impostato correttamente");
-	    	} catch (StanzaNonTrovataException e) {
+	    	} else {
 	    		JOptionPane.showMessageDialog(null,
-	    				"Stanza non trovata: " + e.getStanzaId(),
-	    				"Errore", JOptionPane.ERROR_MESSAGE);
-	    	} catch (ParametroNonValidoException e) {
-	    		JOptionPane.showMessageDialog(null,
-	    				e.getMessage(),
+	    				"Impossibile impostare il parametro.\nVerifica che la stanza abbia un attuatore attivo per questo parametro.",
 	    				"Errore", JOptionPane.ERROR_MESSAGE);
 	    	}
 	    }

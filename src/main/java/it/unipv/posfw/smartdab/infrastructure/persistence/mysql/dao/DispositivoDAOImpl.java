@@ -122,9 +122,10 @@ public class DispositivoDAOImpl implements DispositivoDAO{
 			Connection connection = DatabaseConnection.getConnection();
 
 			if (connection != null) {
-				s = connection.prepareStatement("UPDATE Dispositivo SET attivo = ? WHERE id = ?");
-				s.setBoolean(1, d.isAttivo());
-				s.setString(2, d.getId());
+				s = connection.prepareStatement("UPDATE Dispositivo SET stato = ?, attivo = ?  WHERE id = ?");
+				s.setString(1, d.getParametro().toString());
+				s.setBoolean(2, d.isAttivo());
+				s.setString(3, d.getId());
 
 				s.executeUpdate();
 

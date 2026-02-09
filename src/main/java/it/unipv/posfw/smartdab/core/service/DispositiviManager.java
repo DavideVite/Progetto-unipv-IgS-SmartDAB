@@ -92,15 +92,12 @@ public class DispositiviManager {
     	}
     } 
     
-    // Per i test
-    public void clearDispositivi() {
-		dispositivi.clear();
-	}
-    
-    // Metodo per il DB
-	public boolean deleteDispositivo(String id) {
+    // Metodo per rilevazione dei malfunzionamenti
+    public boolean enableDispositivo(String id) {
     	if(dao.existsById(id)) {
-    		dao.deleteDispositivo(id);
+    		dao.disableDispositivo(id);
+    		getDispositivoById(id).setStato(DispositivoStates.DISABLED);
+    		System.out.println(getDispositivoById(id).getStato());
     		return true;
     	} else {
     		System.out.println("Errore: il dispositivo non esiste");

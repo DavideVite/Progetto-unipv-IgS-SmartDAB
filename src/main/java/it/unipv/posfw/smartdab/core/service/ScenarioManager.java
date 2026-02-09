@@ -1,12 +1,8 @@
 package it.unipv.posfw.smartdab.core.service;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,33 +11,34 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.service.strategy.ImmediateActivationStrategy;
 import it.unipv.posfw.smartdab.core.service.strategy.ScenarioActivationStrategy;
-import it.unipv.posfw.smartdab.core.service.ScenarioImporter.ScenarioImportException;
 
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
+import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
-import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
-import it.unipv.posfw.smartdab.core.domain.exception.ScenarioNonModificabileException;
+import it.unipv.posfw.smartdab.factory.StanzaConfigFactory;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAOImpl;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 
 /**
  * Servizio per la gestione degli scenari.
  *
- * REFACTORING: Inversione delle Dipendenze (DIP)
- * - Prima: Dipendeva direttamente da ScenarioDAO (infrastructure)
- * - Dopo: Dipende da IScenarioRepository (core.port) - Output Port
+ * REFACTORING: Dependency Injection del DAO e persistenza nel database.
+ * - Prima: Gli scenari venivano gestiti solo in memoria (HashMap)
+ * - Dopo: Gli scenari vengono persistiti nel database tramite ScenarioDAO
  *
  * Vantaggi:
- * 1. Il core non conosce piu' MySQL o altri dettagli di persistenza
- * 2. Testabilita: possiamo iniettare un mock di IScenarioRepository
- * 3. Flessibilita: cambiare database senza modificare questo service
- * 4. Architettura Esagonale: il flusso delle dipendenze e' corretto
- *    (Infrastructure -> Core, mai viceversa)
+ * 1. Persistenza: gli scenari sopravvivono al riavvio dell'applicazione
+ * 2. Testabilita: possibilita di iniettare mock DAO nei test
+ * 3. Coerenza: stesso pattern di GestoreStanze
  */
 public class ScenarioManager implements Observable {
 
 	private Map<String, Scenario> scenari;
-	private final IScenarioRepository scenarioRepository;
+	private final ScenarioDAO scenarioDAO;
 	private final List<Observer> observers = new ArrayList<>();
 	private ScenarioActivationStrategy activationStrategy = new ImmediateActivationStrategy();
 
@@ -61,31 +58,99 @@ public class ScenarioManager implements Observable {
 	}
 
 	/**
-	 * Costruttore con Dependency Injection esplicita.
-	 * Le dipendenze vengono iniettate dal MainController (Composition Root).
-	 * Carica automaticamente gli scenari dal repository all'avvio.
-	 *
-	 * @param scenarioRepository Il repository per la persistenza degli scenari (Output Port)
+	 * Costruttore con Dependency Injection.
+	 * Usa l'implementazione di default ScenarioDAOImpl.
+	 * Carica automaticamente gli scenari dal database all'avvio.
 	 */
-	public ScenarioManager(IScenarioRepository scenarioRepository) {
-		this.scenarioRepository = scenarioRepository;
-		this.scenari = new HashMap<>();
-		caricaDalRepository();
+	public ScenarioManager() {
+		this(new ScenarioDAOImpl());
 	}
 
 	/**
-	 * Carica tutti gli scenari dal repository e li inserisce nella mappa in memoria.
+	 * Costruttore con Dependency Injection esplicita del DAO.
+	 * Permette di iniettare mock DAO per i test.
+	 * Carica automaticamente gli scenari dal database all'avvio.
+	 *
+	 * @param scenarioDAO Il DAO per la persistenza degli scenari
+	 */
+	public ScenarioManager(ScenarioDAO scenarioDAO) {
+		this.scenarioDAO = scenarioDAO;
+		this.scenari = new HashMap<>();
+		caricaDalDatabase();
+		inizializzaScenariPredefiniti();
+	}
+
+	/**
+	 * Crea gli scenari predefiniti (Notte, Giorno, Assenza) se non esistono già.
+	 * Ogni scenario viene configurato per tutte le stanze presenti nel database.
+	 */
+	private void inizializzaScenariPredefiniti() {
+		try {
+			StanzaDAO stanzaDAO = new StanzaDAOImpl();
+			Set<Stanza> stanze = stanzaDAO.readAllStanze();
+
+			if (stanze.isEmpty()) {
+				System.out.println("Nessuna stanza trovata: scenari predefiniti non creati");
+				return;
+			}
+
+			creaScenarioNotte(stanze);
+			creaScenarioGiorno(stanze);
+			creaScenarioAssenza(stanze);
+
+		} catch (Exception e) {
+			System.err.println("Errore durante l'inizializzazione degli scenari predefiniti: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void creaScenarioNotte(Set<Stanza> stanze) {
+		if (esisteScenario("Notte")) return;
+		Scenario s = creaScenario("Notte", EnumScenarioType.PREDEFINITO);
+		for (Stanza stanza : stanze) {
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 18.0));
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
+			aggiungiConfigurazione("Notte", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 50.0));
+		}
+		System.out.println("Scenario predefinito 'Notte' creato con " + s.getConfigurazioni().size() + " configurazioni");
+	}
+
+	private void creaScenarioGiorno(Set<Stanza> stanze) {
+		if (esisteScenario("Giorno")) return;
+		Scenario s = creaScenario("Giorno", EnumScenarioType.PREDEFINITO);
+		for (Stanza stanza : stanze) {
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 21.0));
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.UMIDITA, 45.0));
+			aggiungiConfigurazione("Giorno", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 500.0));
+		}
+		System.out.println("Scenario predefinito 'Giorno' creato con " + s.getConfigurazioni().size() + " configurazioni");
+	}
+
+	private void creaScenarioAssenza(Set<Stanza> stanze) {
+		if (esisteScenario("Assenza")) return;
+		Scenario s = creaScenario("Assenza", EnumScenarioType.PREDEFINITO);
+		for (Stanza stanza : stanze) {
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.TEMPERATURA, 16.0));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigNumerico(stanza.getId(), DispositivoParameter.LUMINOSITA, 0.0));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_PRESENZA, true));
+			aggiungiConfigurazione("Assenza", StanzaConfigFactory.creaConfigBooleano(stanza.getId(), DispositivoParameter.SENSORE_MOVIMENTO, true));
+		}
+		System.out.println("Scenario predefinito 'Assenza' creato con " + s.getConfigurazioni().size() + " configurazioni");
+	}
+
+	/**
+	 * Carica tutti gli scenari dal database e li inserisce nella mappa in memoria.
 	 * Chiamato automaticamente nel costruttore.
 	 */
-	private void caricaDalRepository() {
+	private void caricaDalDatabase() {
 		try {
-			List<Scenario> scenariDalDb = scenarioRepository.findAll();
+			List<Scenario> scenariDalDb = scenarioDAO.readAllScenari();
 			for (Scenario scenario : scenariDalDb) {
 				scenari.put(scenario.getNome(), scenario);
 			}
-			System.out.println("Caricati " + scenariDalDb.size() + " scenari dal repository");
+			System.out.println("Caricati " + scenariDalDb.size() + " scenari dal database");
 		} catch (Exception e) {
-			System.err.println("Errore durante il caricamento degli scenari dal repository: " + e.getMessage());
+			System.err.println("Errore durante il caricamento degli scenari dal database: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -94,18 +159,18 @@ public class ScenarioManager implements Observable {
 
 	/**
 	 * Crea uno scenario con il tipo specificato.
-	 * Solo il sistema puo' creare scenari PREDEFINITI (tramite inizializzaScenariPredefiniti).
+	 * Solo il sistema può creare scenari PREDEFINITI (tramite inizializzaScenariPredefiniti).
 	 */
 	public Scenario creaScenario(String nome, EnumScenarioType tipo) {
 		if (esisteScenario(nome)){
-			throw new IllegalArgumentException("Scenario con nome '" + nome + "' esiste gia'");
+			throw new IllegalArgumentException("Scenario con nome '" + nome + "' esiste già");
 		}
 		else {
 			Scenario scenario = new Scenario(nome, tipo);
 			scenari.put(nome, scenario);
 
-			// Persistenza nel repository
-			scenarioRepository.save(scenario);
+			// Persistenza nel database
+			scenarioDAO.insertScenario(scenario);
 
 			notifyObservers("SCENARIO_CREATO");
 			return scenario;
@@ -116,13 +181,13 @@ public class ScenarioManager implements Observable {
 	// secondo modo di chiamare creaScenario
 	public Scenario creaScenario(String nome) {
 		if (esisteScenario(nome)){
-			throw new IllegalArgumentException("Scenario con nome '" + nome + "' esiste gia'");
+			throw new IllegalArgumentException("Scenario con nome '" + nome + "' esiste già");
 		}
 		Scenario scenario = new Scenario(nome);
 		scenari.put(nome, scenario);
 
-		// Persistenza nel repository
-		scenarioRepository.save(scenario);
+		// Persistenza nel database
+		scenarioDAO.insertScenario(scenario);
 
 		notifyObservers("SCENARIO_CREATO");
 		return scenario;
@@ -142,11 +207,11 @@ public class ScenarioManager implements Observable {
 
 		// Gli scenari predefiniti non possono essere eliminati
 		if (scenario.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
-			throw new ScenarioNonModificabileException("Lo scenario predefinito '" + nomeScenario + "' non puo' essere eliminato");
+			throw new IllegalArgumentException("Lo scenario predefinito '" + nomeScenario + "' non può essere eliminato");
 		}
 
-		// Elimina dal repository (elimina anche le StanzaConfig associate)
-		boolean eliminatoDalDb = scenarioRepository.delete(scenario.getId());
+		// Elimina dal database (elimina anche le StanzaConfig associate)
+		boolean eliminatoDalDb = scenarioDAO.deleteScenario(scenario.getId());
 
 		// Rimuovi dalla mappa in memoria
 		scenari.remove(nomeScenario);
@@ -163,12 +228,12 @@ public class ScenarioManager implements Observable {
 	 * Attiva uno scenario ed esegue automaticamente le sue configurazioni.
 	 * Cicla tutte le StanzaConfig dello scenario e le passa al ParametroManager
 	 * che le tratta come impostazioni di parametri manuali.
-	 * Lo stato di attivazione viene persistito nel repository.
+	 * Lo stato di attivazione viene persistito nel database.
 	 *
 	 * @param nomeScenario Nome dello scenario da attivare
 	 * @param parametroManager Il ParametroManager per applicare le configurazioni
 	 * @return true se tutte le configurazioni sono state applicate con successo,
-	 *         false se lo scenario non esiste o se almeno una configurazione e' fallita
+	 *         false se lo scenario non esiste o se almeno una configurazione è fallita
 	 */
 	public boolean attivaScenario(String nomeScenario, ParametroManager parametroManager) {
 		Scenario scenario = scenari.get(nomeScenario);
@@ -179,8 +244,8 @@ public class ScenarioManager implements Observable {
 		// Attiva lo scenario (setta il flag)
 		scenario.attivaScenario();
 
-		// Persiste lo stato di attivazione nel repository
-		scenarioRepository.update(scenario);
+		// Persiste lo stato di attivazione nel database
+		scenarioDAO.updateScenario(scenario);
 
 		// Delega l'esecuzione delle configurazioni alla strategy
 		boolean result = activationStrategy.attiva(scenario, parametroManager);
@@ -195,8 +260,8 @@ public class ScenarioManager implements Observable {
 		if (scenario != null) {
 			scenario.disattivaScenario();
 
-			// Persiste lo stato di disattivazione nel repository
-			scenarioRepository.update(scenario);
+			// Persiste lo stato di disattivazione nel database
+			scenarioDAO.updateScenario(scenario);
 
 			notifyObservers("SCENARIO_DISATTIVATO");
 			return true;
@@ -211,19 +276,13 @@ public class ScenarioManager implements Observable {
 
 	// Getters
 
-	/**
-	 * Restituisce una vista non modificabile di tutti gli scenari.
-	 */
 	public Collection<Scenario> getTuttiScenari() {
-		return Collections.unmodifiableCollection(scenari.values());
+		return scenari.values();
 	}
 
-	/**
-	 * Restituisce una vista non modificabile della mappa degli scenari.
-	 * Il chiamante non puo' modificare la mappa direttamente.
-	 */
+
 	public Map<String, Scenario> getScenari() {
-		return Collections.unmodifiableMap(scenari);
+		return scenari;
 	}
 
 
@@ -235,22 +294,22 @@ public class ScenarioManager implements Observable {
 
 	/**
 	 * Aggiunge una configurazione a uno scenario esistente.
-	 * La modifica viene persistita nel repository.
+	 * La modifica viene persistita nel database.
 	 */
 	public boolean aggiungiConfigurazione(String nomeScenario, StanzaConfig config) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return false;
 		scenario.aggiungiConfigurazione(config);
 
-		// Persiste la modifica nel repository
-		scenarioRepository.update(scenario);
+		// Persiste la modifica nel database
+		scenarioDAO.updateScenario(scenario);
 
 		return true;
 	}
 
 	/**
 	 * Rimuove una configurazione da uno scenario esistente.
-	 * La modifica viene persistita nel repository.
+	 * La modifica viene persistita nel database.
 	 */
 	public boolean rimuoviConfigurazione(String nomeScenario, StanzaConfig config) {
 		Scenario scenario = scenari.get(nomeScenario);
@@ -258,8 +317,8 @@ public class ScenarioManager implements Observable {
 		boolean removed = scenario.rimuoviConfigurazione(config);
 
 		if (removed) {
-			// Persiste la modifica nel repository
-			scenarioRepository.update(scenario);
+			// Persiste la modifica nel database
+			scenarioDAO.updateScenario(scenario);
 		}
 
 		return removed;
@@ -267,21 +326,21 @@ public class ScenarioManager implements Observable {
 
 	/**
 	 * Rimuove una configurazione identificata da stanzaId e tipoParametro.
-	 * La modifica viene persistita nel repository.
+	 * La modifica viene persistita nel database.
 	 */
 	public boolean rimuoviConfigurazione(String nomeScenario, String stanzaId, DispositivoParameter tipoParametro) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return false;
 
-		// Uso di Iterator per rimozione sicura durante l'iterazione
-		Iterator<StanzaConfig> iterator = scenario.iterator();
-		while (iterator.hasNext()) {
-			StanzaConfig config = iterator.next();
+		List<StanzaConfig> configurazioni = scenario.getConfigurazioni();
+		for (StanzaConfig config : configurazioni) {
 			if (config.getStanzaId().equals(stanzaId) && config.getTipo_parametro() == tipoParametro) {
-				iterator.remove();
-				// Persiste la modifica nel repository
-				scenarioRepository.update(scenario);
-				return true;
+				boolean removed = scenario.rimuoviConfigurazione(config);
+				if (removed) {
+					// Persiste la modifica nel database
+					scenarioDAO.updateScenario(scenario);
+				}
+				return removed;
 			}
 		}
 		return false;
@@ -290,134 +349,9 @@ public class ScenarioManager implements Observable {
 	/**
 	 * Ritorna la lista delle configurazioni di uno scenario.
 	 */
-	public Set<StanzaConfig> getConfigurazioniScenario(String nomeScenario) {
+	public List<StanzaConfig> getConfigurazioniScenario(String nomeScenario) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) return null;
 		return scenario.getConfigurazioni();
-	}
-
-	// ===== EXPORT / IMPORT SCENARI =====
-
-	/**
-	 * Esporta uno scenario su file.
-	 * Utilizza ScenarioExporter con pattern Decorator (PrintWriter -> BufferedWriter -> FileWriter).
-	 *
-	 * @param nomeScenario Nome dello scenario da esportare
-	 * @param file File di destinazione
-	 * @return true se l'export e' riuscito, false se lo scenario non esiste
-	 * @throws IOException Se si verifica un errore durante la scrittura
-	 */
-	public boolean esportaScenario(String nomeScenario, File file) throws IOException {
-		Scenario scenario = scenari.get(nomeScenario);
-		if (scenario == null) {
-			return false;
-		}
-
-		ScenarioExporter exporter = new ScenarioExporter();
-		exporter.esportaScenario(scenario, file);
-		return true;
-	}
-
-	/**
-	 * Importa uno scenario da file e lo aggiunge al sistema.
-	 * Utilizza ScenarioImporter con pattern Decorator (BufferedReader -> FileReader)
-	 * e StringTokenizer per il parsing.
-	 *
-	 * Se uno scenario con lo stesso nome esiste gia', viene generata un'eccezione.
-	 *
-	 * @param file File da cui importare
-	 * @return Lo scenario importato
-	 * @throws IOException Se si verifica un errore durante la lettura
-	 * @throws ScenarioImportException Se il formato del file non e' valido
-	 * @throws IllegalArgumentException Se uno scenario con lo stesso nome esiste gia'
-	 */
-	public Scenario importaScenario(File file) throws IOException, ScenarioImportException {
-		ScenarioImporter importer = new ScenarioImporter();
-		Scenario scenario = importer.importaScenario(file);
-
-		// Verifica che non esista gia' uno scenario con lo stesso nome
-		if (esisteScenario(scenario.getNome())) {
-			throw new IllegalArgumentException(
-				"Scenario con nome '" + scenario.getNome() + "' esiste gia'. " +
-				"Eliminare lo scenario esistente prima di importare.");
-		}
-
-		// Aggiungi alla mappa in memoria
-		scenari.put(scenario.getNome(), scenario);
-
-		// Persisti nel repository
-		scenarioRepository.save(scenario);
-
-		notifyObservers("SCENARIO_IMPORTATO");
-		return scenario;
-	}
-
-	/**
-	 * Importa uno scenario da file, sovrascrivendo quello esistente se presente.
-	 *
-	 * @param file File da cui importare
-	 * @param sovrascrivi Se true, sovrascrive lo scenario esistente
-	 * @return Lo scenario importato
-	 * @throws IOException Se si verifica un errore durante la lettura
-	 * @throws ScenarioImportException Se il formato del file non e' valido
-	 */
-	public Scenario importaScenario(File file, boolean sovrascrivi)
-			throws IOException, ScenarioImportException {
-
-		ScenarioImporter importer = new ScenarioImporter();
-		Scenario scenario = importer.importaScenario(file);
-
-		// Se esiste gia' e sovrascrivi e' true, elimina quello esistente
-		if (esisteScenario(scenario.getNome())) {
-			if (sovrascrivi) {
-				Scenario esistente = scenari.get(scenario.getNome());
-				// Non permettere sovrascrittura di scenari predefiniti
-				if (esistente.getTipo_scenario() == EnumScenarioType.PREDEFINITO) {
-					throw new IllegalArgumentException(
-						"Non e' possibile sovrascrivere lo scenario predefinito '" + scenario.getNome() + "'");
-				}
-				// Elimina quello esistente
-				scenarioRepository.delete(esistente.getId());
-				scenari.remove(scenario.getNome());
-			} else {
-				throw new IllegalArgumentException(
-					"Scenario con nome '" + scenario.getNome() + "' esiste gia'.");
-			}
-		}
-
-		// Aggiungi alla mappa in memoria
-		scenari.put(scenario.getNome(), scenario);
-
-		// Persisti nel repository
-		scenarioRepository.save(scenario);
-
-		notifyObservers("SCENARIO_IMPORTATO");
-		return scenario;
-	}
-
-	/**
-	 * Genera un nome file suggerito per l'export di uno scenario.
-	 *
-	 * @param nomeScenario Nome dello scenario
-	 * @return Nome file suggerito o null se lo scenario non esiste
-	 */
-	public String suggerisciNomeFileExport(String nomeScenario) {
-		Scenario scenario = scenari.get(nomeScenario);
-		if (scenario == null) {
-			return null;
-		}
-		ScenarioExporter exporter = new ScenarioExporter();
-		return exporter.suggerisciNomeFile(scenario);
-	}
-
-	/**
-	 * Verifica se un file ha il formato corretto per l'importazione.
-	 *
-	 * @param file File da verificare
-	 * @return true se il formato sembra valido
-	 */
-	public boolean verificaFormatoFileImport(File file) {
-		ScenarioImporter importer = new ScenarioImporter();
-		return importer.verificaFormatoFile(file);
 	}
 }

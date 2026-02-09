@@ -4,6 +4,12 @@ import it.unipv.posfw.smartdab.core.domain.model.command.ICommand;
 import it.unipv.posfw.smartdab.core.port.device.DevicePort;
 import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 
+/**
+ * Comando di base per eseguire l'azione di un dispositivo
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class ActionCommand implements ICommand {
 
 	@Override

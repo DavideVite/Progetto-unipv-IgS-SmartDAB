@@ -8,13 +8,11 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
-import it.unipv.posfw.smartdab.core.domain.exception.PersistenzaException;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.DatabaseConnection;
@@ -52,9 +50,6 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
-				// TRANSACTION: disabilita auto-commit
-				conn.setAutoCommit(false);
-
 				pstmt = conn.prepareStatement(INSERT);
 
 				// Genera un ID se non presente
@@ -74,35 +69,21 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				pstmt.executeUpdate();
 
 				// Salva le configurazioni associate
-				for (StanzaConfig config : scenario ) {
+				for (StanzaConfig config : scenario.getConfigurazioni()) {
 					configDAO.insertConfig(conn, id, config);
 				}
 
-				// TRANSACTION: commit se tutto ok
-				conn.commit();
 				System.out.println("Scenario salvato con successo: " + scenario.getNome());
 			}
 
 		} catch (SQLException e) {
-			// TRANSACTION: rollback in caso di errore
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException rollbackEx) {
-					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
-				}
-			}
-			throw new PersistenzaException("Errore durante l'inserimento dello scenario: " + scenario.getNome(), e);
+			e.printStackTrace();
 		} finally {
-			// Ripristina auto-commit prima di chiudere
-			if (conn != null) {
-				try {
-					conn.setAutoCommit(true);
-				} catch (SQLException e) {
-					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
-				}
+			try {
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			chiudiRisorse(null, pstmt, conn);
 		}
 	}
 
@@ -115,9 +96,6 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
-				// TRANSACTION: disabilita auto-commit
-				conn.setAutoCommit(false);
-
 				pstmt = conn.prepareStatement(UPDATE);
 				pstmt.setString(1, scenario.getTipo_scenario().name());
 				pstmt.setBoolean(2, scenario.isActive());
@@ -128,35 +106,21 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 				// Aggiorna le configurazioni: cancella le vecchie e inserisce le nuove
 				configDAO.deleteByScenario(conn, scenario.getId());
-				for (StanzaConfig config : scenario) {
+				for (StanzaConfig config : scenario.getConfigurazioni()) {
 					configDAO.insertConfig(conn, scenario.getId(), config);
 				}
 
-				// TRANSACTION: commit se tutto ok
-				conn.commit();
 				System.out.println("Scenario aggiornato con successo: " + scenario.getNome());
 			}
 
 		} catch (SQLException e) {
-			// TRANSACTION: rollback in caso di errore
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException rollbackEx) {
-					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
-				}
-			}
-			throw new PersistenzaException("Errore durante l'aggiornamento dello scenario: " + scenario.getNome(), e);
+			e.printStackTrace();
 		} finally {
-			// Ripristina auto-commit prima di chiudere
-			if (conn != null) {
-				try {
-					conn.setAutoCommit(true);
-				} catch (SQLException e) {
-					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
-				}
+			try {
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			chiudiRisorse(null, pstmt, conn);
 		}
 	}
 
@@ -169,9 +133,6 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			conn = DatabaseConnection.getConnection();
 
 			if (conn != null) {
-				// TRANSACTION: disabilita auto-commit
-				conn.setAutoCommit(false);
-
 				// Prima elimina le configurazioni associate
 				configDAO.deleteByScenario(conn, id);
 
@@ -179,32 +140,17 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				pstmt = conn.prepareStatement(DELETE);
 				pstmt.setString(1, id);
 				int rowsAffected = pstmt.executeUpdate();
-
-				// TRANSACTION: commit se tutto ok
-				conn.commit();
 				return rowsAffected > 0;
 			}
 
 		} catch (SQLException e) {
-			// TRANSACTION: rollback in caso di errore
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException rollbackEx) {
-					System.err.println("Errore durante rollback: " + rollbackEx.getMessage());
-				}
-			}
-			throw new PersistenzaException("Errore durante l'eliminazione dello scenario con ID: " + id, e);
+			e.printStackTrace();
 		} finally {
-			// Ripristina auto-commit prima di chiudere
-			if (conn != null) {
-				try {
-					conn.setAutoCommit(true);
-				} catch (SQLException e) {
-					System.err.println("Errore ripristino auto-commit: " + e.getMessage());
-				}
+			try {
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-			chiudiRisorse(null, pstmt, conn);
 		}
 		return false;
 	}
@@ -227,15 +173,20 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					// Carica le configurazioni
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, id);
-					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
+					scenario.setConfigurazioni(configs);
 					return Optional.of(scenario);
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura dello scenario con ID: " + id, e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, pstmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return Optional.empty();
 	}
@@ -257,15 +208,20 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				if (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
+					scenario.setConfigurazioni(configs);
 					return Optional.of(scenario);
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura dello scenario con nome: " + nome, e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, pstmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return Optional.empty();
 	}
@@ -287,15 +243,20 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
+					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura di tutti gli scenari", e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, stmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (stmt != null) stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return scenari;
 	}
@@ -318,15 +279,20 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
+					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura degli scenari di tipo: " + tipo.name(), e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, pstmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return scenari;
 	}
@@ -349,15 +315,20 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 				while (rs.next()) {
 					Scenario scenario = creaScenarioDaResultSet(rs);
 					List<StanzaConfig> configs = configDAO.readConfigsByScenario(conn, scenario.getId());
-					scenario.setConfigurazioni(new LinkedHashSet<>(configs));
+					scenario.setConfigurazioni(configs);
 					scenari.add(scenario);
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la lettura degli scenari attivi: " + active, e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, pstmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return scenari;
 	}
@@ -382,9 +353,14 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante la verifica esistenza scenario: " + nome, e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, pstmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
@@ -408,9 +384,14 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new PersistenzaException("Errore durante il conteggio degli scenari", e);
+			e.printStackTrace();
 		} finally {
-			chiudiRisorse(rs, stmt, conn);
+			try {
+				if (rs != null) rs.close();
+				if (stmt != null) stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return 0;
 	}
@@ -421,7 +402,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 	private Scenario creaScenarioDaResultSet(ResultSet rs) throws SQLException {
 		String id = rs.getString("id");
 		String nome = rs.getString("nome");
-		EnumScenarioType tipo = parseScenarioType(rs.getString("tipo"));
+		EnumScenarioType tipo = EnumScenarioType.valueOf(rs.getString("tipo"));
 		boolean attivo = rs.getBoolean("attivo");
 		LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 		LocalDateTime updatedAt = rs.getTimestamp("updated_at").toLocalDateTime();
@@ -429,38 +410,4 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 		return new Scenario(id, nome, tipo, attivo, createdAt, updatedAt);
 	}
 
-	/**
-	 * Converte una stringa nel corrispondente EnumScenarioType.
-	 * Se il valore non è valido, ritorna PERSONALIZZATO come fallback.
-	 */
-	private EnumScenarioType parseScenarioType(String tipoStr) {
-		try {
-			return EnumScenarioType.valueOf(tipoStr);
-		} catch (IllegalArgumentException e) {
-			System.err.println("Tipo scenario non valido nel DB: " + tipoStr + ". Default a PERSONALIZZATO.");
-			return EnumScenarioType.PERSONALIZZATO;
-		}
-	}
-
-	/**
-	 * Metodo helper per chiudere le risorse JDBC in modo sicuro.
-	 * Evita duplicazione di codice nei blocchi finally.
-	 */
-	private void chiudiRisorse(ResultSet rs, Statement stmt, Connection conn) {
-		try {
-			if (rs != null) rs.close();
-		} catch (SQLException e) {
-			System.err.println("Errore chiusura ResultSet: " + e.getMessage());
-		}
-		try {
-			if (stmt != null) stmt.close();
-		} catch (SQLException e) {
-			System.err.println("Errore chiusura Statement: " + e.getMessage());
-		}
-		try {
-			if (conn != null) conn.close();
-		} catch (SQLException e) {
-			System.err.println("Errore chiusura Connection: " + e.getMessage());
-		}
-	}
 }

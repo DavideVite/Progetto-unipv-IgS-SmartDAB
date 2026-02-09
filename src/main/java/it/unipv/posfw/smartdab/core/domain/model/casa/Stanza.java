@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
@@ -92,21 +91,6 @@ public class Stanza implements Observable, Observer, RoomPort {
 
 	 public List<Dispositivo> getDispositivi() {
 		 return dispositivi;
-	 }
-
-	 /**
-	  * Restituisce solo gli attuatori presenti nella stanza.
-	  * Evita l'uso di instanceof nel codice chiamante, spostando
-	  * la responsabilita' del filtraggio nell'entita' che possiede i dati.
-	  */
-	 public List<AttuatoreFacade> getAttuatori() {
-		 List<AttuatoreFacade> attuatori = new ArrayList<>();
-		 for (Dispositivo d : dispositivi) {
-			 if (d instanceof AttuatoreFacade) {
-				 attuatori.add((AttuatoreFacade) d);
-			 }
-		 }
-		 return attuatori;
 	 }
 
 	 public Map<String, Double> getParametri() {

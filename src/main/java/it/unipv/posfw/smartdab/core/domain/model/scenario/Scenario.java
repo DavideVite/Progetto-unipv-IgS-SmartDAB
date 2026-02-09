@@ -1,14 +1,13 @@
 package it.unipv.posfw.smartdab.core.domain.model.scenario;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> {
+public class Scenario {
 
 //	LocalDateTime() è un classe che rappresenta data e ora senza fuso orario
 //	- non tiene traccia del timezone
@@ -17,17 +16,17 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 
 	private String id;
 	private String nome;
-	private Set<StanzaConfig> configurazioni;
-	private final EnumScenarioType tipo_scenario;
+	private List<StanzaConfig> configurazioni;
+	private EnumScenarioType tipo_scenario;
 	private boolean isActive;
-	private final LocalDateTime data_creazione;
+	private LocalDateTime data_creazione;
 	private	LocalDateTime data_ultima_modifica;
 
 
 	public Scenario(String nome) {
 		this.id = null;
 		this.nome = nome;
-		this.configurazioni = new LinkedHashSet<>();
+		this.configurazioni = new ArrayList<>();
 		this.tipo_scenario = EnumScenarioType.PERSONALIZZATO;
 		this.isActive = false;
 		this.data_creazione = LocalDateTime.now();
@@ -37,7 +36,7 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 	public Scenario(String nome, EnumScenarioType tipo_scenario) {
 		this.id = null;
 		this.nome = nome;
-		this.configurazioni = new LinkedHashSet<>();
+		this.configurazioni = new ArrayList<>();
 		this.tipo_scenario = tipo_scenario;
 		this.isActive = false;
 		this.data_creazione = LocalDateTime.now();
@@ -49,37 +48,13 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 			LocalDateTime data_creazione, LocalDateTime data_ultima_modifica) {
 		this.id = id;
 		this.nome = nome;
-		this.configurazioni = new LinkedHashSet<>();
+		this.configurazioni = new ArrayList<>();
 		this.tipo_scenario = tipo_scenario;
 		this.isActive = isActive;
 		this.data_creazione = data_creazione;
 		this.data_ultima_modifica = data_ultima_modifica;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		Scenario scenario = (Scenario) o;
-
-		return id != null ? id.equals(scenario.id) : scenario.id == null;
-	}
-
-	@Override
-	public int hashCode(){
-		return id != null ? id.hashCode() : 0;
-	}
-
-	@Override
-	public Iterator<StanzaConfig> iterator(){
-		return configurazioni.iterator();
-	}
-
-	@Override
-	public int compareTo(Scenario other) {
-		return this.nome.compareTo(other.nome);
-	}
 	// I senguenti 2 metodi sono public per permettere a ScenarioManager di usarli.
 	/*  Questa funzione aggiunge allo Scenario la nuova configurazione.
 	/*Lo Scenario è sostanzialmente formato da un insime di configurazioni,
@@ -118,19 +93,7 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 		 return id;
 	 }
 
-	 /**
-	  * Imposta l'ID dello scenario.
-	  * ATTENZIONE: Questo metodo e' destinato SOLO all'uso da parte del layer di persistenza
-	  * (ScenarioDAOImpl) per assegnare l'ID generato dal database.
-	  * Non deve essere chiamato dal codice applicativo.
-	  *
-	  * @param id L'ID generato dal database
-	  * @throws IllegalStateException se l'ID e' gia' stato impostato (immutabilita')
-	  */
 	 public void setId(String id) {
-		 if (this.id != null && !this.id.isEmpty()) {
-			 throw new IllegalStateException("L'ID dello scenario e' gia' stato impostato e non puo' essere modificato");
-		 }
 		 this.id = id;
 	 }
 
@@ -138,11 +101,11 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 		 return nome;
 	 }
 
-	 public Set<StanzaConfig> getConfigurazioni() {
+	 public List<StanzaConfig> getConfigurazioni() {
 	        return configurazioni;
 	 }
 
-	 public void setConfigurazioni(Set<StanzaConfig> configurazioni) {
+	 public void setConfigurazioni(List<StanzaConfig> configurazioni) {
 		 this.configurazioni = configurazioni;
 		 this.data_ultima_modifica = LocalDateTime.now();
 	 }
@@ -170,7 +133,7 @@ public class Scenario implements Iterable <StanzaConfig> , Comparable<Scenario> 
 
 	 @Override
 	 public String toString() {
-		return "Scenario [nome=" + nome + ", id=" + id + ", tipo_scenario=" + tipo_scenario + ", isActive=" + isActive + ", data_creazione=" + data_creazione + ", data_ultima_modifica=" + data_ultima_modifica + "\nconfigurazioni=" + configurazioni + "]";
+		return "Scenario [nome=" + nome + ", " + "\nconfigurazioni=" + configurazioni + "]";
 	 }
 
 

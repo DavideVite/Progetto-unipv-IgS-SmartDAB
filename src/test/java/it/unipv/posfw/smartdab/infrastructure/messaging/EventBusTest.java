@@ -119,10 +119,10 @@ public class EventBusTest {
 		
 		// Si attiva la catena sensore -> eventBus -> attuatore -> ...
 		
-		// Verifico che la temperatura sia nel range di tolleranza della pompa
+		// Verifico che la temperatura sia nel range di tolleranza della pompa + 1 di errore del sensore
 		assertTrue(
-				(stanza.getMisura(DispositivoParameter.TEMPERATURA.toString()) >= 22.0) &&
-				(stanza.getMisura(DispositivoParameter.TEMPERATURA.toString()) <= 28.0));
+				(stanza.getMisura(DispositivoParameter.TEMPERATURA.toString()) >= 21.0) &&
+				(stanza.getMisura(DispositivoParameter.TEMPERATURA.toString()) <= 29.0));
 		
 	}
 

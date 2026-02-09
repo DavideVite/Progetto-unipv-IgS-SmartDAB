@@ -62,7 +62,7 @@ public class ScenarioDetailPanel extends JPanel {
         lblStato.setText(scenario.isActive() ? "Attivo" : "Disattivo");
 
         configTableModel.setRowCount(0);
-        for (StanzaConfig config : scenario) {
+        for (StanzaConfig config : scenario.getConfigurazioni()) {
             configTableModel.addRow(new Object[]{
                 config.getStanzaId(),
                 config.getTipo_parametro().toString(),

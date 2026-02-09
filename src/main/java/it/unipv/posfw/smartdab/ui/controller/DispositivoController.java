@@ -146,7 +146,7 @@ public class DispositivoController implements
         } else {
             if (dispositiviManager.getDispositivoById(dispositivo.getId()) != null) {
                 JOptionPane.showMessageDialog(formPanel,
-                    "ID già esistente", "Errore", JOptionPane.ERROR_MESSAGE);
+                    "Il dispositivo inserito è già esistente", "Errore", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             dispositiviManager.aggiungiDispositivo(dispositivo);
