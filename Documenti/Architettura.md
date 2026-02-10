@@ -58,14 +58,7 @@ Disaccoppiando la logica di presentazione (View) da quella di controllo (Control
 
 ## 2.3 Componente event-driven (EventBus pub/sub)
 
-Per favorire il disaccoppiamento tra componenti e per gestire in modo efficiente la comunicazione tra i numerosi dispositivi, il sistema utilizza un EventBus interno.
-Questa architettura consente di disaccoppiare completamente i client: 
-- i sensori (publisher) pubblicano le proprie rilevazioni su topic specifici (es. soggiorno/temperatura, cucina/luminosità),
-- gli attuatori (subscriber) ricevono notifiche solo per i topic a cui sono iscritti. 
-Questo introduce elementi di architettura event-driven, riducendo le dipendenze dirette tra moduli e semplificando l’integrazione di nuove funzionalità che si basano sugli stessi eventi.
+L'architettura utilizzata per gestire le comunicazioni tra i dispositivi modella concettualmente l'architettura client-server. Questa scelta nasce dall'esigenza di gestire un sistema composto da dispositivi logicamente distribuiti, ovvero creando una separazione importante tra componenti che richiedono servizi e componenti che li offrono. Si tratta dunque di una scelta semantica e organizzativa, che bypassa il problema della rete sottostante in quanto non inerente agli obiettivi del progetto, concentrandosi piuttosto sull'interazione tra i vari componenti.
 
 Motivazione della scelta:
 In un sistema puramente a layer, la comunicazione "dal basso verso l'alto" o tra componenti dello stesso livello è difficile e crea dipendenze rigide. L'introduzione dell'EventBus serve a garantire il basso accoppiamento (Loose Coupling). Moduli diversi possono reagire allo stesso evento (es. "SalvataggioCompletato") senza doversi conoscere direttamente o referenziare l'uno con l'altro, migliorando l'estensibilità del sistema.
-
-
-![](img/publisher_subscriber_architecture.png)
