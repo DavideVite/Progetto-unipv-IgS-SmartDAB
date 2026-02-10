@@ -11,7 +11,7 @@ import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenarioFormPanel;
-import it.unipv.posfw.smartdab.core.service.exception.ScenarioNonModificabileException;
+import it.unipv.posfw.smartdab.core.domain.exception.ScenarioNonModificabileException;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -48,6 +48,7 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
     // FIX: Aggiunto ScenarioFormPanel per creazione/modifica scenari con configurazioni
     private ScenarioFormPanel formPanel;
     private JDialog formDialog;
+    private boolean aggiornamentoInCorso = false;
 
     /**
      * Costruttore aggiornato con GestoreStanze per ottenere lista stanze.
@@ -108,6 +109,7 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
 
         // Checkbox attivo/disattivo
         panel.getTableModel().addTableModelListener(e -> {
+            if (aggiornamentoInCorso) return;
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
                 int row = e.getFirstRow();
                 if (row >= 0 && row < scenariList.size()) {
@@ -158,16 +160,21 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
     }
 
     public void aggiornaTabella() {
-        scenariList.clear();
-        scenariList.addAll(scenarioManager.getTuttiScenari());
+        aggiornamentoInCorso = true;
+        try {
+            scenariList.clear();
+            scenariList.addAll(scenarioManager.getTuttiScenari());
 
-        panel.getTableModel().setRowCount(0);
-        for (Scenario s : scenariList) {
-            panel.getTableModel().addRow(new Object[]{
-                s.isActive(),
-                s.getNome(),
-                s.getTipo_scenario().toString()
-            });
+            panel.getTableModel().setRowCount(0);
+            for (Scenario s : scenariList) {
+                panel.getTableModel().addRow(new Object[]{
+                    s.isActive(),
+                    s.getNome(),
+                    s.getTipo_scenario().toString()
+                });
+            }
+        } finally {
+            aggiornamentoInCorso = false;
         }
     }
 

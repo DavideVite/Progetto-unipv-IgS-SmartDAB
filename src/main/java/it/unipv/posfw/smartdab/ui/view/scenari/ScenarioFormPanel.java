@@ -52,10 +52,13 @@ public class ScenarioFormPanel extends JPanel {
 
     // Mappa nome stanza -> ID stanza per il corretto salvataggio nel DB
     private Map<String, String> mappaStanzaNomeToId;
+    // Mappa inversa ID -> nome per visualizzazione in modifica
+    private Map<String, String> mappaStanzaIdToNome;
 
     public ScenarioFormPanel() {
         this.configurazioniTemp = new ArrayList<>();
         this.mappaStanzaNomeToId = new HashMap<>();
+        this.mappaStanzaIdToNome = new HashMap<>();
         initComponents();
     }
 
@@ -347,8 +350,9 @@ public class ScenarioFormPanel extends JPanel {
 
         for (StanzaConfig config : scenario) {
             configurazioniTemp.add(config);
+            String nomeStanza = mappaStanzaIdToNome.getOrDefault(config.getStanzaId(), config.getStanzaId());
             modelloConfig.addRow(new Object[]{
-                config.getStanzaId(),
+                nomeStanza,
                 config.getTipo_parametro().toString(),
                 config.getParametro().getDisplayString()
             });
@@ -365,9 +369,11 @@ public class ScenarioFormPanel extends JPanel {
     public void aggiornaListaStanze(Map<String, String> stanzeMap) {
         comboStanza.removeAllItems();
         mappaStanzaNomeToId.clear();
+        mappaStanzaIdToNome.clear();
         mappaStanzaNomeToId.putAll(stanzeMap);
-        for (String nomeStanza : stanzeMap.keySet()) {
-            comboStanza.addItem(nomeStanza);
+        for (Map.Entry<String, String> entry : stanzeMap.entrySet()) {
+            comboStanza.addItem(entry.getKey());
+            mappaStanzaIdToNome.put(entry.getValue(), entry.getKey());
         }
     }
 
