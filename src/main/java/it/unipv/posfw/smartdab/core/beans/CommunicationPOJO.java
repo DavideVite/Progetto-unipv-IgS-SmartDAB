@@ -38,6 +38,10 @@ public class CommunicationPOJO {
 		last_update = t;
 	}
 	
+	public CommunicationPOJO() {
+		
+	}
+	
 	public int getId() {
 		return id;
 	}

@@ -30,7 +30,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
  */
 public class GestoreStanze {
     private final Casa casa;
-    // FIX: DAO iniettato nel costruttore invece di creato ad ogni operazione
     private final StanzaDAO stanzaDAO;
     private final MisuraDAO misuraDAO;
 
