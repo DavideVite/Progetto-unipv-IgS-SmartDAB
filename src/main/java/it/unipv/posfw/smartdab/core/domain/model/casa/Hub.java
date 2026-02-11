@@ -21,8 +21,20 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImpl;
 import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 
+/**
+ * La classe Hub rappresenta il cuore del sistema di domotica.
+ * Implementa il pattern Singleton per garantire un'unica istanza globale
+ * e il pattern Facade per fornire un accesso semplificato ai sottosistemi
+ * di gestione stanze, malfunzionamenti e autenticazione.
+ * Include un sistema di monitoraggio periodico che verifica lo stato dei 
+ * dispositivi ogni minuto, a condizione che il sistema sia sbloccato.
+ * @author Beatrice Bertone
+ * @version 1.2
+ */
+
 	public class Hub {
 		
+		/** Unica istanza della classe Hub (Singleton). */
 		private static Hub instance;
 		
 		private Autenticazione autenticazione;
@@ -33,6 +45,11 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
       	private CommunicationDAO communicationDao;
 	    private boolean sistemaSbloccato = false;
 	    
+	    /**
+	     * Costruttore privato.
+	     * Inizializza i sottosistemi, i DAO e avvia il timer di monitoraggio periodico.
+	     * * @param passwordProduttore necessaria per il primo avvio.
+	     */
 	    private Hub(String passwordProduttore) {
            this.autenticazione =new Autenticazione(passwordProduttore);
 
@@ -57,7 +74,6 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	        timer.scheduleAtFixedRate(new java.util.TimerTask() {
 	            @Override
 	            public void run() {
-	                // Eseguiamo il controllo solo se il sistema è stato sbloccato col PIN
 	                if (sistemaSbloccato) {
 	                try {
 	                    System.out.println("Monitoraggio periodico: controllo stato dispositivi...");
@@ -70,7 +86,11 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	        }, 5000, 60000); // Parte dopo 5 secondi dall'accensione e ripete ogni 60 secondi (60000 ms)
 	    }  
 	    
-	    //metodo per sbloccare il sistema all'accensione
+	    /**
+	     * Metodo per sbloccare il sistema verificando il PIN inserito.
+	     * * @param pin .
+	     * @return {@code true} se il PIN è corretto, {@code false} altrimenti.
+	     */
 	    public boolean accedi(String pin) {
 	    	if (autenticazione.verificaPin(pin)) {
 	    		this.sistemaSbloccato = true;
@@ -79,6 +99,11 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	    	return false;
 	    }
 	    
+	    /**
+	     * Restituisce l'istanza unica dell'Hub, creandola se necessario.
+	     * * @param passwordProduttore.
+	     * @return L'istanza Singleton di {@link Hub}.
+	     */
 	    public static Hub getInstance(String passwordProduttore) {
 	    	if(instance==null) {
 	    		instance = new Hub(passwordProduttore);
@@ -86,11 +111,14 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	    	return instance;
 	    }
 	    
+	    /**
+	     * Restituisce l'istanza dell'Hub senza richiedere parametri.
+	     * * @return L'istanza Singleton esistente, o {@code null} se non ancora inizializzata.
+	     */
 	    public static Hub getInstance() {
 	    	return instance;
 	    }
 	    
-	    //per accedere all'hub il sistema deve essere sbloccato
 	    public GestoreStanze getGestoreStanze() {
 	    	if (sistemaSbloccato) {
 	    	return gestoreStanze;
@@ -115,6 +143,11 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	    	}
 	    }
 	    
+	    /**
+	     * Esegue la scansione di tutti i dispositivi registrati per verificarne la connessione.
+	     * Recupera le ultime comunicazioni dal database e delega al 
+	     * {@link GestoreMalfunzionamenti} la logica di controllo specifica.
+	     */
 	    public void verificaStatoDispositivi() {
 	    	//Legge le ultime comunicazioni
 	        ArrayList<CommunicationPOJO> ultimeCom = communicationDao.selectN(100); 
@@ -142,6 +175,12 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	        }
 	    }
 	        
+	    /**
+	     * Cerca all'interno di una lista la comunicazione più recente associata a un dispositivo.
+	     * * @param lista La lista di comunicazioni recenti.
+	     * @param idDisp L'identificativo del dispositivo da cercare.
+	     * @return La {@link CommunicationPOJO} trovata, o {@code null} se assente.
+	     */
 	        private CommunicationPOJO trovaComunicazionePerDispositivo(ArrayList<CommunicationPOJO> lista, String idDisp) {
 	        	for(CommunicationPOJO c : lista) {
 	        		//confronto id del dispositivo salvato nella comunicazione con quello del dispositivo che stiamo controllando
