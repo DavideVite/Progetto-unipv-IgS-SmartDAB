@@ -40,6 +40,7 @@ public class ScenarioManager implements Observable {
 
 	private Map<String, Scenario> scenari;
 	private final IScenarioRepository scenarioRepository;
+	private final ParametroManager parametroManager;
 	private final List<Observer> observers = new ArrayList<>();
 	private ScenarioActivationStrategy activationStrategy = new ImmediateActivationStrategy();
 
@@ -64,9 +65,11 @@ public class ScenarioManager implements Observable {
 	 * Carica automaticamente gli scenari dal repository all'avvio.
 	 *
 	 * @param scenarioRepository Il repository per la persistenza degli scenari (Output Port)
+	 * @param parametroManager Il manager per applicare le configurazioni dei parametri
 	 */
-	public ScenarioManager(IScenarioRepository scenarioRepository) {
+	public ScenarioManager(IScenarioRepository scenarioRepository, ParametroManager parametroManager) {
 		this.scenarioRepository = scenarioRepository;
+		this.parametroManager = parametroManager;
 		this.scenari = new HashMap<>();
 		caricaDalRepository();
 	}
@@ -161,12 +164,10 @@ public class ScenarioManager implements Observable {
 	 * che le tratta come impostazioni di parametri manuali.
 	 *
 	 * @param nomeScenario Nome dello scenario da attivare
-	 * @param parametroManager Il ParametroManager per applicare le configurazioni
 	 * @return true se tutte le configurazioni sono state applicate con successo,
 	 *         false se lo scenario non esiste o se almeno una configurazione e' fallita
-	 * @author Davide Vitello
 	 */
-	public boolean attivaScenario(String nomeScenario, ParametroManager parametroManager) {
+	public boolean attivaScenario(String nomeScenario) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario == null) {
 			return false;
@@ -174,7 +175,7 @@ public class ScenarioManager implements Observable {
 
 		scenario.attivaScenario();
 		scenarioRepository.update(scenario);
-		boolean result = activationStrategy.attiva(scenario, parametroManager);
+		boolean result = activationStrategy.attiva(scenario, this.parametroManager);
 
 		notifyObservers("SCENARIO_ATTIVATO");
 		return result;

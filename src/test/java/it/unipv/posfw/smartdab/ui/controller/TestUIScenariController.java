@@ -5,7 +5,6 @@ import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
 import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
-import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 
@@ -35,18 +34,15 @@ public class TestUIScenariController {
             // Crea il pannello scenari
             ScenariPanel scenariPanel = new ScenariPanel();
 
-            // Crea il manager con alcuni scenari di esempio
-            ScenarioManager scenarioManager = creaScenariDiEsempio();
-
-            // Crea un mock semplice per ParametroManager (null-safe per il test UI)
-            ParametroManager parametroManager = null; // In un test reale useresti un mock
-
             // Crea GestoreStanze con una Casa vuota per il test UI
             Casa casa = new Casa();
             GestoreStanze gestoreStanze = new GestoreStanze(casa);
 
-            // Crea il controller con tutti e 4 i parametri richiesti
-            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, parametroManager, gestoreStanze);
+            // Crea il manager con alcuni scenari di esempio
+            ScenarioManager scenarioManager = creaScenariDiEsempio(gestoreStanze);
+
+            // Crea il controller
+            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, gestoreStanze);
 
             // Aggiungi il pannello alla finestra
             frame.add(scenariPanel);
@@ -68,9 +64,10 @@ public class TestUIScenariController {
     /**
      * Crea alcuni scenari di esempio per il test
      */
-    private static ScenarioManager creaScenariDiEsempio() {
+    private static ScenarioManager creaScenariDiEsempio(GestoreStanze gestoreStanze) {
         // Crea un mock repository in-memory per i test
-        ScenarioManager manager = new ScenarioManager(new MockScenarioRepository());
+        // ParametroManager con mock per il test (non invia comandi reali)
+        ScenarioManager manager = new ScenarioManager(new MockScenarioRepository(), null);
 
         // Scenario 1: Mattina
         manager.creaScenario("Mattina", EnumScenarioType.PREDEFINITO);
