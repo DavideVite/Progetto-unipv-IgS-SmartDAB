@@ -37,7 +37,7 @@ L'adozione di un'architettura a layer permette la Separazione delle Responsabili
 │  GestoreStanze, ScenarioManager     │
 │  ParametroManager, DispositiviManager│
 └──────────────┬──────────────────────┘
-               │ istanzia direttamente
+               │ 
                ▼
 ┌─────────────────────────────────────┐
 │      DATA ACCESS LAYER              │
@@ -56,9 +56,14 @@ Questa organizzazione separa chiaramente le responsabilità tra presentazione, c
 Motivazione della scelta:
 Disaccoppiando la logica di presentazione (View) da quella di controllo (Controller), si ottiene un codice più pulito e modulare, facilitando eventuali aggiornamenti futuri dell'interfaccia.
 
+### 
+Il sistema presenta alcuni elementi di architettura esagonale tra dominio e infrastrutta, e tra dominio e persistenza
+
 ## 2.3 Componente event-driven (EventBus pub/sub)
 
 L'architettura utilizzata per gestire le comunicazioni tra i dispositivi modella concettualmente l'architettura client-server. Questa scelta nasce dall'esigenza di gestire un sistema composto da dispositivi logicamente distribuiti, ovvero creando una separazione importante tra componenti che richiedono servizi e componenti che li offrono. Si tratta dunque di una scelta semantica e organizzativa, che bypassa il problema della rete sottostante in quanto non inerente agli obiettivi del progetto, concentrandosi piuttosto sull'interazione tra i vari componenti.
 
 Motivazione della scelta:
 In un sistema puramente a layer, la comunicazione "dal basso verso l'alto" o tra componenti dello stesso livello è difficile e crea dipendenze rigide. L'introduzione dell'EventBus serve a garantire il basso accoppiamento (Loose Coupling). Moduli diversi possono reagire allo stesso evento (es. "SalvataggioCompletato") senza doversi conoscere direttamente o referenziare l'uno con l'altro, migliorando l'estensibilità del sistema.
+
+
