@@ -40,11 +40,7 @@ public class ScenarioDAOImpl implements ScenarioDAO {
 
 	@Override
 	public void insertScenario(Scenario scenario) {
-		if (existsByNome(scenario.getNome())) {
-			System.out.println("Scenario già esistente: " + scenario.getNome());
-			return;
-		}
-
+		// Il controllo esisteScenario e' gia' fatto in ScenarioManager.creaScenario()
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 

@@ -25,7 +25,6 @@ import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
  *    - ScenarioDAO NON estende questa interfaccia
  *    - L'Adapter in infrastructure implementa IScenarioRepository
  *    - L'Adapter USA internamente ScenarioDAO
- *    - Il pattern DAO resta intatto e indipendente
  *
  * 4. TESTABILITA':
  *    - Nei test possiamo creare un mock di IScenarioRepository
