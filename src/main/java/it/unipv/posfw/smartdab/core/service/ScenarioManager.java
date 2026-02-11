@@ -25,8 +25,6 @@ import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
 import it.unipv.posfw.smartdab.core.domain.exception.ScenarioNonModificabileException;
 
 /**
- * Servizio per la gestione degli scenari.
- *
  * REFACTORING: Inversione delle Dipendenze (DIP)
  * - Prima: Dipendeva direttamente da ScenarioDAO (infrastructure)
  * - Dopo: Dipende da IScenarioRepository (core.port) - Output Port
@@ -120,8 +118,6 @@ public class ScenarioManager implements Observable {
 		}
 		Scenario scenario = new Scenario(nome);
 		scenari.put(nome, scenario);
-
-		// Persistenza nel repository
 		scenarioRepository.save(scenario);
 
 		notifyObservers("SCENARIO_CREATO");
@@ -163,12 +159,12 @@ public class ScenarioManager implements Observable {
 	 * Attiva uno scenario ed esegue automaticamente le sue configurazioni.
 	 * Cicla tutte le StanzaConfig dello scenario e le passa al ParametroManager
 	 * che le tratta come impostazioni di parametri manuali.
-	 * Lo stato di attivazione viene persistito nel repository.
 	 *
 	 * @param nomeScenario Nome dello scenario da attivare
 	 * @param parametroManager Il ParametroManager per applicare le configurazioni
 	 * @return true se tutte le configurazioni sono state applicate con successo,
 	 *         false se lo scenario non esiste o se almeno una configurazione e' fallita
+	 * @author Davide Vitello
 	 */
 	public boolean attivaScenario(String nomeScenario, ParametroManager parametroManager) {
 		Scenario scenario = scenari.get(nomeScenario);
@@ -176,13 +172,8 @@ public class ScenarioManager implements Observable {
 			return false;
 		}
 
-		// Attiva lo scenario (setta il flag)
 		scenario.attivaScenario();
-
-		// Persiste lo stato di attivazione nel repository
 		scenarioRepository.update(scenario);
-
-		// Delega l'esecuzione delle configurazioni alla strategy
 		boolean result = activationStrategy.attiva(scenario, parametroManager);
 
 		notifyObservers("SCENARIO_ATTIVATO");

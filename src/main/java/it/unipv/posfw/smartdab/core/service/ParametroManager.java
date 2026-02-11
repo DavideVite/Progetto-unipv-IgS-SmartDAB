@@ -18,18 +18,10 @@ import it.unipv.posfw.smartdab.core.service.strategy.ActuationStrategy.Actuation
 import it.unipv.posfw.smartdab.core.service.strategy.DirectMatchStrategy;
 
 /**
- * Servizio per la gestione dei parametri.
- *
  * REFACTORING: Inversione delle Dipendenze (DIP)
  * - Prima: Dipendeva da IEventBusClient e Request (infrastructure)
  *          Conteneva "SETPOINT" hardcoded
  * - Dopo: Dipende da ICommandSender (core.port) - Output Port
- *
- * REFACTORING: Eliminazione instanceof (OCP/LSP)
- * - Prima: Usava instanceof per filtrare AttuatoreFacade e per estrarre valori
- * - Dopo: Usa Stanza.getAttuatori() e IParametroValue.toNumericValue()
- *         La responsabilita' del filtraggio e' nell'entita' che possiede i dati,
- *         la conversione e' delegata all'oggetto stesso (polimorfismo).
  *
  * REFACTORING: Strategy Pattern per distribuzione comandi
  * - La logica di selezione degli attuatori e' delegata a ActuationStrategy
@@ -52,7 +44,7 @@ public class ParametroManager implements Observable {
         this.actuationStrategy = new DirectMatchStrategy(); // Default
     }
 
-    // ==================== Observable Pattern ====================
+    // ==================== Observer Pattern ====================
 
     @Override
     public void addObserver(Observer observer) {
