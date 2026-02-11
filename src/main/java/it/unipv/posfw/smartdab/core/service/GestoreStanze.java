@@ -15,10 +15,10 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
 
 /**
  * Servizio per la gestione delle stanze della casa.
- *
- * REFACTORING: Dependency Injection del DAO e caricamento dal database.
- * - Prima: Il DAO veniva creato ad ogni operazione (new StanzaDAOImpl() in ogni metodo)
- * - Dopo: Il DAO viene iniettato nel costruttore e riutilizzato
+ * Implementa le operazioni CRUD (create, read, update, delete)
+ * La classe applica i principi di Dependency Injection,
+ * permettendo una maggiore testabilità e disaccoppiamento dall'implementazione specifica del database.
+ * Il DAO viene iniettato nel costruttore e riutilizzato
  * - Le stanze vengono caricate dal database all'avvio
  *
  * Vantaggi:
@@ -27,6 +27,9 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAOImp
  * 3. Dependency Inversion: dipendenza dall'interfaccia StanzaDAO, non dall'implementazione
  * 4. Separazione responsabilita: GestoreStanze non deve sapere come creare il DAO
  * 5. Persistenza: le stanze sopravvivono al riavvio dell'applicazione
+ * 
+ * @author Beatrice Bertone
+ * @version 1.2
  */
 public class GestoreStanze {
     private final Casa casa;
@@ -34,24 +37,20 @@ public class GestoreStanze {
     private final MisuraDAO misuraDAO;
 
     /**
-     * Costruttore con Dependency Injection.
-     * Usa le implementazioni di default.
-     * Carica automaticamente le stanze e le ultime misure dal database all'avvio.
-     *
-     * @param casa L'oggetto Casa da gestire
+     * Costruttore standard. Inizializza il servizio utilizzando le implementazioni 
+     * di default dei DAO e avvia il caricamento automatico dei dati dal database.
+     * * @param casa L'istanza di {@link Casa} da popolare all'avvio.
      */
     public GestoreStanze(Casa casa) {
         this(casa, new StanzaDAOImpl(), new MisuraDAOImpl());
     }
 
     /**
-     * Costruttore con Dependency Injection esplicita dei DAO.
-     * Permette di iniettare mock DAO per i test.
-     * Carica automaticamente le stanze e le ultime misure dal database all'avvio.
-     *
-     * @param casa L'oggetto Casa da gestire
-     * @param stanzaDAO Il DAO per la persistenza delle stanze
-     * @param misuraDAO Il DAO per la lettura delle misure
+     * Costruttore con Dependency Injection esplicita.
+     * Utilile per i test.
+     * * @param casa L'istanza della casa da gestire.
+     * @param stanzaDAO Implementazione del DAO per le stanze.
+     * @param misuraDAO Implementazione del DAO per le misure.
      */
     public GestoreStanze(Casa casa, StanzaDAO stanzaDAO, MisuraDAO misuraDAO) {
         this.casa = casa;
@@ -116,8 +115,9 @@ public class GestoreStanze {
     /**
      * Crea una nuova stanza e la salva nel database.
      * L'autenticazione e' gia' stata verificata all'avvio dell'applicazione.
-     * @param id L'identificatore della stanza (ignorato, verra' generato automaticamente)
-     * @return la Stanza creata, oppure null se esiste gia' una stanza con lo stesso nome
+     * @param nomeStanza (deve essere univoco).
+     * @param mqStanza.
+     * @return La {@link Stanza} creata, o {@code null} se il nome è già presente.
      */
     public Stanza creaStanza(String nomeStanza, double mqStanza) {
         if(casa.esisteStanza(nomeStanza)) {
@@ -165,6 +165,13 @@ public class GestoreStanze {
     	return casa.cercaStanzaPerId(id);
     }
 
+    /**
+     * Rimuove una stanza dal sistema. 
+     * L'operazione è permessa solo se la stanza è priva di dispositivi collegati.
+     * * @param idStanza Identificativo della stanza da eliminare.
+     * @return {@code true} se eliminata correttamente.
+     * @throws Exception Se si verificano errori durante l'accesso al database.
+     */
     public boolean eliminaStanza(String idStanza) throws Exception {
     		Stanza s = cercaStanzaPerId(idStanza);
     		if(s!=null) {

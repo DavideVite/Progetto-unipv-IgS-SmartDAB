@@ -32,7 +32,9 @@ public class GestoreStanzeTest {
 
 	@Test
 	public void testCreaStanzaConSuccesso() {
-		Stanza risultato = gestore.creaStanza("S01", 20);
+		assertFalse(casa.esisteStanza("Cucina"), "La stanza non dovrebbe esistere prima del test");
+		
+		Stanza risultato = gestore.creaStanza("Cucina", 20);
 
 		assertNotNull(risultato, "La stanza dovrebbe essere stata creata");
 		assertTrue(casa.esisteStanza("Cucina"));

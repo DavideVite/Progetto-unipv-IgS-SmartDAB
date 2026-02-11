@@ -16,11 +16,23 @@ import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.port.room.RoomPort;
 import it.unipv.posfw.smartdab.core.service.strategy.ParameterSyncFunction;
 
+
 /**
- * FIX: Aggiunto RoomPort all'elenco delle interfacce implementate.
+ * Rappresenta una stanza della casa e funge da mediatore centrale per la logica dei dispositivi.
+ * Implementa un doppio ruolo nel pattern Observer:
+ * Observer: monitora i cambiamenti provenienti dagli attuatori (tramite {@link ObservableParameter}).
+ * Observable: notifica i sensori quando i parametri cambiano.
+ * 
+ * * @author Beatrice Bertone
+ * @version 2.0
+ */
+
+/**
+ * Aggiunto RoomPort all'elenco delle interfacce implementate.
  * Stanza gia' aveva i metodi getId() e getDispositivi() richiesti da RoomPort.
  * Questo permette di usare Stanza come parametro in Topic.createTopic().
  */
+
 public class Stanza implements Observable, Observer, RoomPort {
      private static int counter = 0;
 	 private String id;
@@ -33,7 +45,12 @@ public class Stanza implements Observable, Observer, RoomPort {
 	 private ParameterSyncFunction syncFunction = (current, target) -> target;
 	 private List<Observer> observers = new ArrayList<>();
 	 
-	 //costruttore per nuove stanze
+	 /**
+	     * Costruttore per la creazione di nuove stanze. 
+	     * Genera automaticamente un ID incrementale prefissato da "S".
+	     * * @param nome Il nome da assegnare alla stanza.
+	     * @param mq della stanza.
+	     */
 	 public Stanza(String nome, double mq) {
 		 counter++;
 		 this.id = "S" + counter;
@@ -42,7 +59,14 @@ public class Stanza implements Observable, Observer, RoomPort {
 		 this.createdAt = LocalDateTime.now();
 	 }
 	 
-	 //costruttore per il DAO
+	 /**
+	     * Costruttore utilizzato dal DAO.
+	     * Ripristina l'ID dal database e aggiorna il contatore globale.
+	     * * @param id esistente nel database.
+	     * @param nome della stanza.
+	     * @param mq della stanza.
+	     * @param createdAt Data di creazione originale.
+	     */
 	 public Stanza(String id, String nome, double mq, LocalDateTime createdAt) {
 		 this.id = id; //prende ID del database
 		 this.nome = nome;
@@ -133,6 +157,12 @@ public class Stanza implements Observable, Observer, RoomPort {
 		}
 	}
 
+	/**
+     * Aggiorna un parametro ambientale e, se il valore è effettivamente cambiato,
+     * notifica tutti gli osservatori registrati.
+     * * @param nomeParametro 
+     * @param nuovoValore rilevato.
+     */
 	public void updateParameter(String nomeParametro, double nuovoValore) {
 		Double vecchioValore = this.parametri.get(nomeParametro);
 		
@@ -143,6 +173,12 @@ public class Stanza implements Observable, Observer, RoomPort {
 		}
 	}
 
+	/**
+     * Imposta un valore desiderato (target) per un parametro e applica la 
+     * {@link ParameterSyncFunction} per determinare il nuovo stato corrente.
+     * * @param nomeParametro.
+     * @param valoreTarget Il valore desiderato dall'utente.
+     */
 	public void updateTarget(String nomeParametro, double valoreTarget) {
 		this.parametriTarget.put(nomeParametro, valoreTarget);
 		double current = this.parametri.getOrDefault(nomeParametro, valoreTarget);
@@ -170,6 +206,10 @@ public class Stanza implements Observable, Observer, RoomPort {
     	 observers.remove(observer);	     
      }
 
+     /**
+      * Notifica tutti gli osservatori del cambiamento di un parametro.
+      * * @param args Il nome del parametro che ha subito la variazione.
+      */
      @Override
 	 public void notifyObservers(Object args) {
          for (Observer o : observers) {
@@ -177,6 +217,12 @@ public class Stanza implements Observable, Observer, RoomPort {
         	 }
          }
 
+     /**
+      * Metodo del pattern Observer. Riceve notifiche dai dispositivi 
+      * (tramite {@link ObservableParameter}) e aggiorna lo stato interno della stanza.
+      * * @param o L'oggetto osservabile (il parametro di un sensore).
+      * @param arg Argomento della notifica (non utilizzato, i dati vengono estratti da o).
+      */
      @Override
      public void update(Observable o, Object arg) {
          ObservableParameter obsParam = (ObservableParameter) o;
