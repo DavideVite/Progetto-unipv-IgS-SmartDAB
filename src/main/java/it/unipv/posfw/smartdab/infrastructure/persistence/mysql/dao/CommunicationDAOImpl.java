@@ -34,20 +34,23 @@ public class CommunicationDAOImpl implements CommunicationDAO {
 			PreparedStatement s;
 			ResultSet r;
 			
-			String query = "SELECT * from Dispositivi LIMIT " + n;
+			String query = "SELECT * from Communication ORDER BY last_update DESC LIMIT " + n;
 			s = connection.prepareStatement(query);
-			r = s.executeQuery(query);
+			r = s.executeQuery();
 			
 			while(r.next()) {
-				CommunicationPOJO c = new CommunicationPOJO(
-														r.getInt(1),
-														r.getString(2),
-														r.getString(3),
-														r.getObject(4),
-														r.getString(5),
-														r.getTimestamp(6).toLocalDateTime()
-														);
-				result.add(c);
+			    CommunicationPOJO c = new CommunicationPOJO();
+			    
+			    c.setId(r.getInt("id"));
+			    c.setEsito(r.getString("esito"));
+			    c.setTipo(r.getString("tipo"));
+			    c.setValue(r.getObject("value"));
+			    
+			    c.setDispositivo(r.getString("dispositivo")); 
+			    
+			    c.setLast_update(r.getTimestamp("last_update").toLocalDateTime());
+			    
+			    result.add(c);
 			}
 			
 		} catch (SQLException e) {

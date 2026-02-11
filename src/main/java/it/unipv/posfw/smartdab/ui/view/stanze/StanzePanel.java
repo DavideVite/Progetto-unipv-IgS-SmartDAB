@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import it.unipv.posfw.smartdab.ui.controller.StanzeController;
 
 public class StanzePanel extends JPanel {
-	private DefaultTableModel modello;  //variabile di istanza
+	private DefaultTableModel modello;
 	private JTable tabella;
 	private StanzeController controller;
 	private StanzeDettaglioPanel dettaglioPanel;

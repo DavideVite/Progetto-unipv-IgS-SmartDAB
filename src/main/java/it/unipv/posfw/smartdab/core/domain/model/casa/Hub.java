@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import it.unipv.posfw.smartdab.core.beans.CommunicationPOJO;
 import it.unipv.posfw.smartdab.core.beans.DispositivoPOJO;
+import it.unipv.posfw.smartdab.core.domain.enums.DispositivoStates;
 import it.unipv.posfw.smartdab.core.domain.model.utente.Autenticazione;
 import it.unipv.posfw.smartdab.core.port.messaging.IEventBusMalfunzionamenti;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
@@ -58,8 +59,12 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	            public void run() {
 	                // Eseguiamo il controllo solo se il sistema è stato sbloccato col PIN
 	                if (sistemaSbloccato) {
+	                try {
 	                    System.out.println("Monitoraggio periodico: controllo stato dispositivi...");
 	                    verificaStatoDispositivi();
+	                } catch (Exception e) {
+	                    System.err.println("ATTENZIONE: Monitoraggio fallito a causa di un errore dati: " + e.getMessage());
+	                }
 	                }
 	            }
 	        }, 5000, 60000); // Parte dopo 5 secondi dall'accensione e ripete ogni 60 secondi (60000 ms)
@@ -117,6 +122,11 @@ import it.unipv.posfw.smartdab.strategy.StrategiaStandard;
 	        ArrayList<DispositivoPOJO> tuttiIDispositivi = dispositivoDao.selectN(100);
 
 	        for (DispositivoPOJO d : tuttiIDispositivi) {
+	        	
+	        	if(d.getStato() == DispositivoStates.DISABLED) {
+	        		continue;
+	        	}
+	        	
 	        	// Cerchiamo l'ultima comunicazione per questo dispositivo
 	            CommunicationPOJO com = trovaComunicazionePerDispositivo(ultimeCom, d.getId());
 	           

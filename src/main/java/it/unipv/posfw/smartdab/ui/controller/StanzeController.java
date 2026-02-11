@@ -117,7 +117,6 @@ public class StanzeController {
 	  
 	    
 	    public void salvaStanza() {
-	    	String id = formPanel.getId();
 	    	String nome = formPanel.getNome();
 	    	String mqStr = formPanel.getMq();
 

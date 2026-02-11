@@ -134,9 +134,13 @@ public class Stanza implements Observable, Observer, RoomPort {
 	}
 
 	public void updateParameter(String nomeParametro, double nuovoValore) {
+		Double vecchioValore = this.parametri.get(nomeParametro);
+		
+		//procedo solo se il valore è cambiato 
+		if(vecchioValore == null || vecchioValore != nuovoValore) {
 		this.parametri.put(nomeParametro, nuovoValore);
-
 		notifyObservers(nomeParametro);
+		}
 	}
 
 	public void updateTarget(String nomeParametro, double valoreTarget) {

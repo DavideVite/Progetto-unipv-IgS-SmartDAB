@@ -28,7 +28,7 @@ public class StanzeFormPanel extends JPanel{
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
 		lblTitolo = new JLabel("Nuova Stanza", SwingConstants.CENTER);
-		gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+		gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2; 
 		add(lblTitolo, gbc);
 
 		//campo nome
@@ -91,10 +91,6 @@ public class StanzeFormPanel extends JPanel{
 	}
 
 	public String getMq() {
-		return txtMq.getText();
-	}
-
-	public String getId() {
 		return txtMq.getText();
 	}
 }
