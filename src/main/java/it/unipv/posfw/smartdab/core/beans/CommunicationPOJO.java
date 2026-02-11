@@ -2,6 +2,12 @@ package it.unipv.posfw.smartdab.core.beans;
 
 import java.time.LocalDateTime;
 
+/**
+ * Questa classe è un contenitore di informazioni di una comunicazione del sistema SmartDAB
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class CommunicationPOJO {
 	private int id;
 	private String esito;

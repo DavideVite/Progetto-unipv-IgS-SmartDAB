@@ -7,6 +7,12 @@ import java.lang.reflect.Method;
 import it.unipv.posfw.smartdab.infrastructure.messaging.EventBus;
 import it.unipv.posfw.smartdab.core.service.DispositiviManager;
 
+/**
+ * Classe factory per la gestione della prima istanza dell'event bus tramite properties
+ * @author Alessandro Ingenito
+ * @version 1.0
+ */
+
 public class EventBusFactory {
 	private static EventBus event;
 	private static final String E_PROPERTYNAME = "eventbus.dispositiviobserver.class.name";
