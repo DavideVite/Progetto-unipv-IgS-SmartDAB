@@ -102,8 +102,10 @@ public class Stanza implements Observable, Observer, RoomPort {
 	 public List<AttuatoreFacade> getAttuatori() {
 		 List<AttuatoreFacade> attuatori = new ArrayList<>();
 		 for (Dispositivo d : dispositivi) {
-			 if (d instanceof AttuatoreFacade) {
+			 try {
 				 attuatori.add((AttuatoreFacade) d);
+			 } catch (ClassCastException e) {
+				 // non è un attuatore, ignora
 			 }
 		 }
 		 return attuatori;
