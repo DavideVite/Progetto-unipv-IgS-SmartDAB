@@ -224,3 +224,4 @@ Si assume che nella smart home reale ci sia un sistema di comunicazione fisico o
 * La base di dati dovrà essere gestita con MySQL  
 * Le interrogazioni alla base di dati devono essere effettuate attraverso linguaggio SQL  
 * Il sistema deve essere ultimato entro fine Gennaio 2026
+* Il  sistema deve garantire un elevata manutenibilità e la possibilità di sostituire fornitori di servizi (es. database, servizi di pagamento) senza impattare sulla logica di business core, per salvaguardare l'investimento futuro.

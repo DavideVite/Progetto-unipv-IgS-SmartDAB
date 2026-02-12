@@ -23,13 +23,6 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
  * - Si comporta come DirectMatchStrategy (primo attuatore trovato)
  * - TODO: quando gli attributi saranno disponibili, ordinare per efficienza
  *
- * ESEMPIO DI IMPLEMENTAZIONE FUTURA:
- * <pre>
- * // Ordina per consumo crescente
- * attuatoriAttivi.sort(Comparator.comparingDouble(AttuatoreFacade::getConsumoNominale));
- * // Prendi il primo (piu' efficiente)
- * risultati.add(new ActuationResult(attuatoriAttivi.get(0), valoreRichiesto));
- * </pre>
  */
 public class EcoEfficiencyStrategy implements ActuationStrategy {
 

@@ -58,7 +58,7 @@ public interface IScenarioRepository {
     boolean delete(String id);
 
     Optional<Scenario> findById(String id);
-
+F
     Optional<Scenario> findByNome(String nome);
 
     List<Scenario> findAll();

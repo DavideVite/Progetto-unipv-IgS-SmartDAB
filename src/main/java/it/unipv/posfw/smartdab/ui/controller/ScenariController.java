@@ -7,7 +7,6 @@ import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observable;
 import it.unipv.posfw.smartdab.core.port.communication.observer.Observer;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
-import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenarioFormPanel;
@@ -41,7 +40,6 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
 
     private ScenariPanel panel;
     private ScenarioManager scenarioManager;
-    private ParametroManager parametroManager;
     private GestoreStanze gestoreStanze;
     private List<Scenario> scenariList;
 
@@ -54,15 +52,13 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
      * Costruttore aggiornato con GestoreStanze per ottenere lista stanze.
      *
      * @param panel Il pannello principale degli scenari
-     * @param scenarioManager Il manager per operazioni CRUD scenari
-     * @param parametroManager Il manager per applicare configurazioni parametri
+     * @param scenarioManager Il manager per operazioni CRUD scenari (contiene ParametroManager)
      * @param gestoreStanze Il gestore stanze per ottenere lista stanze disponibili
      */
     public ScenariController(ScenariPanel panel, ScenarioManager scenarioManager,
-                            ParametroManager parametroManager, GestoreStanze gestoreStanze) {
+                            GestoreStanze gestoreStanze) {
         this.panel = panel;
         this.scenarioManager = scenarioManager;
-        this.parametroManager = parametroManager;
         this.gestoreStanze = gestoreStanze;
         this.scenariList = new ArrayList<>();
 
@@ -116,7 +112,13 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     Boolean attivo = (Boolean) panel.getTableModel().getValueAt(row, 0);
                     Scenario scenario = scenariList.get(row);
                     if (attivo) {
-                        scenarioManager.attivaScenario(scenario.getNome(), parametroManager);
+                        boolean tuttoOk = scenarioManager.attivaScenario(scenario.getNome());
+                        if (!tuttoOk) {
+                            JOptionPane.showMessageDialog(panel,
+                                "Scenario attivato, ma alcune configurazioni non sono state applicate\n" +
+                                "(dispositivi mancanti o non disponibili).",
+                                "Attenzione", JOptionPane.WARNING_MESSAGE);
+                        }
                     } else {
                         scenarioManager.disattivaScenario(scenario.getNome());
                     }

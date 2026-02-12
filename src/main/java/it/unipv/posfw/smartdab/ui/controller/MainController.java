@@ -61,16 +61,6 @@ public class MainController {
         ScenarioDAO scenarioDAO = new ScenarioDAOImpl();
         StanzaDAO stanzaDAO = new StanzaDAOImpl();
 
-        // ===== LAYER INFRASTRUCTURE: Adapters (Output Port implementations) =====
-        IScenarioRepository scenarioRepository = new ScenarioRepositoryAdapter(scenarioDAO);
-
-        // ===== LAYER CORE: Services =====
-        scenarioManager = new ScenarioManager(scenarioRepository);
-
-        // Inizializzazione scenari predefiniti (SRP: separato da ScenarioManager)
-        ScenariPredefinitInitializer scenariInit = new ScenariPredefinitInitializer(scenarioManager);
-        scenariInit.inizializza(stanzaDAO.readAllStanze());
-
         // DispositiviManager e EventBus
         dispositiviManager = new DispositiviManager();
         EventBus eventBus = EventBus.getInstance(dispositiviManager);
@@ -81,6 +71,16 @@ public class MainController {
         // CommandSender Adapter per ParametroManager
         ICommandSender commandSender = new CommandSenderAdapter(eventBus);
         parametroManager = new ParametroManager(gestoreStanze, commandSender);
+
+        // ===== LAYER INFRASTRUCTURE: Adapters (Output Port implementations) =====
+        IScenarioRepository scenarioRepository = new ScenarioRepositoryAdapter(scenarioDAO);
+
+        // ===== LAYER CORE: Services =====
+        scenarioManager = new ScenarioManager(scenarioRepository, parametroManager);
+
+        // Inizializzazione scenari predefiniti (SRP: separato da ScenarioManager)
+        ScenariPredefinitInitializer scenariInit = new ScenariPredefinitInitializer(scenarioManager);
+        scenariInit.inizializza(stanzaDAO.readAllStanze());
     }
 
     private void inizializzaView() {
@@ -108,7 +108,6 @@ public class MainController {
         scenariController = new ScenariController(
             mainPanel.getScenariPanel(),
             scenarioManager,
-            parametroManager,
             gestoreStanze
         );
 

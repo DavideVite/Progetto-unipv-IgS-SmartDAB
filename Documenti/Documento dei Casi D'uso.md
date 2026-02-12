@@ -20,22 +20,24 @@ Una volta che il dispositivo è stato registrato correttamente, verrà poi inser
 
 1. L’utente si reca ad un hub e si autentica con il PIN  
 2. L’utente apre la finestra per l’inserimento del dispositivo.  
-3. L’utente inserisce il nome del dispositivo, il tipo e la stanza in cui è installato.  
-4. L’utente invia la richiesta di inserimento al sistema.  
+3. L’utente inserisce il nome del dispositivo, il tipo, lo stato e la stanza in cui è installato.  
+4. L’utente invia la richiesta di inserimento al sistema cliccando "salva".  
 5. Il sistema accetta il dispositivo.  
-6. Il sistema effettua una prima comunicazione tra event bus e  il communicator del dispositivo per iniziare la corrispondenza.  
-7. Il dispositivo risponde correttamente.  
-8. L’event bus riceve la conferma della richiesta da parte dell’hub e la restituisce all’hub.  
-9. Il sistema lo inserisce nella base di dati.  
-10. Il dispositivo è pronto per ricevere istruzioni.
+6. Il sistema lo inserisce nella base di dati.
 
 *Flusso di eliminazione:*
 
-1. L’utente si reca ad un hub e si autentica con il PIN  
-2. L’utente apre la finestra per l’inserimento del dispositivo.  
-3. L’utente clicca sul dispositivo nella lista dei dispositivi presenti nel sistema.  
-4. L’utente clicca il pulsante “elimina”.  
-5. Il sistema inserisce lo stato di “inattivo” al dispositivo nella base di dati.
+1. L’utente si reca ad un hub e si autentica con il PIN    
+2. L’utente clicca sul dispositivo nella lista dei dispositivi presenti nel sistema.  
+3. L’utente clicca il pulsante “elimina”.  
+4. Il sistema inserisce lo stato di “inattivo” al dispositivo nella base di dati.
+
+Flusso di modifica:
+L’utente si reca ad un hub e si autentica col PIN.
+L’utente apre la finestra per la modifica del dispositivo.
+L’utente inserisce le informazioni che vuole modificare negli appositi spazi.
+L’utente clicca “aggiorna”.
+Il sistema aggiorna le informazioni del dispositivo con quelle inserite.
 
 **Alternative Flows:**
 
@@ -150,16 +152,16 @@ L’interfaccia mostra la lista delle stanze aggiornata.
 Creazione Stanza:
 
 1. L’utente, tramite l’interfaccia dell’hub, seleziona l’opzione “Crea nuova stanza”.   
-2. Il sistema richiede l’inserimento del nome della stanza.  
-3. L’utente inserisce il nome della stanza e conferma.  
+2. Il sistema richiede l’inserimento del nome e dei metri quadri della stanza.  
+3. L’utente inserisce il nome e i metri quadri della stanza e conferma.  
 4. Se il nome è valido e univoco, il sistema aggiunge la stanza.  
 5. Il sistema aggiorna la lista delle stanze. 
 
 Modifica Stanza:
 
 1. L’utente, tramite l’interfaccia dell’hub, seleziona una stanza esistente e sceglie l’opzione “Modifica”.  
-2. Il sistema richiede il nuovo nome da attribuire alla stanza.  
-3. L’utente inserisce il nuovo nome della stanza.  
+2. Il sistema richiede il nuovo nome o i nuovi metri quadri da attribuire alla stanza.  
+3. L’utente inserisce il nuovo nome o i nuovi metri quadri della stanza.  
 4. Se il nome è univoco, il sistema aggiorna la stanza.  
 5. Il sistema mostra la versione aggiornata delle stanze.
 
@@ -194,7 +196,7 @@ Flusso alternativo 2:
 *Primary actor*: Dispositivi
 
 **Preconditions:**  
-I dispositivi devono essere opportunamente configurati e connessi al sistema e quest’ultimo deve essere stato avviato per la prima volta definendo le stanze. Ogni dispositivo deve essere compatibile e dunque munito di un apposito communicator e command dispatcher.
+I dispositivi devono essere opportunamente configurati e connessi al sistema e quest’ultimo deve essere stato avviato per la prima volta definendo le stanze. Ogni dispositivo deve essere compatibile e dunque munito di un apposito communicator.
 
 **Postconditions:**      
 I dispositivi hanno inviato o ricevuto con successo le informazioni dall’event bus. Qualora un dispositivo non funzioni correttamente viene rilevato e segnalato dal sistema.
@@ -208,7 +210,7 @@ I dispositivi hanno inviato o ricevuto con successo le informazioni dall’event
 3. Event bus fa corrispondere all’evento uno specifico topic preesistente  
 4. Event bus invia l’evento all’hub centrale e invia la richiesta agli attuatori iscritti al topic  
 5. I Command dispatcher dei vari attuatori ricevono la richiesta  
-6. Command dispatcher elabora il segnale per renderlo comprensibile all’attuatore  
+6. Command dispatcher elabora il comando per renderlo comprensibile all’attuatore  
 7. Attuatore riceve la richiesta e si attiva  
 8. Communicator manda all’event bus una conferma  
 9. Tutti gli attuatori rispondono e la comunicazione va a buon fine
@@ -218,13 +220,15 @@ I dispositivi hanno inviato o ricevuto con successo le informazioni dall’event
 1. Hub vuole comunicare con dispositivo A  
 2. Richiede all’event bus di inviare una richiesta al dispositivo interessato  
 3. Il communicator del dispositivo A riceve la richiesta  
-4. Risponde con le informazioni richieste all’event bus  
-5. Event bus riceve e invia all’hub
+4. Communicator processa la richiesta ricevuta
+5. Communicator invia la risposta all'event bus 
+6. Event bus riceve e invia all’hub
 
 *Flusso di comunicazione Dispositivo-Hub:*
 
 1. Il communicator del dispositivo A invia un messaggio specifico all’event bus  
-2. Event bus invia la comunicazione all’hub
+2. Event bus invia la comunicazione
+3. Event bus aggiorna le sue informazioni e comunica eventualmente con gli interessati al messaggio
 
 *Flusso di rilevazione guasti:*
 
@@ -233,6 +237,52 @@ I dispositivi hanno inviato o ricevuto con successo le informazioni dall’event
 3. Se non risponde invia un messaggio di dispositivo guasto  
 4. L’hub aggiorna la base di dati mettendo lo stato “inattivo” sul dispositivo interessato  
 5. Hub esegue le operazioni dall’1 al 4 periodicamente
+
+Alternative Flows:
+
+Flusso alternativo rilevazione guasti:
+Event bus prova a comunicare 10 volte con un attuatore
+Attuatore non risponde a nessuna chiamata
+Event bus imposta lo stato del dispositivo su “UNKNOWN”
+
+Frequency of Occurrence: Durante tutta l’esecuzione del sistema
+
+Use Case UC7: Autenticazione 
+Scope: Progetto Smart DAB
+Level: Utente
+Primary actor: Utente
+Stakeholders and interests:
+Utente: vuole configurare il sistema e accedere 
+
+Preconditions:
+Il sistema è avviato e l’hub è nello stato “bloccato”. L’utente possiede la password del produttore per la prima configurazione.
+
+Postconditions:
+L’utente ha accesso completo e il sistema è nello stato “sbloccato”. 
+
+Main Success Scenario:
+Primo avvio:
+L’utente inserisce la password del produttore
+Il sistema richiede all’utente l’inserimento di un pin di cinque cifre
+L’utente inserisce il pin 
+Il sistema salva il pin inserito in modo persistente e sblocca l’accesso
+L’utente accede alla dashboard principale
+Avvii successivi:
+L’utente inserisce il pin scelto al primo avvio
+Il sistema valida il pin e sblocca l’accesso
+L’utente accede alla dashboard principale
+
+Alternative Flows:
+
+Flusso alternativo 1:
+L’utente inserisce una password errata
+Il sistema informa l’utente che la password non è corretta e impedisce la configurazione iniziale
+
+Flusso alternativo 2:
+L’utente inserisce un pin non corretto o che non rispetta il formato
+Il sistema informa l’utente che il pin non è valido e nega l’accesso
+                    
+
 
 
 --- 

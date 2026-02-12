@@ -7,25 +7,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
 import it.unipv.posfw.smartdab.adapter.facade.AttuatoreFacade;
+import it.unipv.posfw.smartdab.core.beans.MisuraPOJO;
 import it.unipv.posfw.smartdab.core.domain.enums.DispositivoParameter;
-import it.unipv.posfw.smartdab.core.domain.enums.Message;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Stanza;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.Dispositivo;
+import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
 import it.unipv.posfw.smartdab.core.domain.model.scenario.StanzaConfig;
-import it.unipv.posfw.smartdab.core.port.messaging.IEventBusClient;
+import it.unipv.posfw.smartdab.core.port.communication.ICommandSender;
 import it.unipv.posfw.smartdab.factory.StanzaConfigFactory;
-import it.unipv.posfw.smartdab.infrastructure.messaging.request.Request;
 import it.unipv.posfw.smartdab.infrastructure.messaging.topic.Topic;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_ON_OFF;
 import it.unipv.posfw.smartdab.core.domain.model.dispositivo.attuatori.lampadaON_OFF.Lampada_Communicator;
-// FIX: Aggiunto import ObservableParameter necessario per costruttore Lampada_ON_OFF
 import it.unipv.posfw.smartdab.core.domain.model.parametro.ObservableParameter;
-// FIX: Aggiunto import StanzaDAO per MockStanzaDAO
 import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.StanzaDAO;
+import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.MisuraDAO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * Test del flusso completo: Impostazione manuale di un parametro
@@ -41,7 +42,7 @@ public class ImpostazioneManualeFlussoTest {
     private Stanza stanzaSoggiorno;
     private GestoreStanze gestoreStanze;
     private ParametroManager parametroManager;
-    private MockEventBusClient mockEventBus;
+    private MockCommandSender mockCommandSender;
     private Lampada_ON_OFF lampada;
 
     @BeforeEach
@@ -83,9 +84,9 @@ public class ImpostazioneManualeFlussoTest {
         stanzaSoggiorno.addDispositivo(lampada);
 
         // Setup managers con mock DAO (non serve connessione DB per i test)
-        gestoreStanze = new GestoreStanze(casa, new MockStanzaDAO(), null);
-        mockEventBus = new MockEventBusClient();
-        parametroManager = new ParametroManager(gestoreStanze, mockEventBus);
+        gestoreStanze = new GestoreStanze(casa, new MockStanzaDAO(), new MockMisuraDAO());
+        mockCommandSender = new MockCommandSender();
+        parametroManager = new ParametroManager(gestoreStanze, mockCommandSender);
     }
 
     // ========== TEST STANZACONFIGFACTORY ==========
@@ -144,27 +145,26 @@ public class ImpostazioneManualeFlussoTest {
         });
     }
 
-    // ========== TEST RICERCA DISPOSITIVO IDONEO ==========
+    // ========== TEST RICERCA ATTUATORE IDONEO ==========
 
     @Test
     @DisplayName("ParametroManager trova attuatore idoneo per LUMINOSITA")
     void testTrovaAttuatoreIdoneo() {
-        Dispositivo trovato = parametroManager.getDispositivoIdoneo(
-            "Soggiorno",
+        // Nota: getAttuatoreIdoneo cerca per stanzaId, non per nome
+        AttuatoreFacade trovato = parametroManager.getAttuatoreIdoneo(
+            "S01",  // ID della stanza, non il nome
             DispositivoParameter.LUMINOSITA
         );
 
         assertNotNull(trovato, "Dovrebbe trovare la lampada");
-        assertTrue(trovato instanceof AttuatoreFacade, "Dovrebbe essere un AttuatoreFacade");
-        // FIX: Dispositivo non ha getId(), l'ID e' nel Topic
         assertEquals("Lamp01", trovato.getTopic().getId());
     }
 
     @Test
     @DisplayName("ParametroManager restituisce null se parametro non supportato")
     void testNonTrovaAttuatorePerParametroNonSupportato() {
-        Dispositivo trovato = parametroManager.getDispositivoIdoneo(
-            "Soggiorno",
+        AttuatoreFacade trovato = parametroManager.getAttuatoreIdoneo(
+            "S01",  // ID della stanza
             DispositivoParameter.TEMPERATURA  // La lampada non supporta temperatura
         );
 
@@ -172,14 +172,15 @@ public class ImpostazioneManualeFlussoTest {
     }
 
     @Test
-    @DisplayName("ParametroManager restituisce null per stanza inesistente")
+    @DisplayName("ParametroManager lancia eccezione per stanza inesistente")
     void testStanzaInesistente() {
-        Dispositivo trovato = parametroManager.getDispositivoIdoneo(
-            "StanzaFantasma",
-            DispositivoParameter.LUMINOSITA
-        );
-
-        assertNull(trovato);
+        // Ora getAttuatoreIdoneo lancia StanzaNonTrovataException per stanze inesistenti
+        assertThrows(Exception.class, () -> {
+            parametroManager.getAttuatoreIdoneo(
+                "StanzaFantasma",
+                DispositivoParameter.LUMINOSITA
+            );
+        });
     }
 
     @Test
@@ -187,8 +188,8 @@ public class ImpostazioneManualeFlussoTest {
     void testIgnoraDispositivoNonAttivo() {
         lampada.switchDispositivo(); // Disattiva la lampada
 
-        Dispositivo trovato = parametroManager.getDispositivoIdoneo(
-            "Soggiorno",
+        AttuatoreFacade trovato = parametroManager.getAttuatoreIdoneo(
+            "S01",  // ID della stanza
             DispositivoParameter.LUMINOSITA
         );
 
@@ -198,55 +199,64 @@ public class ImpostazioneManualeFlussoTest {
     // ========== TEST FLUSSO COMPLETO ==========
 
     @Test
-    @DisplayName("Flusso completo: Factory -> ParametroManager -> EventBus")
+    @DisplayName("Flusso completo: Factory -> ParametroManager -> CommandSender")
     void testFlussoCompleto() {
         // 1. GUI crea StanzaConfig tramite factory (simulando luminosità)
-        // Nota: usiamo un valore numerico anche se la lampada è ON/OFF per semplicità
+        // Nota: usiamo l'ID della stanza, non il nome
         StanzaConfig config = StanzaConfigFactory.creaConfigNumerico(
-            "Soggiorno",
+            "S01",  // ID della stanza
             DispositivoParameter.LUMINOSITA,
             5000.0  // valore luminosità
         );
 
         // 2. Verifica che la config sia stata creata correttamente
         assertNotNull(config);
-        assertEquals("Soggiorno", config.getStanzaId());
+        assertEquals("S01", config.getStanzaId());
 
-        // 3. ParametroManager applica la configurazione
-        boolean risultato = parametroManager.applicaStanzaConfig(config);
+        // 3. ParametroManager applica la configurazione (ora è void, non boolean)
+        // Se fallisce, lancera' un'eccezione
+        assertDoesNotThrow(() -> parametroManager.applicaStanzaConfig(config));
 
-        // 4. Verifica che il comando sia stato inviato all'EventBus
-        assertTrue(risultato, "L'applicazione della config dovrebbe avere successo");
-        assertTrue(mockEventBus.isRequestSent(), "La request dovrebbe essere stata inviata");
-        assertNotNull(mockEventBus.getLastRequest(), "Dovrebbe esserci una request salvata");
+        // 4. Verifica che il comando sia stato inviato via ICommandSender
+        assertTrue(mockCommandSender.isCommandSent(), "Il comando dovrebbe essere stato inviato");
+        assertNotNull(mockCommandSender.getLastDispositivo(), "Dovrebbe esserci un dispositivo salvato");
+        assertEquals(DispositivoParameter.LUMINOSITA, mockCommandSender.getLastTipoParametro());
     }
 
-    // ========== MOCK EVENTBUS CLIENT ==========
+    // ========== MOCK COMMAND SENDER ==========
 
     /**
-     * Mock semplice di IEventBusClient per i test
+     * Mock semplice di ICommandSender per i test
      */
-    private static class MockEventBusClient implements IEventBusClient {
-        private Request lastRequest;
-        private boolean requestSent = false;
+    private static class MockCommandSender implements ICommandSender {
+        private Dispositivo lastDispositivo;
+        private DispositivoParameter lastTipoParametro;
+        private IParametroValue lastValore;
+        private boolean commandSent = false;
 
         @Override
-        public void setRequest(Request request) {
-            this.lastRequest = request;
+        public boolean inviaComando(Dispositivo dispositivo, DispositivoParameter tipo, IParametroValue valore) {
+            this.lastDispositivo = dispositivo;
+            this.lastTipoParametro = tipo;
+            this.lastValore = valore;
+            this.commandSent = true;
+            return true;  // Simula sempre successo
         }
 
-        @Override
-        public Message sendRequest(Request request) {
-            this.requestSent = true;
-            return Message.ACK;  // Simula sempre successo
+        public Dispositivo getLastDispositivo() {
+            return lastDispositivo;
         }
 
-        public Request getLastRequest() {
-            return lastRequest;
+        public DispositivoParameter getLastTipoParametro() {
+            return lastTipoParametro;
         }
 
-        public boolean isRequestSent() {
-            return requestSent;
+        public IParametroValue getLastValore() {
+            return lastValore;
+        }
+
+        public boolean isCommandSent() {
+            return commandSent;
         }
     }
 
@@ -282,6 +292,37 @@ public class ImpostazioneManualeFlussoTest {
         public Set<Stanza> readAllStanze() {
             // Mock: restituisce set vuoto
             return Set.of();
+        }
+    }
+
+    // ========== MOCK MISURA DAO ==========
+
+    /**
+     * Mock semplice di MisuraDAO per i test (non richiede connessione DB)
+     */
+    private static class MockMisuraDAO implements MisuraDAO {
+
+        @Override
+        public void insertMisura(MisuraPOJO m) {
+            // Mock: non fa nulla
+        }
+
+        @Override
+        public List<MisuraPOJO> readMisuraStanza(String idStanza) {
+            // Mock: restituisce lista vuota
+            return new ArrayList<>();
+        }
+
+        @Override
+        public List<MisuraPOJO> readUltimeMisurePerStanza() {
+            // Mock: restituisce lista vuota
+            return new ArrayList<>();
+        }
+
+        @Override
+        public MisuraPOJO readUltimaMisura(String idStanza, String tipo) {
+            // Mock: restituisce null
+            return null;
         }
     }
 }

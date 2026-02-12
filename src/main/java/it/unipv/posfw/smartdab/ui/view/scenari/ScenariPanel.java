@@ -1,8 +1,18 @@
 package it.unipv.posfw.smartdab.ui.view.scenari;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
 public class ScenariPanel extends JPanel {
 
@@ -21,7 +31,6 @@ public class ScenariPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Titolo
         JLabel titolo = new JLabel("Gestione Scenari");
         titolo.setFont(titolo.getFont().deriveFont(Font.BOLD, 16f));
         add(titolo, BorderLayout.NORTH);
@@ -29,8 +38,7 @@ public class ScenariPanel extends JPanel {
         // Split: lista a sinistra, dettaglio a destra
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.5);
-
-        // Pannello sinistro: tabella + bottoni
+        
         JPanel leftPanel = new JPanel(new BorderLayout(5, 5));
 
         // Tabella scenari con colonne: Attivo (checkbox), Nome, Tipo

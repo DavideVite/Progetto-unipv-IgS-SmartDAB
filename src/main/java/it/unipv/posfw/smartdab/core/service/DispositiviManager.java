@@ -92,8 +92,6 @@ public class DispositiviManager {
     	}
     } 
     
-
-    
     // Per i test
     public void clearDispositivi() {
 		dispositivi.clear();
@@ -108,8 +106,8 @@ public class DispositiviManager {
     		System.out.println("Errore: il dispositivo non esiste");
     		return false;
     	}
-    } 
-    
+    }
+
     public DispositivoPOJO getDispositivoById(String id) {
     	Iterator<DispositivoPOJO> iter = dispositivi.iterator();
     	DispositivoPOJO d;
