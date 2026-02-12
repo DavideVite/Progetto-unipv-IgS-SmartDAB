@@ -19,12 +19,15 @@ La gestione dei dispositivi avviene tramite un’interfaccia grafica semplice ch
 
 Se il nuovo dispositivo inserito è un sensore allora entrerà subito in funzione; nel caso di un attuatore, verrà tenuto spento fino all’attivazione manuale dell’utente o automatica.  
 Tutti i sensori inviano le loro misure ad un sistema centrale, attraverso l’event bus, che le integrerà tra di loro e attiverà gli attuatori in base alle impostazioni presenti. Inoltre manderà i valori all’hub, che li elaborerà per valutare eventuali anomalie.
+Il dovrà presentare inizialmente 5 dispositivi già installati e presenti nell’interfaccia grafica.
 
 L'utente è in grado di settare manualmente la temperatura o altri parametri, qualora possegga i dispositivi idonei.
 
 Il sistema supporta un'ampia gamma di parametri ambientali e domestici, tra cui: temperatura, umidità, luminosità, qualità dell'aria (inclusi particolato fine e anidride carbonica), livello di rumore, pressione atmosferica, consumo idrico, consumo di gas ed energia elettrica, produzione fotovoltaica. Sono inoltre supportati parametri di sicurezza come il rilevamento di fumo, gas, apertura porte e finestre, e movimento. Ogni parametro ha dei limiti di sicurezza predefiniti che il sistema non consente di superare.
 
 Il sistema deve essere utilizzabile sia da utente domestico singolo sia da più utenti che vivono nella stessa casa (come le famiglie). 
+
+Il  sistema deve garantire un elevata manutenibilità e la possibilità di sostituire fornitori di servizi (es. database, servizi di pagamento) senza impattare sulla logica di business core, per salvaguardare l'investimento futuro.
 
 **Automazioni**
 
@@ -42,6 +45,8 @@ Il sistema viene fornito con una serie di scenari predefiniti pronti all'uso, pr
 * **Scenario Assenza**: temperatura ridotta a 16°C, luci spente, attivazione sensori di sicurezza
 
 Tutti gli scenari predefiniti possono essere modificati o eliminati dall'utente secondo le proprie preferenze. Prima dell'attivazione, il sistema verifica automaticamente la disponibilità dei dispositivi necessari; se alcuni dispositivi sono assenti o non funzionanti, lo scenario si attiverà parzialmente con i dispositivi disponibili, notificando all'utente delle limitazioni.
+
+L'utente può esportare uno scenario su file per backup o condivisione, e successivamente importarlo su un altro sistema Smart DAB. Durante l'importazione, il sistema verifica che non esista già uno scenario con lo stesso nome; in tal caso, l'utente può scegliere se sovrascriverlo (solo per scenari personalizzati) o annullare l'operazione. Gli scenari predefiniti non possono essere sovrascritti durante l'importazione.
 
 Durante la creazione o modifica di uno scenario, il sistema esegue automaticamente controlli di coerenza per prevenire configurazioni illogiche. Nello specifico:
 
