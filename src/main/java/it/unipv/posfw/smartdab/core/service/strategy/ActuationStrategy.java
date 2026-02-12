@@ -10,15 +10,9 @@ import it.unipv.posfw.smartdab.core.domain.model.parametro.IParametroValue;
  * Strategy per la distribuzione dei comandi agli attuatori.
  * Permette di variare l'algoritmo di selezione/distribuzione senza modificare ParametroManager.
  *
- * Applicazione del Design Pattern Strategy (GoF) e dei principi:
- * - Open/Closed: nuove strategie senza modificare codice esistente
- * - Protected Variations: isola la logica di distribuzione
- * - Dependency Inversion: ParametroManager dipende dall'astrazione, non dalle implementazioni
- *
  * STRATEGIE IMPLEMENTABILI CON ATTRIBUTI ATTUALI (id, stanza, parametro, tipo, stato, attivo):
  * - DirectMatchStrategy: primo attuatore idoneo
  * - BroadcastStrategy: tutti gli attuatori idonei
- * - FirstActiveStrategy: primo attuatore attivo (placeholder per logiche future)
  *
  * STRATEGIE FUTURE (richiedono nuovi attributi):
  * - LoadBalancingStrategy: richiede attributo "carico" o "potenzaMax" sui dispositivi

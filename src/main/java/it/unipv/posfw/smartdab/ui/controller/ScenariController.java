@@ -112,7 +112,13 @@ public class ScenariController implements ScenarioFormPanel.ScenarioFormListener
                     Boolean attivo = (Boolean) panel.getTableModel().getValueAt(row, 0);
                     Scenario scenario = scenariList.get(row);
                     if (attivo) {
-                        scenarioManager.attivaScenario(scenario.getNome());
+                        boolean tuttoOk = scenarioManager.attivaScenario(scenario.getNome());
+                        if (!tuttoOk) {
+                            JOptionPane.showMessageDialog(panel,
+                                "Scenario attivato, ma alcune configurazioni non sono state applicate\n" +
+                                "(dispositivi mancanti o non disponibili).",
+                                "Attenzione", JOptionPane.WARNING_MESSAGE);
+                        }
                     } else {
                         scenarioManager.disattivaScenario(scenario.getNome());
                     }

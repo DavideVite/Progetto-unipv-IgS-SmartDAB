@@ -182,6 +182,7 @@ public class ScenarioManager implements Observable {
 	}
 
 
+
 	public boolean disattivaScenario(String nomeScenario) {
 		Scenario scenario = scenari.get(nomeScenario);
 		if (scenario != null) {

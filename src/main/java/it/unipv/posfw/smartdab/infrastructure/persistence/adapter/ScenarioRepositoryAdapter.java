@@ -16,25 +16,6 @@ import it.unipv.posfw.smartdab.infrastructure.persistence.mysql.dao.ScenarioDAO;
  * - Traduce le chiamate dal dominio (IScenarioRepository) al DAO (ScenarioDAO)
  * - Il pattern DAO resta intatto e indipendente
  * - Aggiunge validazione multilivello prima della persistenza
- *
- * VALIDAZIONE MULTILIVELLO - PERCHE' E' UNA BUONA COSA:
- *
- * 1. DEFENSE IN DEPTH:
- *    - Livello 1 (UI): ParametroValidator in StanzeController/ScenarioFormPanel
- *    - Livello 2 (Service): Validazione in ParametroManager/ScenarioManager
- *    - Livello 3 (Adapter/Persistence): Validazione qui, ultima linea di difesa
- *
- * 2. PROTEZIONE DA BYPASS:
- *    - Se qualcuno chiama direttamente il repository (es. da test o altro service)
- *    - I dati vengono comunque validati prima di arrivare al database
- *
- * 3. RIUTILIZZO CODICE:
- *    - Usiamo lo stesso ParametroValidator del core (no duplicazione)
- *    - Infrastructure puo' dipendere da core (direzione corretta delle dipendenze)
- *
- * 4. FAIL FAST:
- *    - Meglio fallire con un messaggio chiaro prima di toccare il DB
- *    - Evita stati inconsistenti nel database
  */
 public class ScenarioRepositoryAdapter implements IScenarioRepository {
     private final ScenarioDAO scenarioDAO;
