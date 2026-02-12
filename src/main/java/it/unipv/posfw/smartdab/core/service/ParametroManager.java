@@ -91,7 +91,7 @@ public class ParametroManager implements Observable {
 
         // Itera solo sugli attuatori - il filtraggio e' gia' fatto da Stanza
         for (AttuatoreFacade attuatore : stanza.getAttuatori()) {
-            if (attuatore.isActive() && attuatore.supportaParametro(tipoParametro)) {
+            if (attuatore.isActive() && attuatore.getTopic().getParameter().equals(tipoParametro)) {
                 return attuatore;
             }
         }
@@ -125,7 +125,7 @@ public class ParametroManager implements Observable {
         // Raccogli tutti gli attuatori candidati che supportano il parametro
         List<AttuatoreFacade> attuatoriCandidati = new ArrayList<>();
         for (AttuatoreFacade attuatore : stanza.getAttuatori()) {
-            if (attuatore.supportaParametro(tipoParametro)) {
+            if (attuatore.getTopic().getParameter().equals(tipoParametro)) {
                 attuatoriCandidati.add(attuatore);
             }
         }
@@ -136,9 +136,10 @@ public class ParametroManager implements Observable {
         );
 
         // Invia comandi a tutti gli attuatori selezionati dalla strategia
+        // L'aggiornamento del target nella stanza avviene tramite il flusso Observer:
+        // Attuatore.action() -> ObservableParameter.notifyObservers() -> Stanza.update()
         for (ActuationResult risultato : risultati) {
-            // L'aggiornamento del target nella stanza avviene tramite il flusso Observer:
-            // Attuatore.action() -> ObservableParameter.notifyObservers() -> Stanza.update()
+
             commandSender.inviaComando(
                 risultato.getAttuatore(),
                 tipoParametro,
