@@ -32,23 +32,23 @@ public class GestoreStanzeTest {
 
 	@Test
 	public void testCreaStanzaConSuccesso() {
-		assertFalse(casa.esisteStanza("Cucina"), "La stanza non dovrebbe esistere prima del test");
+		assertFalse(casa.esisteStanza("Cucina2"), "La stanza non dovrebbe esistere prima del test");
 		
-		Stanza risultato = gestore.creaStanza("Cucina", 20);
+		Stanza risultato = gestore.creaStanza("Cucina2", 20);
 
 		assertNotNull(risultato, "La stanza dovrebbe essere stata creata");
-		assertTrue(casa.esisteStanza("Cucina"));
+		assertTrue(casa.esisteStanza("Cucina2"));
 	}
 
 	@Test
 	public void testModificaNomeStanza() {
-		casa.nuovaStanza(new Stanza("S02", "Bagno", 10, LocalDateTime.now()));
+		casa.nuovaStanza(new Stanza("Bagno1", 10));
 
-		boolean modificato = gestore.modificaNomeStanza("Bagno", "Bagno Ospiti");
+		boolean modificato = gestore.modificaNomeStanza("Bagno1", "Bagno Ospiti1");
 
 		assertTrue(modificato);
-		assertNotNull(casa.cercaStanza("Bagno Ospiti"));
-		assertFalse(casa.esisteStanza("Bagno"));
+		assertNotNull(casa.cercaStanza("Bagno Ospiti1"));
+		assertFalse(casa.esisteStanza("Bagno1"));
 	}
 
 	@Test
