@@ -2,12 +2,16 @@ package it.unipv.posfw.smartdab.ui.controller;
 
 import it.unipv.posfw.smartdab.core.domain.enums.EnumScenarioType;
 import it.unipv.posfw.smartdab.core.domain.model.casa.Casa;
+import it.unipv.posfw.smartdab.core.domain.model.scenario.Scenario;
+import it.unipv.posfw.smartdab.core.port.persistence.IScenarioRepository;
 import it.unipv.posfw.smartdab.core.service.GestoreStanze;
-import it.unipv.posfw.smartdab.core.service.ParametroManager;
 import it.unipv.posfw.smartdab.core.service.ScenarioManager;
 import it.unipv.posfw.smartdab.ui.view.scenari.ScenariPanel;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Test interattivo per ScenariController.
@@ -30,18 +34,15 @@ public class TestUIScenariController {
             // Crea il pannello scenari
             ScenariPanel scenariPanel = new ScenariPanel();
 
-            // Crea il manager con alcuni scenari di esempio
-            ScenarioManager scenarioManager = creaScenariDiEsempio();
-
-            // Crea un mock semplice per ParametroManager (null-safe per il test UI)
-            ParametroManager parametroManager = null; // In un test reale useresti un mock
-
             // Crea GestoreStanze con una Casa vuota per il test UI
             Casa casa = new Casa();
             GestoreStanze gestoreStanze = new GestoreStanze(casa);
 
-            // Crea il controller con tutti e 4 i parametri richiesti
-            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, parametroManager, gestoreStanze);
+            // Crea il manager con alcuni scenari di esempio
+            ScenarioManager scenarioManager = creaScenariDiEsempio(gestoreStanze);
+
+            // Crea il controller
+            ScenariController controller = new ScenariController(scenariPanel, scenarioManager, gestoreStanze);
 
             // Aggiungi il pannello alla finestra
             frame.add(scenariPanel);
@@ -63,8 +64,10 @@ public class TestUIScenariController {
     /**
      * Crea alcuni scenari di esempio per il test
      */
-    private static ScenarioManager creaScenariDiEsempio() {
-        ScenarioManager manager = new ScenarioManager();
+    private static ScenarioManager creaScenariDiEsempio(GestoreStanze gestoreStanze) {
+        // Crea un mock repository in-memory per i test
+        // ParametroManager con mock per il test (non invia comandi reali)
+        ScenarioManager manager = new ScenarioManager(new MockScenarioRepository(), null);
 
         // Scenario 1: Mattina
         manager.creaScenario("Mattina", EnumScenarioType.PREDEFINITO);
@@ -84,5 +87,62 @@ public class TestUIScenariController {
         );
 
         return manager;
+    }
+
+    /**
+     * Mock in-memory del repository scenari per i test UI
+     */
+    private static class MockScenarioRepository implements IScenarioRepository {
+        private final List<Scenario> scenari = new ArrayList<>();
+
+        @Override
+        public void save(Scenario scenario) {
+            scenari.add(scenario);
+        }
+
+        @Override
+        public void update(Scenario scenario) {
+            // Mock: non fa nulla
+        }
+
+        @Override
+        public boolean delete(String id) {
+            return scenari.removeIf(s -> s.getId().equals(id));
+        }
+
+        @Override
+        public Optional<Scenario> findById(String id) {
+            return scenari.stream().filter(s -> s.getId().equals(id)).findFirst();
+        }
+
+        @Override
+        public Optional<Scenario> findByNome(String nome) {
+            return scenari.stream().filter(s -> s.getNome().equals(nome)).findFirst();
+        }
+
+        @Override
+        public List<Scenario> findAll() {
+            return new ArrayList<>(scenari);
+        }
+
+        @Override
+        public List<Scenario> findByTipo(EnumScenarioType tipo) {
+            return scenari.stream().filter(s -> s.getTipo_scenario() == tipo).toList();
+        }
+
+        @Override
+        public List<Scenario> findByActive(boolean active) {
+            return scenari.stream().filter(s -> s.isActive() == active).toList();
+        }
+
+        @Override
+        public boolean existsByNome(String nome) {
+            return scenari.stream().anyMatch(s -> s.getNome().equals(nome));
+        }
+
+        @Override
+        public int count() {
+            return scenari.size();
+        }
     }
 }

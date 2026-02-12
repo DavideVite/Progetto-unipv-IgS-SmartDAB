@@ -18,15 +18,6 @@ import it.unipv.posfw.smartdab.core.service.strategy.ActuationStrategy.Actuation
 import it.unipv.posfw.smartdab.core.service.strategy.DirectMatchStrategy;
 
 /**
- * REFACTORING: Inversione delle Dipendenze (DIP)
- * - Prima: Dipendeva da IEventBusClient e Request (infrastructure)
- *          Conteneva "SETPOINT" hardcoded
- * - Dopo: Dipende da ICommandSender (core.port) - Output Port
- *
- * REFACTORING: Strategy Pattern per distribuzione comandi
- * - La logica di selezione degli attuatori e' delegata a ActuationStrategy
- * - Strategie disponibili: DirectMatch, Broadcast, LoadBalancing, EcoEfficiency
- * - Cambio strategia a runtime via setActuationStrategy()
  *
  * PATTERN OBSERVER:
  * - Implementa Observable per notificare quando un parametro viene impostato
